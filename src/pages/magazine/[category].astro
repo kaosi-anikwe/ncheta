@@ -60,7 +60,7 @@ const currentPage = 1;
 
     <!-- Breadcrumb -->
     <nav class="mb-6 flex items-center gap-2 font-inter text-xs text-noir/40" aria-label="Breadcrumb">
-      <a href="/" class="hover:text-lime transition-colors">Home</a>
+      <a href="/" class=" transition-colors">Home</a>
       <span aria-hidden="true">/</span>
       <span class="text-noir/70">{categoryName}</span>
     </nav>
@@ -105,7 +105,7 @@ const currentPage = 1;
             "px-3 py-2 font-inter text-sm border transition-colors duration-150",
             currentPage === 1
               ? "border-noir/10 text-noir/25 cursor-not-allowed"
-              : "border-noir/20 text-noir hover:border-lime hover:text-lime",
+              : "border-noir/20 text-noir hover:border-lime ",
           ]}
           aria-label="Previous page"
         >
@@ -120,7 +120,7 @@ const currentPage = 1;
               "w-9 h-9 flex items-center justify-center font-inter text-sm border transition-colors duration-150",
               page === currentPage
                 ? "bg-noir text-cotton border-noir"
-                : "border-noir/15 text-noir/65 hover:border-lime hover:text-lime",
+                : "border-noir/15 text-noir/65 hover:border-lime ",
             ]}
           >
             {page}
@@ -135,7 +135,7 @@ const currentPage = 1;
             "px-3 py-2 font-inter text-sm border transition-colors duration-150",
             currentPage === totalPages
               ? "border-noir/10 text-noir/25 cursor-not-allowed"
-              : "border-noir/20 text-noir hover:border-lime hover:text-lime",
+              : "border-noir/20 text-noir hover:border-lime ",
           ]}
           aria-label="Next page"
         >

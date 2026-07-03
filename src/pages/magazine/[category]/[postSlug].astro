@@ -113,13 +113,13 @@ function fmtDate(d: string) {
     <!-- ── Breadcrumb ──────────────────────────────────────────── -->
     <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
       <nav class="flex items-center gap-2 font-inter text-xs text-noir/40 mb-7" aria-label="Breadcrumb">
-        <a href="/" class="hover:text-lime transition-colors">Home</a>
+        <a href="/" class=" transition-colors">Home</a>
         <span aria-hidden="true">/</span>
-        <a href={`/magazine/${articleCategory.slug}`} class="hover:text-lime transition-colors capitalize">
+        <a href={`/magazine/${articleCategory.slug}`} class=" transition-colors capitalize">
           {articleCategory.name}
         </a>
         <span aria-hidden="true">/</span>
-        <span class="text-noir/60 truncate max-w-[200px]">{title}</span>
+        <span class="text-noir/60 truncate max-w-50">{title}</span>
       </nav>
     </div>
 
@@ -128,7 +128,7 @@ function fmtDate(d: string) {
       <!-- Category tag -->
       <a
         href={`/magazine/${articleCategory.slug}`}
-        class="tag-pill hover:text-lime transition-colors mb-4 block"
+        class="tag-pill  transition-colors mb-4 block"
       >
         {articleCategory.name}
       </a>
