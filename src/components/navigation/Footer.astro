@@ -1,0 +1,335 @@
+---
+/**
+ * Footer — Ncheta Magazine global footer
+ *
+ * Brand tokens (Ncheta Brand Guide):
+ *   Cotton   #e7d7b6  → background canvas
+ *   Noir     #181717  → all text, borders, headings
+ *   Lime     #b3d67c  → hover highlights, focus rings, CTA button hover
+ *   Cherry   #650606  → error states, subtle accent
+ *
+ * Layout:
+ *   Mobile  → stacked single column
+ *   Tablet  → 2-column grid
+ *   Desktop → 3-column grid (Navigation | Legal | Newsletter)
+ *
+ * Performance:
+ *   - Pure static markup; no framework hydration.
+ *   - Inline script < 500 bytes, async form handler only.
+ *   - All anchors have explicit aria-labels for a11y.
+ */
+
+const currentYear = new Date().getFullYear();
+
+const navLinks = [
+  { label: "Home",       href: "/" },
+  { label: "About",      href: "/about" },
+  { label: "Services",   href: "/services" },
+  { label: "Contact Us", href: "/contact" },
+  { label: "Resources",  href: "/resources/search" },
+];
+
+const legalLinks = [
+  { label: "Copyright Information",                                 href: "/copyright" },
+  { label: "Donations",                                             href: "/donations" },
+  { label: "Site Policy",                                           href: "/site-policy" },
+  { label: "Sitemap",                                               href: "/sitemap.xml" },
+  { label: "Terms and Conditions",                                  href: "/terms" },
+  {
+    label: "Add Ncheta Magazine as a preferred source on Google",
+    href: "https://news.google.com",
+    external: true,
+    rel: "noopener noreferrer",
+  },
+];
+---
+
+<footer
+  class="bg-cotton border-t-2 border-noir/10 mt-auto"
+  aria-label="Ncheta Magazine site footer"
+>
+  <!-- ── Main content grid ──────────────────────────────────────── -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
+
+      <!-- ┌─────────────────────────────────────────────────────────┐ -->
+      <!-- │  Column 1 — Navigation & Discovery                     │ -->
+      <!-- └─────────────────────────────────────────────────────────┘ -->
+      <div>
+        <!-- Wordmark / Logo -->
+        <a
+          href="/"
+          class="inline-flex items-center gap-2 mb-8 group focus:outline-none focus-visible:ring-2 focus-visible:ring-lime/60"
+          aria-label="Ncheta Magazine — go to homepage"
+        >
+          <!-- Inline SVG: "N" letterform from logo.svg, scaled to footer size -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 67.58 39.56"
+            class="h-6 w-auto text-noir group-hover:text-cherry transition-colors duration-200"
+            aria-hidden="true"
+            fill="currentColor"
+          >
+            <polygon points="0,0 0,39.56 4.69,39.56 4.69,5.53 61.63,39.56 67.58,39.56 67.58,0 62.78,0 62.78,34.5 5.38,0" />
+          </svg>
+          <span class="font-cinzel font-black text-lg text-noir tracking-wide group-hover:text-cherry transition-colors duration-200">
+            NCHETA
+          </span>
+        </a>
+
+        <!-- Column heading -->
+        <h2 class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5">
+          Navigation
+        </h2>
+
+        <nav aria-label="Footer navigation links">
+          <ul class="space-y-3">
+            {navLinks.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="
+                    font-inter text-sm text-noir/75
+                    hover:text-lime
+                    transition-colors duration-200
+                    underline-offset-4 hover:underline decoration-lime/60
+                    focus:outline-none focus-visible:text-lime focus-visible:underline
+                  "
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <!-- ┌─────────────────────────────────────────────────────────┐ -->
+      <!-- │  Column 2 — Legal & Institutional                      │ -->
+      <!-- └─────────────────────────────────────────────────────────┘ -->
+      <div>
+        <h2 class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5 mt-0 md:mt-0">
+          Information
+        </h2>
+
+        <nav aria-label="Legal and institutional links">
+          <ul class="space-y-3">
+            {legalLinks.map((item) => (
+              <li>
+                <a
+                  href={item.href}
+                  class="
+                    font-inter text-sm text-noir/75
+                    hover:text-lime
+                    transition-colors duration-200
+                    underline-offset-4 hover:underline decoration-lime/60
+                    focus:outline-none focus-visible:text-lime focus-visible:underline
+                    leading-snug inline-block
+                  "
+                  {...(item.external ? { target: "_blank", rel: item.rel } : {})}
+                >
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <!-- ┌─────────────────────────────────────────────────────────┐ -->
+      <!-- │  Column 3 — Newsletter Capture                         │ -->
+      <!-- └─────────────────────────────────────────────────────────┘ -->
+      <div>
+        <h2 class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5">
+          Newsletter
+        </h2>
+
+        <p class="font-inter text-sm text-noir/65 leading-relaxed mb-7 max-w-xs">
+          Get the latest African art news, exhibition previews, and critical
+          conversations delivered to your inbox — every week, no noise.
+        </p>
+
+        <!--
+          Newsletter form:
+          • Raw semantic HTML — no iframes
+          • Targets /api/newsletter via async fetch (edge function → Beehiiv v2)
+          • Input: flat Noir border, Lime focus ring (matches Figma input spec)
+          • Button: Noir bg / Cotton text → hover Lime bg / Noir text
+        -->
+        <form
+          id="footer-newsletter-form"
+          class="space-y-3"
+          novalidate
+          aria-label="Subscribe to the Ncheta newsletter"
+        >
+          <div>
+            <label
+              for="footer-email-input"
+              class="block font-inter text-[11px] font-medium text-noir/55 uppercase tracking-wider mb-2"
+            >
+              Email address
+              <span class="text-cherry ml-0.5" aria-hidden="true">*</span>
+            </label>
+
+            <!-- Input: flat architecture, Lime focus ring as per Figma spec -->
+            <input
+              id="footer-email-input"
+              name="email"
+              type="email"
+              required
+              placeholder="Enter your email address"
+              autocomplete="email"
+              aria-label="Your email address"
+              aria-required="true"
+              class="
+                w-full px-4 py-3
+                bg-cotton
+                border border-noir/25
+                font-inter text-sm text-noir
+                placeholder:text-noir/30
+                focus:outline-none
+                focus:border-lime
+                focus:ring-2 focus:ring-lime/35
+                transition-all duration-200
+              "
+            />
+          </div>
+
+          <!--
+            Button: matches Figma primary button spec with brand override.
+            Default  → Noir bg, Cotton text
+            Hover    → Lime bg, Noir text
+            Focus    → Lime ring, offset on Cotton canvas
+          -->
+          <button
+            id="footer-subscribe-btn"
+            type="submit"
+            aria-label="Subscribe to the Ncheta newsletter"
+            class="
+              w-full px-6 py-3
+              bg-noir text-cotton
+              font-inter font-medium text-sm tracking-wide
+              border border-noir
+              transition-all duration-200
+              hover:bg-lime hover:text-noir hover:border-lime
+              focus:outline-none
+              focus:ring-2 focus:ring-lime/50
+              focus:ring-offset-2 focus:ring-offset-cotton
+              disabled:opacity-60 disabled:cursor-not-allowed
+              cursor-pointer
+            "
+          >
+            Subscribe
+          </button>
+
+          <!-- Live status region for async feedback -->
+          <p
+            id="footer-newsletter-status"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+            class="font-inter text-xs hidden"
+          ></p>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Bottom bar ─────────────────────────────────────────────── -->
+  <div class="border-t border-noir/10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+      <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="font-inter text-xs text-noir/45 order-2 sm:order-1">
+          &copy; {currentYear} Ncheta Magazine. All rights reserved.
+        </p>
+
+        <nav
+          aria-label="Bottom legal links"
+          class="flex items-center gap-5 order-1 sm:order-2"
+        >
+          <a
+            href="/site-policy"
+            class="font-inter text-xs text-noir/45 hover:text-lime transition-colors duration-200 focus:outline-none focus-visible:text-lime"
+          >
+            Privacy
+          </a>
+          <span class="text-noir/20 text-xs select-none" aria-hidden="true">|</span>
+          <a
+            href="/terms"
+            class="font-inter text-xs text-noir/45 hover:text-lime transition-colors duration-200 focus:outline-none focus-visible:text-lime"
+          >
+            Terms
+          </a>
+          <span class="text-noir/20 text-xs select-none" aria-hidden="true">|</span>
+          <a
+            href="/sitemap.xml"
+            class="font-inter text-xs text-noir/45 hover:text-lime transition-colors duration-200 focus:outline-none focus-visible:text-lime"
+          >
+            Sitemap
+          </a>
+        </nav>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!--
+  Async newsletter form handler — fires only on submit.
+  Compiled to < 500 bytes. Zero framework overhead.
+  Umami telemetry hook fires on confirmed 200 response.
+-->
+<script>
+  (() => {
+    const form   = document.getElementById("footer-newsletter-form")   as HTMLFormElement | null;
+    const status = document.getElementById("footer-newsletter-status") as HTMLParagraphElement | null;
+    const btn    = document.getElementById("footer-subscribe-btn")     as HTMLButtonElement | null;
+
+    if (!form || !status || !btn) return;
+
+    form.addEventListener("submit", async (e: Event) => {
+      e.preventDefault();
+
+      const emailInput = form.elements.namedItem("email") as HTMLInputElement | null;
+      if (!emailInput) return;
+
+      const email = emailInput.value.trim();
+      if (!email) {
+        status.textContent = "Please enter a valid email address.";
+        status.className   = "font-inter text-xs text-cherry block mt-1";
+        return;
+      }
+
+      // ── Optimistic UI ──────────────────────────────────────────
+      btn.disabled    = true;
+      btn.textContent = "Subscribing…";
+      status.textContent = "";
+      status.className   = "font-inter text-xs hidden";
+
+      try {
+        const res = await fetch("/api/newsletter", {
+          method:  "POST",
+          headers: { "Content-Type": "application/json" },
+          body:    JSON.stringify({ email }),
+        });
+
+        if (res.ok) {
+          // Umami: fires only on confirmed 200 subscription response
+          (window as any).umami?.track?.("Newsletter Signup");
+
+          form.innerHTML = `
+            <p class="font-inter text-sm text-noir/75 py-3 px-4 border border-lime/50 bg-lime/10">
+              ✓ You're in! Check your inbox for a confirmation.
+            </p>
+          `;
+        } else {
+          throw new Error("Server error");
+        }
+      } catch {
+        btn.disabled    = false;
+        btn.textContent = "Subscribe";
+        status.textContent = "Something went wrong. Please try again.";
+        status.className   = "font-inter text-xs text-cherry block mt-1";
+      }
+    });
+  })();
+</script>

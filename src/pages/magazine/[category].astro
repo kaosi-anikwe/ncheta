@@ -1,9 +1,9 @@
 ---
-// Category index page — breadcrumbs + item listing
+// Category index page — medium article grid with pagination
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
-import GridCard from "../../components/cards/GridCard.astro";
+import Footer from "../../components/navigation/Footer.astro";
+import ArticleCard from "../../components/cards/ArticleCard.astro";
 
 export async function getStaticPaths() {
   return [
@@ -19,31 +19,131 @@ export async function getStaticPaths() {
 }
 
 const { category } = Astro.params;
-const categoryName = category === "art-news" ? "Art News" : category?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Category";
-const categoryDescription = "Explore articles in this category.";
+const categoryName =
+  category === "art-news"
+    ? "Art News"
+    : category === "exhibitions-fairs"
+    ? "Exhibitions & Fairs"
+    : category === "galleries-museums"
+    ? "Galleries & Museums"
+    : category === "african-art-history"
+    ? "African Art History"
+    : category?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Category";
+
+// Placeholder articles — replaced by Sanity GROQ at build time
+const articles = [
+  { title: "Venice Biennale 2026: African Pavilions Take Center Stage", excerpt: "With a record number of African national pavilions, this year's Biennale signals a tectonic shift in global contemporary art.", category: categoryName, date: "2026-06-28", author: "Emeka Okafor", imageUrl: "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=600&q=75", href: `/magazine/${category}/venice-biennale` },
+  { title: "The Benin Bronzes: Restitution and the Politics of Return", excerpt: "Five years after the landmark repatriation agreement, scholars and curators assess the lasting impact on global museum practice.", category: categoryName, date: "2026-06-22", author: "Chisom Eze", imageUrl: "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=600&q=75", href: `/magazine/${category}/benin-bronzes` },
+  { title: "Wangechi Mutu on World-Building and Afrofuturist Ecologies", excerpt: "The Nairobi-born artist discusses her latest permanent commission at the Met and the role of myth-making in contemporary sculpture.", category: categoryName, date: "2026-06-18", author: "Adaeze Nwosu", imageUrl: "https://images.unsplash.com/photo-1531913764164-f85c52e6e654?w=600&q=75", href: `/magazine/${category}/wangechi-mutu` },
+  { title: "Ghana's Art Market Sees 300% Growth in Five Years", excerpt: "New data from the African Art Market Report reveals unprecedented growth driven by diaspora collectors and institutional acquisitions.", category: categoryName, date: "2026-06-15", author: "Samuel Agwu", imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=75", href: `/magazine/${category}/ghana-art-market` },
+  { title: "Curator Nontsikelelo Mutiti on Zimbabwe's Digital Art Renaissance", excerpt: "How a new generation of Zimbabwean artists are using artificial intelligence and code as their primary creative medium.", category: categoryName, date: "2026-06-10", author: "Tunde Adeyemi", imageUrl: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=600&q=75", href: `/magazine/${category}/nontsikelelo-mutiti` },
+  { title: "Re-reading Uche Okeke: Natural Synthesis in the 21st Century", excerpt: "A major new publication re-examines the artist-scholar's theoretical framework and its relevance to contemporary African practice.", category: categoryName, date: "2026-06-05", author: "Dr. Amara Diallo", imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&q=75", href: `/magazine/${category}/uche-okeke` },
+  { title: "Nigerian Government Launches ₦5bn National Arts Endowment", excerpt: "The landmark fund aims to support emerging artists and cultural institutions across all 36 states over the next decade.", category: categoryName, date: "2026-05-30", author: "Nkechi Obi", imageUrl: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=600&q=75", href: `/magazine/${category}/nigerian-arts-endowment` },
+  { title: "Zeitz MOCAA at Five: Cape Town's Cultural Transformation", excerpt: "The museum's impact on African contemporary art discourse, and the challenges of sustaining a world-class institution on a limited budget.", category: categoryName, date: "2026-05-25", author: "Nomvula Dlamini", imageUrl: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=600&q=75", href: `/magazine/${category}/zeitz-mocaa` },
+  { title: "Tate Modern Acquires Major African Photography Archive", excerpt: "The acquisition of the landmark collection signals a long-overdue shift in how Western institutions are approaching the African photographic tradition.", category: categoryName, date: "2026-05-20", author: "Yemi Hassan", imageUrl: "https://images.unsplash.com/photo-1568097904979-f6e3f1c6a5d4?w=600&q=75", href: `/magazine/${category}/tate-acquisition` },
+  { title: "Inside 1-54 London 2026: The Premier African Art Fair", excerpt: "This year's edition set new records for attendance and sales, cementing London's position as a global hub for the African art market.", category: categoryName, date: "2026-05-15", author: "Bisi Afolabi", imageUrl: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&q=75", href: `/magazine/${category}/1-54-london` },
+  { title: "Collecting Now: Five Artists Reshaping the Market", excerpt: "From Lagos to Accra to Cape Town, these five artists are commanding serious attention from collectors and institutions worldwide.", category: categoryName, date: "2026-05-10", author: "Fatima Diallo", imageUrl: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=600&q=75", href: `/magazine/${category}/five-artists` },
+  { title: "African Art History: The Missing Decades", excerpt: "A new generation of scholars is working to fill the gaps left by colonial-era historiography, recovering the voices and works that were silenced.", category: categoryName, date: "2026-05-05", author: "Dr. Amara Diallo", imageUrl: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=600&q=75", href: `/magazine/${category}/missing-decades` },
+];
+
+const ARTICLES_PER_PAGE = 12;
+const totalPages = Math.ceil(articles.length / ARTICLES_PER_PAGE);
+const currentPage = 1;
 ---
 
-<Layout title={categoryName}>
+<Layout
+  title={categoryName}
+  description={`Ncheta Magazine — ${categoryName}: African art news, analysis, and commentary.`}
+>
   <Header />
   <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <nav class="mb-8 text-sm font-inter text-white/40" aria-label="Breadcrumb">
-      <a href="/" class="hover:text-cotton transition-colors">Home</a>
-      <span class="mx-2">/</span>
-      <span class="text-white/70">{categoryName}</span>
+
+    <!-- Breadcrumb -->
+    <nav class="mb-6 flex items-center gap-2 font-inter text-xs text-noir/40" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-lime transition-colors">Home</a>
+      <span aria-hidden="true">/</span>
+      <span class="text-noir/70">{categoryName}</span>
     </nav>
-    <div class="mb-10">
-      <h1 class="font-cinzel font-bold text-3xl md:text-4xl lg:text-5xl text-white">{categoryName}</h1>
-      <p class="mt-3 text-white/50 text-lg max-w-2xl">{categoryDescription}</p>
+
+    <!-- Category heading -->
+    <div class="mb-8 border-b border-noir/10 pb-6">
+      <h1 class="font-cinzel font-bold text-3xl md:text-4xl lg:text-5xl text-noir">
+        {categoryName}
+      </h1>
+      <p class="mt-3 font-inter text-sm text-noir/50 max-w-2xl">
+        Explore in-depth coverage, analysis, and commentary on {categoryName.toLowerCase()} from across the continent and the diaspora.
+      </p>
     </div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      <GridCard
-        title="Sample Article Title"
-        excerpt="A brief excerpt describing the article content."
-        category={categoryName}
-        date="2026-07-01"
-        href="/magazine/art-news/sample-article"
-      />
+
+    <!-- Article grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
+      {articles.slice(0, ARTICLES_PER_PAGE).map((article) => (
+        <ArticleCard
+          variant="medium"
+          title={article.title}
+          excerpt={article.excerpt}
+          category={article.category}
+          date={article.date}
+          author={article.author}
+          imageUrl={article.imageUrl}
+          href={article.href}
+        />
+      ))}
     </div>
+
+    <!-- Pagination -->
+    {totalPages > 1 && (
+      <nav
+        class="mt-16 flex items-center justify-center gap-1"
+        aria-label="Pagination"
+      >
+        <!-- Previous -->
+        <a
+          href={currentPage > 1 ? `?page=${currentPage - 1}` : undefined}
+          aria-disabled={currentPage === 1}
+          class:list={[
+            "px-3 py-2 font-inter text-sm border transition-colors duration-150",
+            currentPage === 1
+              ? "border-noir/10 text-noir/25 cursor-not-allowed"
+              : "border-noir/20 text-noir hover:border-lime hover:text-lime",
+          ]}
+          aria-label="Previous page"
+        >
+          ←
+        </a>
+
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+          <a
+            href={`?page=${page}`}
+            aria-current={page === currentPage ? "page" : undefined}
+            class:list={[
+              "w-9 h-9 flex items-center justify-center font-inter text-sm border transition-colors duration-150",
+              page === currentPage
+                ? "bg-noir text-cotton border-noir"
+                : "border-noir/15 text-noir/65 hover:border-lime hover:text-lime",
+            ]}
+          >
+            {page}
+          </a>
+        ))}
+
+        <!-- Next -->
+        <a
+          href={currentPage < totalPages ? `?page=${currentPage + 1}` : undefined}
+          aria-disabled={currentPage === totalPages}
+          class:list={[
+            "px-3 py-2 font-inter text-sm border transition-colors duration-150",
+            currentPage === totalPages
+              ? "border-noir/10 text-noir/25 cursor-not-allowed"
+              : "border-noir/20 text-noir hover:border-lime hover:text-lime",
+          ]}
+          aria-label="Next page"
+        >
+          →
+        </a>
+      </nav>
+    )}
+
   </main>
   <Footer />
 </Layout>

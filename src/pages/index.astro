@@ -1,165 +1,394 @@
 ---
-// Homepage — hero, grid sections, middle CTA break
+/**
+ * index.astro — Ncheta Magazine Homepage
+ *
+ * Layout (per Figma):
+ *   [Navbar]
+ *   For each category section:
+ *     Section heading + "View all →"
+ *     ┌─────────────────────────────┬──────────────┐
+ *     │  ArticleCard variant="hero" │ small card 1 │
+ *     │  (spans 2/3 width)          │ small card 2 │
+ *     │                             │ small card 3 │
+ *     │                             │ small card 4 │
+ *     └─────────────────────────────┴──────────────┘
+ *     [text card] [text card] [text card] [text card]
+ *   [Footer]
+ */
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import HeroCard from "../components/cards/HeroCard.astro";
-import GridCard from "../components/cards/GridCard.astro";
-import Button from "../components/ui/Button.astro";
+import Footer from "../components/navigation/Footer.astro";
+import ArticleCard from "../components/cards/ArticleCard.astro";
+
+// ── Static placeholder data (replaced by Sanity GROQ at build time) ──
+const sections = [
+  {
+    title: "Latest",
+    slug: "art-news",
+    hero: {
+      title: "President and general manager of Sotheby's on revitalising the auction house for a new generation of collectors",
+      excerpt: "In a wide-ranging conversation, the new leadership team outlines a bold plan to remake the storied auction house for the digital era.",
+      category: "Art News",
+      href: "/magazine/art-news/sothebys-new-era",
+      imageUrl: "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=900&q=80",
+      date: "2026-07-01",
+      author: "Emeka Okafor",
+    },
+    small: [
+      {
+        title: "Bonhams set to sell major collection of West African bronze sculptures",
+        category: "Art Market",
+        href: "/magazine/art-news/bonhams-west-african",
+        imageUrl: "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=400&q=80",
+        date: "2026-06-30",
+      },
+      {
+        title: "Kenyan artist Wangechi Mutu opens new permanent commission at the Met",
+        category: "Exhibitions",
+        href: "/magazine/exhibitions-fairs/wangechi-mutu-met",
+        imageUrl: "https://images.unsplash.com/photo-1531913764164-f85c52e6e654?w=400&q=80",
+        date: "2026-06-28",
+      },
+      {
+        title: "Ghana's art market sees record growth in the secondary market",
+        category: "Art Market",
+        href: "/magazine/art-news/ghana-market-growth",
+        imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400&q=80",
+        date: "2026-06-25",
+      },
+      {
+        title: "1-54 London 2026: What to expect from this year's premier African art fair",
+        category: "Exhibitions & Fairs",
+        href: "/magazine/exhibitions-fairs/1-54-london-2026",
+        imageUrl: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=400&q=80",
+        date: "2026-06-22",
+      },
+    ],
+    text: [
+      {
+        title: "Nigeria's National Museum announces landmark repatriation agreement with British institutions",
+        category: "Art News",
+        href: "/magazine/art-news/nigeria-repatriation",
+        date: "2026-06-20",
+        author: "Chisom Eze",
+      },
+      {
+        title: "Decolonising the art archive: How Nigerian institutions are reclaiming their histories",
+        category: "Academia",
+        href: "/magazine/academia/decolonising-archive",
+        date: "2026-06-18",
+        author: "Tunde Adeyemi",
+      },
+      {
+        title: "In conversation with El Anatsui: Material, memory, and monumentality",
+        category: "Interviews",
+        href: "/magazine/interviews/el-anatsui",
+        date: "2026-06-15",
+        author: "Nkechi Obi",
+      },
+      {
+        title: "Collecting Now: Five emerging African artists to watch in the second half of 2026",
+        category: "Collecting Now",
+        href: "/magazine/collecting-now/five-emerging-artists",
+        date: "2026-06-12",
+        author: "Yemi Hassan",
+      },
+    ],
+  },
+  {
+    title: "Art Market",
+    slug: "art-news",
+    hero: {
+      title: "19th-century bronze: Laceeba leads Lceeba Old Master auctions, selling for £1.5m at Sotheby's",
+      excerpt: "A spectacular result for the historic bronze underscores growing institutional appetite for pre-colonial African objects.",
+      category: "Art Market",
+      href: "/magazine/art-news/laceeba-bronze-sothebys",
+      imageUrl: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=900&q=80",
+      date: "2026-06-10",
+      author: "Samuel Agwu",
+    },
+    small: [
+      {
+        title: "Christie's September auction to feature rare Yoruba beaded crown",
+        category: "Art Market",
+        href: "/magazine/art-news/christies-yoruba-crown",
+        imageUrl: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=400&q=80",
+        date: "2026-06-08",
+      },
+      {
+        title: "The market for South African modernists is finally catching up",
+        category: "Art Market",
+        href: "/magazine/art-news/south-african-modernists",
+        imageUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&q=80",
+        date: "2026-06-05",
+      },
+      {
+        title: "Gallery Friday: inside the fastest-growing art fair in East Africa",
+        category: "Exhibitions",
+        href: "/magazine/exhibitions-fairs/gallery-friday",
+        imageUrl: "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=400&q=80",
+        date: "2026-06-02",
+      },
+      {
+        title: "How digital platforms are disrupting the traditional African art market",
+        category: "Art Market",
+        href: "/magazine/collecting-now/digital-disruption",
+        imageUrl: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&q=80",
+        date: "2026-05-30",
+      },
+    ],
+    text: [
+      {
+        title: "Prices for Enwonwu works have tripled in five years. What's driving the surge?",
+        category: "Art Market",
+        href: "/magazine/art-news/enwonwu-price-surge",
+        date: "2026-05-28",
+        author: "Bisi Afolabi",
+      },
+      {
+        title: "Understanding provenance: why collectors must ask harder questions",
+        category: "Academia",
+        href: "/magazine/academia/understanding-provenance",
+        date: "2026-05-25",
+        author: "Dr. Amara Diallo",
+      },
+      {
+        title: "Inside a Nairobi collector's extraordinary trove of East African ceramics",
+        category: "Collecting Now",
+        href: "/magazine/collecting-now/nairobi-ceramics",
+        date: "2026-05-22",
+        author: "Wanjiku Kamau",
+      },
+      {
+        title: "Auction preview: ten lots every African art collector should watch this season",
+        category: "Art Market",
+        href: "/magazine/art-news/ten-lots-to-watch",
+        date: "2026-05-20",
+        author: "Samuel Agwu",
+      },
+    ],
+  },
+  {
+    title: "The Art of Luxury",
+    slug: "collecting-now",
+    hero: {
+      title: "From the Hamptons to Saint-Tropez: design fairs, P&D and festival failures",
+      excerpt: "As the summer circuit winds down, we examine which design fairs delivered and which failed to live up to their own billing.",
+      category: "Collecting Now",
+      href: "/magazine/collecting-now/summer-fairs-review",
+      imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=80",
+      date: "2026-05-18",
+      author: "Adaeze Nwosu",
+    },
+    small: [
+      {
+        title: "Mexican chef brings spirit of Frida Kahlo to São Paulo pop-up",
+        category: "The Art of Luxury",
+        href: "/magazine/collecting-now/frida-kahlo-popup",
+        imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80",
+        date: "2026-05-15",
+      },
+      {
+        title: "Perfectly poached: the rise of art-focused hospitality experiences",
+        category: "The Art of Luxury",
+        href: "/magazine/collecting-now/art-hospitality",
+        imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
+        date: "2026-05-12",
+      },
+      {
+        title: "International: the new power season in contemporary art",
+        category: "Exhibitions",
+        href: "/magazine/exhibitions-fairs/power-season",
+        imageUrl: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=400&q=80",
+        date: "2026-05-10",
+      },
+      {
+        title: "Tate Modern acquires landmark collection of African photography",
+        category: "Galleries & Museums",
+        href: "/magazine/galleries-museums/tate-african-photography",
+        imageUrl: "https://images.unsplash.com/photo-1568097904979-f6e3f1c6a5d4?w=400&q=80",
+        date: "2026-05-08",
+      },
+    ],
+    text: [
+      {
+        title: "A guide to the best African art residencies accepting applications this year",
+        category: "Resources",
+        href: "/resources/art-residencies-2026",
+        date: "2026-05-06",
+        author: "Sade Johnson",
+      },
+      {
+        title: "Luxury, craft, and identity: the new generation of African fashion and fine art crossovers",
+        category: "Collecting Now",
+        href: "/magazine/collecting-now/fashion-art-crossover",
+        date: "2026-05-04",
+        author: "Fatima Diallo",
+      },
+      {
+        title: "Five African museums that are quietly building world-class permanent collections",
+        category: "Galleries & Museums",
+        href: "/magazine/galleries-museums/five-african-museums",
+        date: "2026-05-02",
+        author: "Chukwuemeka Osei",
+      },
+      {
+        title: "The Zeitz MOCAA at five: how it changed Cape Town's cultural landscape",
+        category: "Galleries & Museums",
+        href: "/magazine/galleries-museums/zeitz-mocaa-five-years",
+        date: "2026-04-30",
+        author: "Nomvula Dlamini",
+      },
+    ],
+  },
+];
 ---
 
-<Layout title="Home" description="Ncheta Magazine — African art news, academia, interviews, and exhibitions.">
+<Layout
+  title="Home"
+  description="Ncheta Magazine — African art news, academia, interviews, and exhibitions."
+>
   <Header />
+
   <main>
-    <!-- Hero Section -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-12">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-2">
-          <HeroCard
-            title="The New Vanguard: Contemporary African Artists Reshaping Global Narratives"
-            excerpt="From Lagos to London, a new generation of African artists is reclaiming agency and redefining what the world understands as contemporary African art."
-            category="Art News"
-            href="/magazine/art-news/the-new-vanguard"
-          />
+    {sections.map((section, sectionIndex) => (
+      <section
+        class:list={[
+          "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+          sectionIndex === 0 ? "pt-8 pb-10" : "py-10",
+        ]}
+      >
+        <!-- Section header -->
+        <div class="flex items-baseline justify-between mb-6 border-b border-noir/15 pb-3">
+          <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-noir">
+            {section.title}
+          </h2>
+          <a
+            href={`/magazine/${section.slug}`}
+            class="font-inter text-xs font-medium text-noir/45 hover:text-lime transition-colors duration-150 uppercase tracking-widest"
+          >
+            View all →
+          </a>
         </div>
-        <div class="flex flex-col gap-4">
-          <div class="bg-cotton/5 border border-white/5 rounded-lg p-5">
-            <h3 class="font-cinzel font-bold text-cotton text-lg mb-3">Latest Stories</h3>
-            <ul class="space-y-4">
-              <li>
-                <a href="#" class="group">
-                  <span class="text-xs text-cherry font-medium uppercase tracking-wider">Academia</span>
-                  <p class="text-sm text-white/80 group-hover:text-cotton transition-colors mt-1 leading-snug">
-                    Decolonizing Art History Curricula in West African Universities
-                  </p>
-                </a>
-              </li>
-              <li>
-                <a href="#" class="group">
-                  <span class="text-xs text-cherry font-medium uppercase tracking-wider">Exhibitions &amp; Fairs</span>
-                  <p class="text-sm text-white/80 group-hover:text-cotton transition-colors mt-1 leading-snug">
-                    1-54 London 2026: What to Expect from the Premier African Art Fair
-                  </p>
-                </a>
-              </li>
-              <li>
-                <a href="#" class="group">
-                  <span class="text-xs text-cherry font-medium uppercase tracking-wider">Interviews</span>
-                  <p class="text-sm text-white/80 group-hover:text-cotton transition-colors mt-1 leading-snug">
-                    In Conversation with El Anatsui: Material, Memory, and Monumentality
-                  </p>
-                </a>
-              </li>
-            </ul>
+
+        <!-- Hero + 2×2 grid of small cards -->
+        <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr] xl:grid-cols-[3fr_2fr] gap-6 mb-0">
+          <!-- Hero card -->
+          <div>
+            <ArticleCard
+              variant="hero"
+              title={section.hero.title}
+              excerpt={section.hero.excerpt}
+              category={section.hero.category}
+              href={section.hero.href}
+              imageUrl={section.hero.imageUrl}
+              author={section.hero.author}
+              date={section.hero.date}
+            />
+          </div>
+
+          <!-- 4 small cards in a 2×2 grid -->
+          <div class="grid grid-cols-2 gap-4 mt-4 lg:mt-0">
+            {section.small.map((card) => (
+              <ArticleCard
+                variant="small"
+                title={card.title}
+                category={card.category}
+                href={card.href}
+                imageUrl={card.imageUrl}
+                date={card.date}
+              />
+            ))}
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Middle CTA Break -->
-    <section class="bg-cherry/10 border-y border-white/5 py-16 my-6">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="font-cinzel font-bold text-3xl md:text-4xl text-cotton">
-          Sign up for the Ncheta Newsletter
+        <!-- 4 text-only article links below -->
+        <div class="border-t border-noir/10 mt-5 pt-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
+          {section.text.map((card, i) => (
+            <ArticleCard
+              variant="text"
+              title={card.title}
+              category={card.category}
+              href={card.href}
+              date={card.date}
+              author={card.author}
+              bordered={i < section.text.length - 1}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- Mid-page newsletter CTA strip -->
+    <section class="bg-noir py-16 my-4">
+      <div class="max-w-2xl mx-auto px-4 sm:px-6 text-center">
+        <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton mb-3">
+          Subscribe to the Ncheta Newsletter
         </h2>
-        <p class="mt-3 text-white/60 text-lg max-w-2xl mx-auto">
-          Weekly curation of the most important stories in African art — delivered straight to your inbox.
+        <p class="font-inter text-sm text-cotton/60 mb-8 max-w-md mx-auto leading-relaxed">
+          Weekly curation of the most important African art stories — delivered straight to your inbox.
         </p>
-        <form class="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="event.preventDefault(); handleNewsletterSubmit(this);">
+        <form
+          id="home-newsletter-form"
+          class="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
+          novalidate
+        >
           <input
-            type="email"
+            id="home-email"
             name="email"
+            type="email"
             required
-            placeholder="your@email.com"
-            class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded text-white placeholder:text-white/30 focus:outline-none focus:border-cherry font-inter text-sm"
+            placeholder="Enter your email address"
+            aria-label="Your email address"
+            class="flex-1 px-4 py-3 bg-cotton/10 border border-cotton/20 text-cotton placeholder:text-cotton/35 font-inter text-sm focus:outline-none focus:border-lime focus:ring-1 focus:ring-lime/40 transition-all"
           />
-          <Button type="submit">Subscribe</Button>
+          <button
+            type="submit"
+            class="px-6 py-3 bg-lime text-noir font-inter font-medium text-sm hover:bg-lime/90 transition-colors duration-150 whitespace-nowrap"
+          >
+            Subscribe
+          </button>
         </form>
-      </div>
-    </section>
-
-    <!-- Category Grids -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="flex items-center justify-between mb-8">
-        <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton">Art News</h2>
-        <a href="/magazine/art-news" class="text-sm text-white/50 hover:text-lime transition-colors font-inter">
-          View all →
-        </a>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        <GridCard
-          title="Venice Biennale 2026: African Pavilions Take Center Stage"
-          excerpt="With a record number of African national pavilions, this year's Biennale signals a tectonic shift."
-          category="Art News"
-          date="2026-06-28"
-          href="/magazine/art-news/venice-biennale-2026"
-        />
-        <GridCard
-          title="Ghana's Art Market Sees 300% Growth in Five Years"
-          excerpt="New data from the African Art Market Report reveals unprecedented growth in West African art sales."
-          category="Art News"
-          date="2026-06-22"
-          href="/magazine/art-news/ghana-art-market"
-        />
-        <GridCard
-          title="Nigerian Government Launches National Arts Endowment"
-          excerpt="The ₦5 billion fund aims to support emerging artists and cultural institutions across the country."
-          category="Art News"
-          date="2026-06-15"
-          href="/magazine/art-news/nigerian-arts-endowment"
-        />
-      </div>
-    </section>
-
-    <!-- Second Grid: Academia + Interviews -->
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-        <div>
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton">Academia</h2>
-            <a href="/magazine/academia" class="text-sm text-white/50 hover:text-lime transition-colors font-inter">View all →</a>
-          </div>
-          <div class="space-y-5">
-            <GridCard
-              title="The Benin Bronzes: Restitution and the Politics of Return"
-              excerpt="Five years after the landmark repatriation, scholars assess the impact on museum practice."
-              category="Academia"
-              date="2026-07-01"
-              href="/magazine/academia/benin-bronzes-restitution"
-            />
-            <GridCard
-              title="Re-reading Uche Okeke: Natural Synthesis in the 21st Century"
-              excerpt="A major new publication re-examines Okeke's theoretical framework for contemporary practice."
-              category="Academia"
-              date="2026-06-18"
-              href="/magazine/academia/uche-okeke"
-            />
-          </div>
-        </div>
-        <div>
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton">Interviews</h2>
-            <a href="/magazine/interviews" class="text-sm text-white/50 hover:text-lime transition-colors font-inter">View all →</a>
-          </div>
-          <div class="space-y-5">
-            <GridCard
-              title="Wangechi Mutu on World-Building and Afrofuturist Ecologies"
-              excerpt="The Nairobi-born artist discusses her latest installation at the Met and the role of myth-making."
-              category="Interviews"
-              date="2026-06-25"
-              href="/magazine/interviews/wangechi-mutu"
-            />
-            <GridCard
-              title="Curator Nontsikelelo Mutiti on Zimbabwe's Digital Art Renaissance"
-              excerpt="How a new generation of Zimbabwean artists are using AI and code as their medium."
-              category="Interviews"
-              date="2026-06-10"
-              href="/magazine/interviews/nontsikelelo-mutiti"
-            />
-          </div>
-        </div>
+        <p id="home-newsletter-status" role="status" aria-live="polite" class="mt-3 font-inter text-sm text-cotton/50 hidden"></p>
       </div>
     </section>
   </main>
+
   <Footer />
 </Layout>
+
+<script>
+  (() => {
+    const form   = document.getElementById("home-newsletter-form") as HTMLFormElement | null;
+    const status = document.getElementById("home-newsletter-status") as HTMLParagraphElement | null;
+    if (!form || !status) return;
+
+    form.addEventListener("submit", async (e: Event) => {
+      e.preventDefault();
+      const input = form.elements.namedItem("email") as HTMLInputElement;
+      const email = input?.value.trim();
+      if (!email) return;
+
+      const btn = form.querySelector("button") as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = "Subscribing…";
+
+      try {
+        const res = await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        if (res.ok) {
+          (window as any).umami?.track?.("Newsletter Signup");
+          form.innerHTML = `<p class="font-inter text-sm text-lime">✓ You're subscribed! Check your inbox.</p>`;
+        } else { throw new Error(); }
+      } catch {
+        btn.disabled = false;
+        btn.textContent = "Subscribe";
+        status.textContent = "Something went wrong. Please try again.";
+        status.className = "mt-3 font-inter text-sm text-cherry/80 block";
+      }
+    });
+  })();
+</script>

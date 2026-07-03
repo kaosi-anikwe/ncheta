@@ -1,62 +1,69 @@
 @import "tailwindcss";
 
-/* Ncheta Brand Design Tokens */
+/* ── Ncheta Brand Design Tokens ──────────────────────────────── */
 @theme {
-  --color-noir: #181717;
+  --color-noir:   #181717;
   --color-cherry: #650606;
   --color-maroon: #630000;
   --color-cotton: #e7d7b6;
-  --color-lime: #b3d67c;
+  --color-lime:   #b3d67c;
+
   --font-cinzel: "Cinzel", serif;
-  --font-inter: "Inter", sans-serif;
+  --font-inter:  "Inter", sans-serif;
 }
 
-/* Base layer */
+/* ── Base layer: Cotton canvas, Noir text ────────────────────── */
 @layer base {
   body {
-    @apply bg-noir text-white font-inter antialiased;
+    @apply bg-cotton text-noir font-inter antialiased;
   }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-cinzel;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-cinzel text-noir;
   }
 }
 
-/* PortableText prose styles */
+/* ── Article prose styles (on Cotton background) ─────────────── */
 @layer components {
   .prose-content {
-    @apply text-white/90 leading-relaxed;
+    @apply text-noir/85 leading-relaxed;
   }
   .prose-content p {
-    @apply mb-5 text-lg;
+    @apply mb-6 text-lg font-inter leading-[1.85];
   }
   .prose-content h2 {
-    @apply text-2xl md:text-3xl font-bold mt-10 mb-4 text-cotton;
+    @apply text-2xl md:text-3xl font-bold mt-12 mb-5 text-noir font-cinzel;
   }
   .prose-content h3 {
-    @apply text-xl md:text-2xl font-semibold mt-8 mb-3 text-cotton;
+    @apply text-xl md:text-2xl font-semibold mt-10 mb-4 text-noir font-cinzel;
   }
   .prose-content a {
-    @apply text-lime underline decoration-lime/50 hover:decoration-lime;
+    @apply text-cherry underline decoration-cherry/40 hover:decoration-cherry transition-colors;
   }
   .prose-content blockquote {
-    @apply border-l-4 border-cherry pl-6 italic text-white/70 my-8;
+    @apply border-l-4 border-cherry pl-6 italic text-noir/60 my-10 text-xl;
   }
   .prose-content ul,
   .prose-content ol {
-    @apply ml-6 mb-5 space-y-2;
+    @apply ml-6 mb-6 space-y-2 font-inter text-lg;
   }
-  .prose-content ul {
-    @apply list-disc;
+  .prose-content ul  { @apply list-disc; }
+  .prose-content ol  { @apply list-decimal; }
+  .prose-content img { @apply my-10 w-full; }
+  .prose-content strong { @apply font-semibold text-noir; }
+
+  /* Category tag pill */
+  .tag-pill {
+    @apply inline-block font-inter text-[11px] font-medium uppercase tracking-widest text-noir/60;
   }
-  .prose-content ol {
-    @apply list-decimal;
+
+  /* Section divider */
+  .section-rule {
+    @apply border-t border-noir/10 my-10;
   }
-  .prose-content img {
-    @apply rounded-lg my-8 w-full;
+
+  /* Nav active indicator */
+  .nav-item--active::after {
+    content: "";
+    @apply absolute bottom-0 left-3 right-3 h-[2px] bg-lime rounded-full;
   }
 }

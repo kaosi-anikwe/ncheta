@@ -1,28 +1,130 @@
 ---
-// Contact page
+// Contact page — Cotton background, Noir text, Lime focus, brand-correct form
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
-import Footer from "../components/Footer.astro";
-import InputField from "../components/ui/InputField.astro";
-import Button from "../components/ui/Button.astro";
+import Footer from "../components/navigation/Footer.astro";
 ---
 
-<Layout title="Contact" description="Get in touch with Ncheta Magazine.">
+<Layout
+  title="Contact"
+  description="Get in touch with the Ncheta Magazine editorial team."
+>
   <Header />
   <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-    <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-white mb-3">Contact</h1>
-    <p class="text-white/50 text-lg mb-10">Have a story tip, press inquiry, or want to collaborate? Reach out.</p>
+    <!-- Breadcrumb -->
+    <nav class="mb-8 font-inter text-xs text-noir/40 flex gap-2" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-lime transition-colors">Home</a>
+      <span>/</span>
+      <span class="text-noir/60">Contact</span>
+    </nav>
 
-    <form class="space-y-5" onsubmit="event.preventDefault(); alert('Message sent!');">
+    <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-noir mb-3">Contact Us</h1>
+    <p class="font-inter text-base text-noir/55 mb-10 border-l-2 border-lime pl-4">
+      Story tips, press enquiries, editorial pitches, or partnership proposals — we read everything.
+    </p>
+
+    <!-- Contact form: flat borders, Lime focus, Noir submit button -->
+    <form
+      id="contact-form"
+      class="space-y-5"
+      novalidate
+      aria-label="Contact form"
+    >
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <InputField name="firstName" label="First Name" required />
-        <InputField name="lastName" label="Last Name" required />
+        <div class="space-y-1.5">
+          <label for="firstName" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+            First Name <span class="text-cherry" aria-hidden="true">*</span>
+          </label>
+          <input
+            id="firstName" name="firstName" type="text" required
+            placeholder="First name"
+            aria-required="true"
+            class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+          />
+        </div>
+        <div class="space-y-1.5">
+          <label for="lastName" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+            Last Name <span class="text-cherry" aria-hidden="true">*</span>
+          </label>
+          <input
+            id="lastName" name="lastName" type="text" required
+            placeholder="Last name"
+            aria-required="true"
+            class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+          />
+        </div>
       </div>
-      <InputField name="email" label="Email" type="email" required />
-      <InputField name="subject" label="Subject" required />
-      <InputField name="message" label="Message" type="textarea" required />
-      <Button type="submit">Send Message</Button>
+
+      <div class="space-y-1.5">
+        <label for="email" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+          Email <span class="text-cherry" aria-hidden="true">*</span>
+        </label>
+        <input
+          id="email" name="email" type="email" required
+          placeholder="your@email.com"
+          aria-required="true"
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+        />
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="subject" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+          Subject <span class="text-cherry" aria-hidden="true">*</span>
+        </label>
+        <input
+          id="subject" name="subject" type="text" required
+          placeholder="What is your enquiry about?"
+          aria-required="true"
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+        />
+      </div>
+
+      <div class="space-y-1.5">
+        <label for="message" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+          Message <span class="text-cherry" aria-hidden="true">*</span>
+        </label>
+        <textarea
+          id="message" name="message" required rows={5}
+          placeholder="Tell us about your enquiry..."
+          aria-required="true"
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all resize-y min-h-[120px]"
+        ></textarea>
+      </div>
+
+      <!-- Submit: Noir bg / Cotton text → Lime bg / Noir text on hover -->
+      <button
+        type="submit"
+        class="w-full px-6 py-3 bg-noir text-cotton font-inter font-medium text-sm border border-noir hover:bg-lime hover:text-noir hover:border-lime focus:outline-none focus:ring-2 focus:ring-lime/50 focus:ring-offset-2 focus:ring-offset-cotton transition-all duration-200"
+      >
+        Send Message
+      </button>
+
+      <p id="contact-status" role="status" aria-live="polite" class="font-inter text-sm hidden"></p>
     </form>
   </main>
   <Footer />
 </Layout>
+
+<script>
+  (() => {
+    const form = document.getElementById("contact-form") as HTMLFormElement | null;
+    const status = document.getElementById("contact-status") as HTMLParagraphElement | null;
+    if (!form || !status) return;
+    form.addEventListener("submit", async (e: Event) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(form).entries());
+      const btn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+      btn.disabled = true;
+      btn.textContent = "Sending…";
+      try {
+        await fetch("/api/inbound", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        form.innerHTML = `<div class="py-8 text-center"><p class="font-cinzel font-bold text-xl text-noir mb-2">Message received</p><p class="font-inter text-sm text-noir/55">We'll be in touch within 48 hours.</p></div>`;
+      } catch {
+        btn.disabled = false;
+        btn.textContent = "Send Message";
+        status.textContent = "Something went wrong. Please try again.";
+        status.className = "font-inter text-sm text-cherry block";
+      }
+    });
+  })();
+</script>
