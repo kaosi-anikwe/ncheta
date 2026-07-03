@@ -59,7 +59,7 @@ function fmtDate(d: string | undefined) {
     aria-label={title}
   >
     {/* Image — no overlay, no absolute text */}
-    <div class="overflow-hidden aspect-[4/3] md:aspect-[16/10] lg:aspect-[3/2]">
+    <div class="overflow-hidden aspect-4/3 md:aspect-16/10 lg:aspect-3/2">
       {imageUrl ? (
         <img
           src={imageUrl}
@@ -103,7 +103,7 @@ function fmtDate(d: string | undefined) {
     class="group block bg-cotton hover:bg-noir/4 transition-colors duration-200"
     aria-label={title}
   >
-    <div class="overflow-hidden aspect-[3/2]">
+    <div class="overflow-hidden aspect-3/2">
       {imageUrl ? (
         <img
           src={imageUrl}

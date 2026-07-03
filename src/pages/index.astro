@@ -1,20 +1,4 @@
 ---
-/**
- * index.astro — Ncheta Magazine Homepage
- *
- * Layout (per Figma):
- *   [Navbar]
- *   For each category section:
- *     Section heading + "View all →"
- *     ┌─────────────────────────────┬──────────────┐
- *     │  ArticleCard variant="hero" │ small card 1 │
- *     │  (spans 2/3 width)          │ small card 2 │
- *     │                             │ small card 3 │
- *     │                             │ small card 4 │
- *     └─────────────────────────────┴──────────────┘
- *     [text card] [text card] [text card] [text card]
- *   [Footer]
- */
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
@@ -252,14 +236,21 @@ const sections = [
 
   <main>
     {sections.map((section, sectionIndex) => (
-      <section
-        class:list={[
-          "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
-          sectionIndex === 0 ? "pt-8 pb-10" : "py-10",
-        ]}
-      >
-        <!-- Section header -->
-        <div class="flex items-baseline justify-between mb-6 border-b border-noir/15 pb-3">
+      <>
+        {sectionIndex > 0 && (
+          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <hr class="border-t border-noir/15 mt-8" />
+            <hr class="border-t border-noir/15 mt-8" />
+          </div>
+        )}
+        <section
+          class:list={[
+            "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
+            sectionIndex === 0 ? "pt-8 pb-10" : "pt-6 pb-10",
+          ]}
+        >
+          <!-- Section header -->
+          <div class="flex items-baseline justify-between mb-6">
           <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-noir">
             {section.title}
           </h2>
@@ -316,7 +307,8 @@ const sections = [
             />
           ))}
         </div>
-      </section>
+        </section>
+      </>
     ))}
 
     <!-- Mid-page newsletter CTA strip -->

@@ -127,7 +127,7 @@ function isActive(href: string) {
   <!-- Row 2: Nav links (desktop only) -->
   <div class="hidden lg:block border-t border-noir/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex items-center" aria-label="Primary navigation">
+      <nav class="flex items-center justify-around" aria-label="Primary navigation">
         {navItems.map((item) => {
           const active = isActive(item.href);
           return (
@@ -152,7 +152,7 @@ function isActive(href: string) {
 <!-- Subscribe modal -->
 <div
   id="subscribe-modal"
-  class="fixed inset-0 z-[100] hidden items-center justify-center p-4"
+  class="fixed inset-0 z-100 hidden items-center justify-center p-4"
   role="dialog"
   aria-modal="true"
   aria-labelledby="modal-title"
