@@ -14,7 +14,11 @@ import Footer from "../../components/Footer.astro";
   <Footer />
 </Layout>
 
-<script>
-  // Pagefind will mount into #search at build time
-  // The Pagefind UI script is injected via the build process
+<script is:inline>
+  // Pagefind UI loads from post-build output
+  const s = document.createElement("script");
+  s.src = "/pagefind/pagefind-ui.js";
+  s.onload = () => { new PagefindUI({ element: "#search" }); };
+  document.head.appendChild(s);
 </script>
+<link rel="stylesheet" href="/pagefind/pagefind-ui.css" />

@@ -16,7 +16,12 @@
   body {
     @apply bg-noir text-white font-inter antialiased;
   }
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     @apply font-cinzel;
   }
 }
@@ -41,7 +46,8 @@
   .prose-content blockquote {
     @apply border-l-4 border-cherry pl-6 italic text-white/70 my-8;
   }
-  .prose-content ul, .prose-content ol {
+  .prose-content ul,
+  .prose-content ol {
     @apply ml-6 mb-5 space-y-2;
   }
   .prose-content ul {
