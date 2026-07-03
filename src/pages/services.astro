@@ -1,0 +1,110 @@
+---
+// Services page — business offerings grid with HubSpot-ready form
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import Button from "../components/ui/Button.astro";
+import InputField from "../components/ui/InputField.astro";
+
+const services = [
+  {
+    title: "Artist Documentation",
+    description: "Professional archival documentation of artworks, exhibitions, and studio practice. High-resolution imaging, cataloguing, and digital portfolio creation.",
+    icon: "📸",
+  },
+  {
+    title: "Critical Essays",
+    description: "Scholarly essays and exhibition texts by experienced art writers. Rigorous research, contextual analysis, and publication-ready prose.",
+    icon: "📝",
+  },
+  {
+    title: "Research Reports",
+    description: "In-depth market analysis and art historical research commissioned for galleries, collectors, and institutions.",
+    icon: "📊",
+  },
+];
+---
+
+<Layout title="Services" description="Professional art documentation, critical essays, and research services.">
+  <Header />
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    {/* Hero */}
+    <div class="text-center mb-16">
+      <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-white">Our Services</h1>
+      <p class="mt-4 text-white/50 text-lg max-w-2xl mx-auto">
+        Professional services for artists, galleries, collectors, and institutions — delivered with scholarly rigor and cultural sensitivity.
+      </p>
+    </div>
+
+    {/* Service Cards */}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+      {services.map((service) => (
+        <div class="bg-white/3 border border-white/5 rounded-lg p-8 hover:border-white/10 transition-colors text-center">
+          <span class="text-4xl">{service.icon}</span>
+          <h3 class="font-cinzel font-bold text-xl text-cotton mt-4 mb-3">{service.title}</h3>
+          <p class="text-white/50 text-sm leading-relaxed">{service.description}</p>
+        </div>
+      ))}
+    </div>
+
+    {/* Inquiry Form */}
+    <div class="max-w-2xl mx-auto bg-cotton/5 border border-white/10 rounded-xl p-8 md:p-12">
+      <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton text-center mb-2">Make an Inquiry</h2>
+      <p class="text-white/50 text-sm text-center mb-8">Tell us about your project and we'll respond within 48 hours.</p>
+
+      <form id="service-form" class="space-y-5" onsubmit="event.preventDefault(); handleServiceSubmit(this);">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <InputField name="firstName" label="First Name" required placeholder="John" />
+          <InputField name="lastName" label="Last Name" required placeholder="Doe" />
+        </div>
+        <InputField name="email" label="Email" type="email" required placeholder="john@example.com" />
+        <div class="space-y-1.5">
+          <label for="serviceType" class="block text-sm font-medium text-white/70 font-inter">
+            Service Type <span class="text-cherry ml-1">*</span>
+          </label>
+          <select
+            id="serviceType"
+            name="serviceType"
+            required
+            class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded text-white text-sm focus:outline-none focus:border-cherry font-inter"
+          >
+            <option value="" class="bg-noir">Select a service...</option>
+            <option value="artist-documentation" class="bg-noir">Artist Documentation</option>
+            <option value="critical-essays" class="bg-noir">Critical Essays</option>
+            <option value="research-reports" class="bg-noir">Research Reports</option>
+          </select>
+        </div>
+        <InputField name="message" label="Project Details" type="textarea" required placeholder="Tell us about your project, timeline, and any specific requirements..." />
+        <div class="pt-2">
+          <Button type="submit" class="w-full">Submit Inquiry</Button>
+        </div>
+      </form>
+
+      <div id="form-success" class="hidden text-center py-8">
+        <span class="text-4xl">✓</span>
+        <h3 class="font-cinzel font-bold text-xl text-lime mt-3">Inquiry Received</h3>
+        <p class="text-white/50 text-sm mt-2">We'll get back to you within 48 hours.</p>
+      </div>
+    </div>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  async function handleServiceSubmit(form: HTMLFormElement) {
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    try {
+      await fetch('/api/inbound', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      (window as any).umami?.track?.('B2B Service Inquiry', { type: data.serviceType });
+      form.classList.add('hidden');
+      document.getElementById('form-success')?.classList.remove('hidden');
+    } catch {
+      alert('Something went wrong. Please try again.');
+    }
+  }
+</script>

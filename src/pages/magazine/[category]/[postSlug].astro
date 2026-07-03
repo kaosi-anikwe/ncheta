@@ -1,0 +1,81 @@
+---
+// Article detail page — editorial layout with PortableText, media embeds, sticky sidebar
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/Header.astro";
+import Footer from "../../../components/Footer.astro";
+import PortableText from "../../../components/PortableText.astro";
+import MediaEmbed from "../../../components/MediaEmbed.astro";
+import ListCard from "../../../components/cards/ListCard.astro";
+
+export async function getStaticPaths() {
+  return [
+    { params: { category: "art-news", postSlug: "venice-biennale-2026" } },
+    { params: { category: "art-news", postSlug: "ghana-art-market" } },
+    { params: { category: "academia", postSlug: "benin-bronzes-restitution" } },
+    { params: { category: "interviews", postSlug: "wangechi-mutu" } },
+  ];
+}
+
+const { category: categorySlug, postSlug } = Astro.params;
+
+const article = {
+  title: "Venice Biennale 2026: African Pavilions Take Center Stage",
+  category: { name: "Art News", slug: "art-news" },
+  publishedAt: "2026-06-28",
+  excerpt: "With a record number of African national pavilions, this year's Biennale signals a tectonic shift.",
+  content: [
+    { _type: "block", style: "normal", children: [{ _type: "span", text: "The 2026 Venice Biennale marks a historic turning point for African representation on the world's most prestigious art stage." }] },
+    { _type: "block", style: "h2", children: [{ _type: "span", text: "A Record Year for African Pavilions" }] },
+    { _type: "block", style: "normal", children: [{ _type: "span", text: "Nigeria, Ghana, Kenya, Senegal, South Africa, Zimbabwe, and for the first time, Tanzania and Rwanda, have all secured pavilion spaces." }] },
+  ],
+  youtubeVideoUrl: "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+};
+
+const { title, category: articleCategory, publishedAt, excerpt, content, youtubeVideoUrl } = article;
+---
+
+<Layout title={title} description={excerpt}>
+  <Header />
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <nav class="mb-8 text-sm font-inter text-white/40" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-cotton transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <a href={`/magazine/${articleCategory.slug}`} class="hover:text-cotton transition-colors">{articleCategory.name}</a>
+      <span class="mx-2">/</span>
+      <span class="text-white/70 line-clamp-1">{title}</span>
+    </nav>
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10 lg:gap-16">
+      <article>
+        <header class="mb-10">
+          <span class="inline-block px-3 py-1 text-xs font-inter font-medium bg-cherry/20 text-cherry rounded-full mb-4">{articleCategory.name}</span>
+          <h1 class="font-cinzel font-bold text-3xl md:text-4xl lg:text-5xl text-white leading-tight">{title}</h1>
+          <div class="mt-4 text-sm text-white/40 font-inter">
+            <time datetime={publishedAt}>{new Date(publishedAt).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</time>
+          </div>
+        </header>
+        <div class="aspect-video bg-linear-to-br from-cherry/10 to-maroon/10 rounded-lg mb-10 flex items-center justify-center">
+          <span class="font-cinzel font-bold text-white/10 text-6xl">N</span>
+        </div>
+        <PortableText blocks={content} />
+        <MediaEmbed youtubeUrl={youtubeVideoUrl} />
+      </article>
+      <aside class="lg:block">
+        <div class="sticky top-24 space-y-8">
+          <div class="bg-white/3 border border-white/5 rounded-lg p-5">
+            <h4 class="font-cinzel font-bold text-cotton text-sm uppercase tracking-wider mb-3">About this article</h4>
+            <p class="text-sm text-white/50">{excerpt}</p>
+          </div>
+          <div>
+            <h4 class="font-cinzel font-bold text-cotton text-sm uppercase tracking-wider mb-4">Related Stories</h4>
+            <div class="space-y-2">
+              <ListCard title="Ghana's Art Market Sees 300% Growth" category="Art News" date="2026-06-22" href="/magazine/art-news/ghana-art-market" />
+              <ListCard title="Nigerian Government Launches Arts Endowment" category="Art News" date="2026-06-15" href="/magazine/art-news/nigerian-arts-endowment" />
+              <ListCard title="In Conversation with El Anatsui" category="Interviews" date="2026-06-12" href="/magazine/interviews/el-anatsui" />
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </main>
+  <Footer />
+</Layout>

@@ -1,0 +1,43 @@
+---
+// ListCard — compact row-oriented sidebar variation (thumbnail left, text right)
+export interface Props {
+  title: string;
+  imageUrl?: string;
+  imageAlt?: string;
+  href: string;
+  category?: string;
+  date?: string;
+}
+
+const { title, imageUrl, imageAlt, href, category, date } = Astro.props;
+---
+
+<a href={href} class="group flex gap-4 p-3 rounded-lg hover:bg-white/5 transition-colors border border-transparent hover:border-white/5">
+  <div class="shrink-0 w-20 h-20 md:w-24 md:h-24 rounded-md overflow-hidden">
+    {imageUrl ? (
+      <img
+        src={imageUrl}
+        alt={imageAlt || title}
+        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+        loading="lazy"
+      />
+    ) : (
+      <div class="w-full h-full bg-white/5 flex items-center justify-center">
+        <span class="font-cinzel font-bold text-white/10 text-lg">N</span>
+      </div>
+    )}
+  </div>
+  <div class="flex-1 min-w-0">
+    {category && (
+      <span class="text-xs font-inter font-medium text-cherry uppercase tracking-wider">{category}</span>
+    )}
+    <h4 class="font-cinzel font-bold text-sm md:text-base text-white group-hover:text-cotton transition-colors line-clamp-2 mt-0.5">
+      {title}
+    </h4>
+    {date && (
+      <p class="mt-1 text-xs text-white/30 font-inter">
+        {new Date(date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+      </p>
+    )}
+  </div>
+</a>

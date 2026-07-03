@@ -1,0 +1,28 @@
+---
+// Contact page
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import InputField from "../components/ui/InputField.astro";
+import Button from "../components/ui/Button.astro";
+---
+
+<Layout title="Contact" description="Get in touch with Ncheta Magazine.">
+  <Header />
+  <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-white mb-3">Contact</h1>
+    <p class="text-white/50 text-lg mb-10">Have a story tip, press inquiry, or want to collaborate? Reach out.</p>
+
+    <form class="space-y-5" onsubmit="event.preventDefault(); alert('Message sent!');">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+        <InputField name="firstName" label="First Name" required />
+        <InputField name="lastName" label="Last Name" required />
+      </div>
+      <InputField name="email" label="Email" type="email" required />
+      <InputField name="subject" label="Subject" required />
+      <InputField name="message" label="Message" type="textarea" required />
+      <Button type="submit">Send Message</Button>
+    </form>
+  </main>
+  <Footer />
+</Layout>

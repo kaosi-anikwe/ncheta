@@ -1,0 +1,40 @@
+---
+// InputField — text/textarea with focus states and validation
+export interface Props {
+  name: string;
+  label: string;
+  type?: "text" | "email" | "textarea";
+  required?: boolean;
+  placeholder?: string;
+  class?: string;
+}
+
+const { name, label, type = "text", required = false, placeholder = "", class: extraClass = "" } = Astro.props;
+
+const inputBase = "w-full px-4 py-3 bg-white/5 border border-white/10 rounded text-white placeholder:text-white/30 focus:outline-none focus:border-cherry focus:ring-1 focus:ring-cherry/30 transition-colors font-inter text-sm";
+---
+
+<div class={`space-y-1.5 ${extraClass}`}>
+  <label for={name} class="block text-sm font-medium text-white/70 font-inter">
+    {label}{required && <span class="text-cherry ml-1">*</span>}
+  </label>
+  {type === "textarea" ? (
+    <textarea
+      id={name}
+      name={name}
+      required={required}
+      placeholder={placeholder}
+      rows={4}
+      class={inputBase + " resize-y min-h-[100px]"}
+    ></textarea>
+  ) : (
+    <input
+      id={name}
+      name={name}
+      type={type}
+      required={required}
+      placeholder={placeholder}
+      class={inputBase}
+    />
+  )}
+</div>

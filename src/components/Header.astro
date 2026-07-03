@@ -1,0 +1,69 @@
+---
+// Header — 8 primary editorial pillars, clientless mobile toggle
+const navItems = [
+  { label: "Art News", href: "/magazine/art-news" },
+  { label: "Academia", href: "/magazine/academia" },
+  { label: "Interviews", href: "/magazine/interviews" },
+  { label: "Collecting Now", href: "/magazine/collecting-now" },
+  { label: "African Art History", href: "/magazine/african-art-history" },
+  { label: "Exhibitions & Fairs", href: "/magazine/exhibitions-fairs" },
+  { label: "Galleries & Museums", href: "/magazine/galleries-museums" },
+  { label: "Awards", href: "/magazine/awards" },
+];
+---
+
+<header class="sticky top-0 z-50 bg-noir/95 backdrop-blur border-b border-white/10">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16 md:h-20">
+      <!-- Logo -->
+      <a href="/" class="shrink-0">
+        <span class="font-cinzel font-black text-xl md:text-2xl text-white tracking-wide">
+          NCHETA
+        </span>
+      </a>
+
+      <!-- Desktop nav -->
+      <nav class="hidden lg:flex items-center space-x-1" aria-label="Primary">
+        {navItems.map((item) => (
+          <a
+            href={item.href}
+            class="px-3 py-2 text-sm font-inter font-medium text-white/70 hover:text-cotton transition-colors rounded"
+          >
+            {item.label}
+          </a>
+        ))}
+      </nav>
+
+      <!-- Search + Mobile toggle -->
+      <div class="flex items-center gap-3">
+        <a href="/resources/search" class="text-white/60 hover:text-cotton transition-colors" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+        </a>
+
+        <!-- Mobile menu toggle (clientless <details>) -->
+        <details class="lg:hidden group">
+          <summary class="list-none cursor-pointer p-2 text-white/70 hover:text-cotton transition-colors" aria-label="Toggle menu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path class="group-open:hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+              <path class="hidden group-open:block" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </summary>
+          <nav class="absolute top-full left-0 right-0 bg-noir border-b border-white/10 shadow-xl" aria-label="Mobile">
+            <div class="px-4 py-3 space-y-1">
+              {navItems.map((item) => (
+                <a
+                  href={item.href}
+                  class="block px-3 py-2.5 text-base font-inter font-medium text-white/80 hover:text-cotton hover:bg-white/5 rounded transition-colors"
+                >
+                  {item.label}
+                </a>
+              ))}
+            </div>
+          </nav>
+        </details>
+      </div>
+    </div>
+  </div>
+</header>

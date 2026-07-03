@@ -1,0 +1,46 @@
+---
+// PortableText — renders Sanity block content via astro-portabletext
+import { PortableText } from "astro-portabletext";
+import MediaEmbed from "./MediaEmbed.astro";
+
+export interface Props {
+  blocks: any[];
+}
+
+const { blocks } = Astro.props;
+---
+
+<article class="prose-content max-w-none">
+  <PortableText
+    value={blocks}
+    components={{
+      type: {
+        image: ({ value }: any) => (
+          <figure class="my-8">
+            <img
+              src={value.asset?.url || value.url}
+              alt={value.alt || ""}
+              class="rounded-lg w-full"
+              loading="lazy"
+            />
+            {value.caption && (
+              <figcaption class="mt-2 text-sm text-white/40 italic text-center">{value.caption}</figcaption>
+            )}
+          </figure>
+        ),
+      },
+      mark: {
+        link: ({ children, value }: any) => (
+          <a
+            href={value.href}
+            target={value.href?.startsWith("http") ? "_blank" : undefined}
+            rel={value.href?.startsWith("http") ? "noopener noreferrer" : undefined}
+            class="text-lime underline decoration-lime/50 hover:decoration-lime"
+          >
+            {children}
+          </a>
+        ),
+      },
+    }}
+  />
+</article>

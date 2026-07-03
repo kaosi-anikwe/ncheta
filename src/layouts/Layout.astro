@@ -1,0 +1,38 @@
+---
+// Master layout wrapper — global metadata, fonts, Umami telemetry
+export interface Props {
+  title: string;
+  description?: string;
+  ogImage?: string;
+}
+const { title, description, ogImage } = Astro.props;
+const siteTitle = "Ncheta Magazine";
+const fullTitle = title === "Home" ? siteTitle : `${title} — ${siteTitle}`;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description || "Ncheta Magazine — African art news, academia, interviews, and exhibitions."} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- Google Fonts: Cinzel + Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;500;700&display=swap" rel="stylesheet" />
+
+    <!-- Umami Analytics (privacy-first, self-hosted) -->
+    <script defer src={import.meta.env.PUBLIC_UMAMI_URL || "https://umami.example.com/script.js"} data-website-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID || "00000000-0000-0000-0000-000000000000"}></script>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <slot />
+  </body>
+</html>

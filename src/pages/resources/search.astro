@@ -1,0 +1,20 @@
+---
+// Search page — Pagefind shell
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<Layout title="Search" description="Search Ncheta Magazine articles and resources.">
+  <Header />
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 min-h-[60vh]">
+    <h1 class="font-cinzel font-bold text-3xl md:text-4xl text-white mb-8">Search</h1>
+    <div id="search"></div>
+  </main>
+  <Footer />
+</Layout>
+
+<script>
+  // Pagefind will mount into #search at build time
+  // The Pagefind UI script is injected via the build process
+</script>

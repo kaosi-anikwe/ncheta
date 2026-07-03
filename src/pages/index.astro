@@ -1,17 +1,165 @@
 ---
-
+// Homepage — hero, grid sections, middle CTA break
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import HeroCard from "../components/cards/HeroCard.astro";
+import GridCard from "../components/cards/GridCard.astro";
+import Button from "../components/ui/Button.astro";
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Home" description="Ncheta Magazine — African art news, academia, interviews, and exhibitions.">
+  <Header />
+  <main>
+    <!-- Hero Section -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 md:pt-10 pb-12">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2">
+          <HeroCard
+            title="The New Vanguard: Contemporary African Artists Reshaping Global Narratives"
+            excerpt="From Lagos to London, a new generation of African artists is reclaiming agency and redefining what the world understands as contemporary African art."
+            category="Art News"
+            href="/magazine/art-news/the-new-vanguard"
+          />
+        </div>
+        <div class="flex flex-col gap-4">
+          <div class="bg-cotton/5 border border-white/5 rounded-lg p-5">
+            <h3 class="font-cinzel font-bold text-cotton text-lg mb-3">Latest Stories</h3>
+            <ul class="space-y-4">
+              <li>
+                <a href="#" class="group">
+                  <span class="text-xs text-cherry font-medium uppercase tracking-wider">Academia</span>
+                  <p class="text-sm text-white/80 group-hover:text-cotton transition-colors mt-1 leading-snug">
+                    Decolonizing Art History Curricula in West African Universities
+                  </p>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="group">
+                  <span class="text-xs text-cherry font-medium uppercase tracking-wider">Exhibitions &amp; Fairs</span>
+                  <p class="text-sm text-white/80 group-hover:text-cotton transition-colors mt-1 leading-snug">
+                    1-54 London 2026: What to Expect from the Premier African Art Fair
+                  </p>
+                </a>
+              </li>
+              <li>
+                <a href="#" class="group">
+                  <span class="text-xs text-cherry font-medium uppercase tracking-wider">Interviews</span>
+                  <p class="text-sm text-white/80 group-hover:text-cotton transition-colors mt-1 leading-snug">
+                    In Conversation with El Anatsui: Material, Memory, and Monumentality
+                  </p>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Middle CTA Break -->
+    <section class="bg-cherry/10 border-y border-white/5 py-16 my-6">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <h2 class="font-cinzel font-bold text-3xl md:text-4xl text-cotton">
+          Sign up for the Ncheta Newsletter
+        </h2>
+        <p class="mt-3 text-white/60 text-lg max-w-2xl mx-auto">
+          Weekly curation of the most important stories in African art — delivered straight to your inbox.
+        </p>
+        <form class="mt-8 flex flex-col sm:flex-row gap-3 max-w-md mx-auto" onsubmit="event.preventDefault(); handleNewsletterSubmit(this);">
+          <input
+            type="email"
+            name="email"
+            required
+            placeholder="your@email.com"
+            class="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded text-white placeholder:text-white/30 focus:outline-none focus:border-cherry font-inter text-sm"
+          />
+          <Button type="submit">Subscribe</Button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Category Grids -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton">Art News</h2>
+        <a href="/magazine/art-news" class="text-sm text-white/50 hover:text-lime transition-colors font-inter">
+          View all →
+        </a>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <GridCard
+          title="Venice Biennale 2026: African Pavilions Take Center Stage"
+          excerpt="With a record number of African national pavilions, this year's Biennale signals a tectonic shift."
+          category="Art News"
+          date="2026-06-28"
+          href="/magazine/art-news/venice-biennale-2026"
+        />
+        <GridCard
+          title="Ghana's Art Market Sees 300% Growth in Five Years"
+          excerpt="New data from the African Art Market Report reveals unprecedented growth in West African art sales."
+          category="Art News"
+          date="2026-06-22"
+          href="/magazine/art-news/ghana-art-market"
+        />
+        <GridCard
+          title="Nigerian Government Launches National Arts Endowment"
+          excerpt="The ₦5 billion fund aims to support emerging artists and cultural institutions across the country."
+          category="Art News"
+          date="2026-06-15"
+          href="/magazine/art-news/nigerian-arts-endowment"
+        />
+      </div>
+    </section>
+
+    <!-- Second Grid: Academia + Interviews -->
+    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div>
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton">Academia</h2>
+            <a href="/magazine/academia" class="text-sm text-white/50 hover:text-lime transition-colors font-inter">View all →</a>
+          </div>
+          <div class="space-y-5">
+            <GridCard
+              title="The Benin Bronzes: Restitution and the Politics of Return"
+              excerpt="Five years after the landmark repatriation, scholars assess the impact on museum practice."
+              category="Academia"
+              date="2026-07-01"
+              href="/magazine/academia/benin-bronzes-restitution"
+            />
+            <GridCard
+              title="Re-reading Uche Okeke: Natural Synthesis in the 21st Century"
+              excerpt="A major new publication re-examines Okeke's theoretical framework for contemporary practice."
+              category="Academia"
+              date="2026-06-18"
+              href="/magazine/academia/uche-okeke"
+            />
+          </div>
+        </div>
+        <div>
+          <div class="flex items-center justify-between mb-8">
+            <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton">Interviews</h2>
+            <a href="/magazine/interviews" class="text-sm text-white/50 hover:text-lime transition-colors font-inter">View all →</a>
+          </div>
+          <div class="space-y-5">
+            <GridCard
+              title="Wangechi Mutu on World-Building and Afrofuturist Ecologies"
+              excerpt="The Nairobi-born artist discusses her latest installation at the Met and the role of myth-making."
+              category="Interviews"
+              date="2026-06-25"
+              href="/magazine/interviews/wangechi-mutu"
+            />
+            <GridCard
+              title="Curator Nontsikelelo Mutiti on Zimbabwe's Digital Art Renaissance"
+              excerpt="How a new generation of Zimbabwean artists are using AI and code as their medium."
+              category="Interviews"
+              date="2026-06-10"
+              href="/magazine/interviews/nontsikelelo-mutiti"
+            />
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <Footer />
+</Layout>

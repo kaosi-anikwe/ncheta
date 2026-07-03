@@ -25,3 +25,11 @@ pnpm-debug.log*
 
 # wrangler
 .wrangler/
+
+# misc
+GUIDE.md
+DESIGN SPEC.md
+Ncheta Brand Guide.pdf
+Ncheta Logos-06.svg
+TRD.md
+.figma-refs/

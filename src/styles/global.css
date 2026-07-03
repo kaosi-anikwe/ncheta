@@ -1,1 +1,56 @@
 @import "tailwindcss";
+
+/* Ncheta Brand Design Tokens */
+@theme {
+  --color-noir: #181717;
+  --color-cherry: #650606;
+  --color-maroon: #630000;
+  --color-cotton: #e7d7b6;
+  --color-lime: #b3d67c;
+  --font-cinzel: "Cinzel", serif;
+  --font-inter: "Inter", sans-serif;
+}
+
+/* Base layer */
+@layer base {
+  body {
+    @apply bg-noir text-white font-inter antialiased;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-cinzel;
+  }
+}
+
+/* PortableText prose styles */
+@layer components {
+  .prose-content {
+    @apply text-white/90 leading-relaxed;
+  }
+  .prose-content p {
+    @apply mb-5 text-lg;
+  }
+  .prose-content h2 {
+    @apply text-2xl md:text-3xl font-bold mt-10 mb-4 text-cotton;
+  }
+  .prose-content h3 {
+    @apply text-xl md:text-2xl font-semibold mt-8 mb-3 text-cotton;
+  }
+  .prose-content a {
+    @apply text-lime underline decoration-lime/50 hover:decoration-lime;
+  }
+  .prose-content blockquote {
+    @apply border-l-4 border-cherry pl-6 italic text-white/70 my-8;
+  }
+  .prose-content ul, .prose-content ol {
+    @apply ml-6 mb-5 space-y-2;
+  }
+  .prose-content ul {
+    @apply list-disc;
+  }
+  .prose-content ol {
+    @apply list-decimal;
+  }
+  .prose-content img {
+    @apply rounded-lg my-8 w-full;
+  }
+}

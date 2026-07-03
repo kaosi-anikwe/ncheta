@@ -1,0 +1,49 @@
+---
+// Category index page — breadcrumbs + item listing
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import GridCard from "../../components/cards/GridCard.astro";
+
+export async function getStaticPaths() {
+  return [
+    { params: { category: "art-news" } },
+    { params: { category: "academia" } },
+    { params: { category: "interviews" } },
+    { params: { category: "collecting-now" } },
+    { params: { category: "african-art-history" } },
+    { params: { category: "exhibitions-fairs" } },
+    { params: { category: "galleries-museums" } },
+    { params: { category: "awards" } },
+  ];
+}
+
+const { category } = Astro.params;
+const categoryName = category === "art-news" ? "Art News" : category?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Category";
+const categoryDescription = "Explore articles in this category.";
+---
+
+<Layout title={categoryName}>
+  <Header />
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <nav class="mb-8 text-sm font-inter text-white/40" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-cotton transition-colors">Home</a>
+      <span class="mx-2">/</span>
+      <span class="text-white/70">{categoryName}</span>
+    </nav>
+    <div class="mb-10">
+      <h1 class="font-cinzel font-bold text-3xl md:text-4xl lg:text-5xl text-white">{categoryName}</h1>
+      <p class="mt-3 text-white/50 text-lg max-w-2xl">{categoryDescription}</p>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <GridCard
+        title="Sample Article Title"
+        excerpt="A brief excerpt describing the article content."
+        category={categoryName}
+        date="2026-07-01"
+        href="/magazine/art-news/sample-article"
+      />
+    </div>
+  </main>
+  <Footer />
+</Layout>
