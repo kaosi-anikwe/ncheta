@@ -1,6 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
+import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
 import ArticleCard from "../components/cards/ArticleCard.astro";
 
@@ -303,7 +303,7 @@ const sections = [
               href={card.href}
               date={card.date}
               author={card.author}
-              bordered={i < section.text.length - 1}
+              bordered
             />
           ))}
         </div>
@@ -317,7 +317,7 @@ const sections = [
         <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-cotton mb-3">
           Subscribe to the Ncheta Newsletter
         </h2>
-        <p class="font-inter text-sm text-cotton/60 mb-8 max-w-md mx-auto leading-relaxed">
+        <p class="font-inter text-sm text-cotton/80 mb-8 max-w-md mx-auto leading-relaxed">
           Weekly curation of the most important African art stories — delivered straight to your inbox.
         </p>
         <form

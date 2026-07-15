@@ -1,7 +1,7 @@
 ---
 // Contact page — Cotton background, Noir text, Lime focus, brand-correct form
 import Layout from "../layouts/Layout.astro";
-import Header from "../components/Header.astro";
+import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
 ---
 
@@ -19,7 +19,7 @@ import Footer from "../components/navigation/Footer.astro";
     </nav>
 
     <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-noir mb-3">Contact Us</h1>
-    <p class="font-inter text-base text-noir/55 mb-10 border-l-2 border-lime pl-4">
+    <p class="font-inter text-base text-noir/55 mb-10 border-l-2 border-cherry pl-4">
       Story tips, press enquiries, editorial pitches, or partnership proposals — we read everything.
     </p>
 
@@ -39,7 +39,7 @@ import Footer from "../components/navigation/Footer.astro";
             id="firstName" name="firstName" type="text" required
             placeholder="First name"
             aria-required="true"
-            class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+            class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
           />
         </div>
         <div class="space-y-1.5">
@@ -50,7 +50,7 @@ import Footer from "../components/navigation/Footer.astro";
             id="lastName" name="lastName" type="text" required
             placeholder="Last name"
             aria-required="true"
-            class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+            class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
           />
         </div>
       </div>
@@ -63,7 +63,7 @@ import Footer from "../components/navigation/Footer.astro";
           id="email" name="email" type="email" required
           placeholder="your@email.com"
           aria-required="true"
-          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
         />
       </div>
 
@@ -75,7 +75,7 @@ import Footer from "../components/navigation/Footer.astro";
           id="subject" name="subject" type="text" required
           placeholder="What is your enquiry about?"
           aria-required="true"
-          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all"
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
         />
       </div>
 
@@ -87,14 +87,14 @@ import Footer from "../components/navigation/Footer.astro";
           id="message" name="message" required rows={5}
           placeholder="Tell us about your enquiry..."
           aria-required="true"
-          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-lime focus:ring-2 focus:ring-lime/30 transition-all resize-y min-h-30"
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all resize-y min-h-30"
         ></textarea>
       </div>
 
       <!-- Submit: Noir bg / Cotton text → Lime bg / Noir text on hover -->
       <button
         type="submit"
-        class="w-full px-6 py-3 bg-noir text-cotton font-inter font-medium text-sm border border-noir hover:bg-lime hover:text-noir hover:border-lime focus:outline-none focus:ring-2 focus:ring-lime/50 focus:ring-offset-2 focus:ring-offset-cotton transition-all duration-200"
+        class="w-full px-6 py-3 bg-noir text-cotton font-inter font-medium text-sm border border-noir hover:bg-cherry hover:text-noir hover:border-cherry focus:outline-none focus:ring-2 focus:ring-cherry/50 focus:ring-offset-2 focus:ring-offset-cotton transition-all duration-200"
       >
         Send Message
       </button>

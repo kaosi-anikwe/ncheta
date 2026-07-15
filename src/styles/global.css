@@ -99,6 +99,6 @@
   /* Nav active indicator */
   .nav-item--active::after {
     content: "";
-    @apply absolute bottom-0 left-3 right-3 h-[2px] bg-lime rounded-full;
+    @apply absolute bottom-0 left-3 right-3 h-[2px] bg-cherry rounded-full;
   }
 }

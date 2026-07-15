@@ -24,7 +24,7 @@ function isActive(href: string) {
     <div class="flex items-center justify-between h-16 md:h-20 gap-4">
 
       <!-- Full wordmark logo -->
-      <a href="/" class="shrink-0 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-lime/60" aria-label="Ncheta Magazine homepage">
+      <a href="/" class="shrink-0 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60" aria-label="Ncheta Magazine homepage">
         <img src="/logo.svg" alt="Ncheta Magazine" class="h-10 md:h-14 w-auto" />
       </a>
 
@@ -37,7 +37,14 @@ function isActive(href: string) {
             id="nav-search"
             type="search"
             placeholder="Search articles..."
-            class="w-44 md:w-56 h-8 pl-3 pr-8 text-xs font-inter bg-noir/5 border border-noir/15 rounded-sm text-noir placeholder:text-noir/40 focus:outline-none focus:border-noir/30 focus:bg-white transition-colors"
+            class="w-44 md:w-56 h-8 pl-3 pr-8 text-xs bg-cotton
+                border border-noir/25
+                font-inter text-noir
+                placeholder:text-noir/30
+                focus:outline-none
+                focus:border-cherry
+                focus:ring-2 focus:ring-cherry/35
+                transition-all duration-200"
             aria-label="Search articles"
           />
           <button
@@ -56,7 +63,16 @@ function isActive(href: string) {
         <button
           id="subscribe-btn"
           type="button"
-          class="h-8 px-4 text-xs font-inter font-medium border border-noir/30 text-noir hover:bg-noir hover:text-cotton transition-colors rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-lime/60 whitespace-nowrap"
+          class="h-8 px-4 text-xs font-inter font-medium bg-noir text-cotton
+              tracking-wide
+              border border-noir
+              transition-all duration-200
+              hover:bg-lime hover:text-noir hover:border-lime
+              focus:outline-none
+              focus:ring-2 focus:ring-lime/50
+              focus:ring-offset-2 focus:ring-offset-cotton
+              disabled:opacity-60 disabled:cursor-not-allowed
+              cursor-pointer"
         >
           Subscribe
         </button>
@@ -93,7 +109,7 @@ function isActive(href: string) {
                     aria-current={active ? "page" : undefined}
                     class:list={[
                       "flex items-center px-5 py-3 font-inter text-sm font-medium transition-colors duration-150 border-l-2",
-                      active ? "text-noir border-lime bg-lime/10" : "text-noir/65 hover:text-noir hover:bg-noir/5 border-transparent",
+                      active ? "text-noir border-cherry bg-cherry/10" : "text-noir/65 hover:text-noir hover:bg-noir/5 border-transparent",
                     ]}
                   >
                     {item.label}
@@ -119,7 +135,7 @@ function isActive(href: string) {
               href={item.href}
               aria-current={active ? "page" : undefined}
               class:list={[
-                "relative px-3 py-2.5 font-inter text-[13px] font-medium tracking-wide transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-lime/60 rounded-sm nav-item",
+                "relative px-3 py-2.5 font-inter text-[13px] font-medium tracking-wide transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60 rounded-sm nav-item",
                 active ? "text-noir nav-item--active" : "text-noir/60 hover:text-noir",
               ]}
             >
@@ -164,11 +180,27 @@ function isActive(href: string) {
         type="email"
         required
         placeholder="your@email.com"
-        class="w-full h-10 px-4 text-sm font-inter bg-white border border-noir/20 text-noir placeholder:text-noir/35 focus:outline-none focus:border-noir/50 transition-colors rounded-sm"
+        class="w-full h-10 px-4 bg-cotton
+                border border-noir/25
+                font-inter text-noir
+                placeholder:text-noir/30
+                focus:outline-none
+                focus:border-cherry
+                focus:ring-2 focus:ring-cherry/35
+                transition-all duration-200"
       />
       <button
         type="submit"
-        class="w-full h-10 bg-noir text-cotton font-inter text-sm font-medium hover:bg-cherry transition-colors rounded-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-lime/60"
+        class="w-full h-10 bg-noir text-cotton
+              font-inter font-medium text-sm tracking-wide
+              border border-noir
+              transition-all duration-200
+              hover:bg-lime hover:text-noir hover:border-lime
+              focus:outline-none
+              focus:ring-2 focus:ring-lime/50
+              focus:ring-offset-2 focus:ring-offset-cotton
+              disabled:opacity-60 disabled:cursor-not-allowed
+              cursor-pointer"
       >
         Subscribe
       </button>

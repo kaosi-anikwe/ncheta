@@ -1,25 +1,12 @@
 ---
 /**
  * [postSlug].astro — Article detail page
- *
- * Layout (from article.png Figma):
- *   [Navbar]
- *   Breadcrumb
- *   Category tag | Title | Author | Date | Share
- *   ─────────────────────────────────────────────
- *   Hero image (full-width within content column)
- *   Single-column prose (max-ch ~680px)
- *   Inline newsletter CTA (mid-article)
- *   YouTube embed (if present)
- *   ─────────────────────────────────────────────
- *   Related articles grid
- *   [Footer]
  */
 import Layout from "../../../layouts/Layout.astro";
-import Header from "../../../components/Header.astro";
+import Header from "../../../components/navigation/Header.astro";
 import Footer from "../../../components/navigation/Footer.astro";
-import PortableText from "../../../components/PortableText.astro";
-import MediaEmbed from "../../../components/MediaEmbed.astro";
+import PortableText from "../../../components/ui/PortableText.astro";
+import MediaEmbed from "../../../components/ui/MediaEmbed.astro";
 import ArticleCard from "../../../components/cards/ArticleCard.astro";
 
 export async function getStaticPaths() {
@@ -139,7 +126,7 @@ function fmtDate(d: string) {
       </h1>
 
       <!-- Excerpt / standfirst -->
-      <p class="font-inter text-base md:text-lg text-noir/60 leading-relaxed mb-6 border-l-2 border-lime pl-4">
+      <p class="font-inter text-base md:text-lg text-noir/60 leading-relaxed mb-6 border-l-2 border-cherry pl-4">
         {excerpt}
       </p>
 
