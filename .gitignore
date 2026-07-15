@@ -12,7 +12,6 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-
 # environment variables
 .env
 .env.production
@@ -33,7 +32,6 @@ DESIGN SPEC.md
 Ncheta Brand Guide.pdf
 Ncheta Logos-06.svg
 TRD.md
-.figma-refs/
 logo.svg
 .agent/
 branch_structure.json
