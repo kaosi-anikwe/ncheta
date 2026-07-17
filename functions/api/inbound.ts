@@ -4,7 +4,8 @@ interface Env {
   HUBSPOT_FORM_GUID?: string;
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost = async (context: { request: Request; env: Env }) => {
+  const { request, env } = context;
   try {
     const data = await request.json() as Record<string, string>;
     const { firstName, lastName, email, serviceType, message } = data;

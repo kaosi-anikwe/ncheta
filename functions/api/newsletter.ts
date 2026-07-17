@@ -1,10 +1,10 @@
-// Cloudflare Pages Function — forwards newsletter signups to Beehiiv
+// Cloudflare Pages Function — forwards newsletter signups to Kit (formerly ConvertKit)
 interface Env {
-  BEEHIIV_API_KEY?: string;
-  BEEHIIV_PUBLICATION_ID?: string;
+  KIT_API_KEY?: string;
 }
 
-export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
+export const onRequestPost = async (context: { request: Request; env: Env }) => {
+  const { request, env } = context;
   try {
     const { email } = await request.json() as { email: string };
 
@@ -15,31 +15,46 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
       });
     }
 
-    const beehiivApiKey = env.BEEHIIV_API_KEY;
-    const beehiivPublicationId = env.BEEHIIV_PUBLICATION_ID;
+    const kitApiKey = env.KIT_API_KEY;
 
-    if (beehiivApiKey && beehiivPublicationId) {
-      await fetch(
-        `https://api.beehiiv.com/v2/publications/${beehiivPublicationId}/subscriptions`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${beehiivApiKey}`,
-          },
-          body: JSON.stringify({ email }),
-        }
-      );
+    if (kitApiKey) {
+      const response = await fetch("https://api.kit.com/v4/subscribers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Kit-Api-Key": kitApiKey,
+        },
+        body: JSON.stringify({
+          email_address: email,
+          state: "active",
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error("Kit API error:", errorData);
+        return new Response(
+          JSON.stringify({ success: false, error: "Failed to forward subscription to Kit" }),
+          {
+            status: 502,
+            headers: { "Content-Type": "application/json" },
+          }
+        );
+      }
+    } else {
+      console.warn("KIT_API_KEY is not defined in Cloudflare environment variables.");
     }
 
     return new Response(JSON.stringify({ success: true }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
-  } catch {
+  } catch (err) {
+    console.error("Newsletter subscription error:", err);
     return new Response(JSON.stringify({ success: false, error: "Failed to subscribe" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
 };
+
