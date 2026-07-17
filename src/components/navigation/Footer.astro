@@ -22,19 +22,19 @@
 const currentYear = new Date().getFullYear();
 
 const navLinks = [
-  { label: "Home",       href: "/" },
-  { label: "About",      href: "/about" },
-  { label: "Services",   href: "/services" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Services", href: "/services" },
   { label: "Contact Us", href: "/contact" },
-  { label: "Resources",  href: "/search" },
+  { label: "Resources", href: "/search" },
 ];
 
 const legalLinks = [
-  { label: "Copyright Information",                                 href: "/copyright" },
-  { label: "Donations",                                             href: "/donations" },
-  { label: "Site Policy",                                           href: "/site-policy" },
-  { label: "Sitemap",                                               href: "/sitemap.xml" },
-  { label: "Terms and Conditions",                                  href: "/terms" },
+  { label: "Copyright Information", href: "/copyright" },
+  { label: "Donations", href: "/donations" },
+  { label: "Site Policy", href: "/site-policy" },
+  { label: "Sitemap", href: "/sitemap-index.xml" },
+  { label: "Terms and Conditions", href: "/terms" },
   {
     label: "Add Ncheta Magazine as a preferred source on Google",
     href: "https://news.google.com",
@@ -50,8 +50,9 @@ const legalLinks = [
 >
   <!-- ── Main content grid ──────────────────────────────────────── -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 lg:py-20">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16">
-
+    <div
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 lg:gap-16"
+    >
       <!-- ┌─────────────────────────────────────────────────────────┐ -->
       <!-- │  Column 1 — Navigation & Discovery                     │ -->
       <!-- └─────────────────────────────────────────────────────────┘ -->
@@ -62,32 +63,40 @@ const legalLinks = [
           class="inline-flex items-center gap-2 mb-8 group focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60"
           aria-label="Ncheta Magazine — go to homepage"
         >
-          <img src="/logo.svg" alt="Ncheta Magazine" class="h-11 md:h-14 w-auto" />
+          <img
+            src="/logo.svg"
+            alt="Ncheta Magazine"
+            class="h-11 md:h-14 w-auto"
+          />
         </a>
 
         <!-- Column heading -->
-        <h2 class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5">
+        <h2
+          class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5"
+        >
           Navigation
         </h2>
 
         <nav aria-label="Footer navigation links">
           <ul class="space-y-3">
-            {navLinks.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class="
+            {
+              navLinks.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class="
                     font-inter text-sm text-noir/75
                     
                     transition-colors duration-200
                     underline-offset-4 hover:underline decoration-cherry/60
                     focus:outline-none focus-visible:text-cherry focus-visible:underline
                   "
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
           </ul>
         </nav>
       </div>
@@ -96,17 +105,20 @@ const legalLinks = [
       <!-- │  Column 2 — Legal & Institutional                      │ -->
       <!-- └─────────────────────────────────────────────────────────┘ -->
       <div>
-        <h2 class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5 mt-0 md:mt-0">
+        <h2
+          class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5 mt-0 md:mt-0"
+        >
           Information
         </h2>
 
         <nav aria-label="Legal and institutional links">
           <ul class="space-y-3">
-            {legalLinks.map((item) => (
-              <li>
-                <a
-                  href={item.href}
-                  class="
+            {
+              legalLinks.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class="
                     font-inter text-sm text-noir/75
                     
                     transition-colors duration-200
@@ -114,12 +126,15 @@ const legalLinks = [
                     focus:outline-none focus-visible:text-cherry focus-visible:underline
                     leading-snug inline-block
                   "
-                  {...(item.external ? { target: "_blank", rel: item.rel } : {})}
-                >
-                  {item.label}
-                </a>
-              </li>
-            ))}
+                    {...(item.external
+                      ? { target: "_blank", rel: item.rel }
+                      : {})}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))
+            }
           </ul>
         </nav>
       </div>
@@ -128,11 +143,15 @@ const legalLinks = [
       <!-- │  Column 3 — Newsletter Capture                         │ -->
       <!-- └─────────────────────────────────────────────────────────┘ -->
       <div>
-        <h2 class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5">
+        <h2
+          class="font-cinzel font-bold text-[10px] text-noir/45 uppercase tracking-[0.18em] mb-5"
+        >
           Newsletter
         </h2>
 
-        <p class="font-inter text-sm text-noir/65 leading-relaxed mb-7 max-w-xs">
+        <p
+          class="font-inter text-sm text-noir/65 leading-relaxed mb-7 max-w-xs"
+        >
           Get the latest African art news, exhibition previews, and critical
           conversations delivered to your inbox — every week, no noise.
         </p>
@@ -169,8 +188,7 @@ const legalLinks = [
               autocomplete="email"
               aria-label="Your email address"
               aria-required="true"
-              class="
-                w-full px-4 py-3
+              class="w-full px-4 py-3
                 bg-cotton
                 border border-noir/25
                 font-inter text-sm text-noir
@@ -178,8 +196,7 @@ const legalLinks = [
                 focus:outline-none
                 focus:border-cherry
                 focus:ring-2 focus:ring-cherry/35
-                transition-all duration-200
-              "
+                transition-all duration-200"
             />
           </div>
 
@@ -193,8 +210,7 @@ const legalLinks = [
             id="footer-subscribe-btn"
             type="submit"
             aria-label="Subscribe to the Ncheta newsletter"
-            class="
-              w-full px-6 py-3
+            class="w-full px-6 py-3
               bg-noir text-cotton
               font-inter font-medium text-sm tracking-wide
               border border-noir
@@ -204,8 +220,7 @@ const legalLinks = [
               focus:ring-2 focus:ring-lime/50
               focus:ring-offset-2 focus:ring-offset-cotton
               disabled:opacity-60 disabled:cursor-not-allowed
-              cursor-pointer
-            "
+              cursor-pointer"
           >
             Subscribe
           </button>
@@ -217,7 +232,8 @@ const legalLinks = [
             aria-live="polite"
             aria-atomic="true"
             class="font-inter text-xs hidden"
-          ></p>
+          >
+          </p>
         </form>
       </div>
     </div>
@@ -237,21 +253,25 @@ const legalLinks = [
         >
           <a
             href="/site-policy"
-            class="font-inter text-xs text-noir/45  transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
+            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
           >
             Privacy
           </a>
-          <span class="text-noir/20 text-xs select-none" aria-hidden="true">|</span>
+          <span class="text-noir/20 text-xs select-none" aria-hidden="true"
+            >|</span
+          >
           <a
             href="/terms"
-            class="font-inter text-xs text-noir/45  transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
+            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
           >
             Terms
           </a>
-          <span class="text-noir/20 text-xs select-none" aria-hidden="true">|</span>
+          <span class="text-noir/20 text-xs select-none" aria-hidden="true"
+            >|</span
+          >
           <a
-            href="/sitemap.xml"
-            class="font-inter text-xs text-noir/45  transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
+            href="/sitemap-index.xml"
+            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
           >
             Sitemap
           </a>
@@ -268,36 +288,44 @@ const legalLinks = [
 -->
 <script>
   (() => {
-    const form   = document.getElementById("footer-newsletter-form")   as HTMLFormElement | null;
-    const status = document.getElementById("footer-newsletter-status") as HTMLParagraphElement | null;
-    const btn    = document.getElementById("footer-subscribe-btn")     as HTMLButtonElement | null;
+    const form = document.getElementById(
+      "footer-newsletter-form",
+    ) as HTMLFormElement | null;
+    const status = document.getElementById(
+      "footer-newsletter-status",
+    ) as HTMLParagraphElement | null;
+    const btn = document.getElementById(
+      "footer-subscribe-btn",
+    ) as HTMLButtonElement | null;
 
     if (!form || !status || !btn) return;
 
     form.addEventListener("submit", async (e: Event) => {
       e.preventDefault();
 
-      const emailInput = form.elements.namedItem("email") as HTMLInputElement | null;
+      const emailInput = form.elements.namedItem(
+        "email",
+      ) as HTMLInputElement | null;
       if (!emailInput) return;
 
       const email = emailInput.value.trim();
       if (!email) {
         status.textContent = "Please enter a valid email address.";
-        status.className   = "font-inter text-xs text-cherry block mt-1";
+        status.className = "font-inter text-xs text-cherry block mt-1";
         return;
       }
 
       // ── Optimistic UI ──────────────────────────────────────────
-      btn.disabled    = true;
+      btn.disabled = true;
       btn.textContent = "Subscribing…";
       status.textContent = "";
-      status.className   = "font-inter text-xs hidden";
+      status.className = "font-inter text-xs hidden";
 
       try {
         const res = await fetch("/api/newsletter", {
-          method:  "POST",
+          method: "POST",
           headers: { "Content-Type": "application/json" },
-          body:    JSON.stringify({ email }),
+          body: JSON.stringify({ email }),
         });
 
         if (res.ok) {
@@ -313,10 +341,10 @@ const legalLinks = [
           throw new Error("Server error");
         }
       } catch {
-        btn.disabled    = false;
+        btn.disabled = false;
         btn.textContent = "Subscribe";
         status.textContent = "Something went wrong. Please try again.";
-        status.className   = "font-inter text-xs text-cherry block mt-1";
+        status.className = "font-inter text-xs text-cherry block mt-1";
       }
     });
   })();

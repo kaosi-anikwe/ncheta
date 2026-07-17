@@ -13,10 +13,10 @@
     "astro": "astro",
     "generate-types": "wrangler types",
     "deploy": "npm run build && wrangler pages deploy dist"
-
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.1.1",
+    "@astrojs/sitemap": "^3.7.3",
     "@sanity/client": "^7.23.0",
     "@sanity/image-url": "^2.1.1",
     "@tailwindcss/vite": "^4.3.2",
