@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from "astro/config";
+import pagefind from "astro-pagefind";
 
 import tailwindcss from "@tailwindcss/vite";
 
@@ -13,4 +14,6 @@ export default defineConfig({
       exclude: ["@sanity/client"],
     },
   },
+
+  integrations: [pagefind()],
 });

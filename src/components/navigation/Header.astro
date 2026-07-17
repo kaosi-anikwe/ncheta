@@ -2,14 +2,14 @@
 const pathname = Astro.url.pathname;
 
 const navItems = [
-  { label: "Art News",            href: "/magazine/art-news" },
-  { label: "Academia",            href: "/magazine/academia" },
-  { label: "Interviews",          href: "/magazine/interviews" },
-  { label: "Collecting Now",      href: "/magazine/collecting-now" },
+  { label: "Art News", href: "/magazine/art-news" },
+  { label: "Academia", href: "/magazine/academia" },
+  { label: "Interviews", href: "/magazine/interviews" },
+  { label: "Collecting Now", href: "/magazine/collecting-now" },
   { label: "African Art History", href: "/magazine/african-art-history" },
   { label: "Exhibitions & Fairs", href: "/magazine/exhibitions-fairs" },
   { label: "Galleries & Museums", href: "/magazine/galleries-museums" },
-  { label: "Awards",              href: "/magazine/awards" },
+  { label: "Awards", href: "/magazine/awards" },
 ];
 
 function isActive(href: string) {
@@ -17,20 +17,24 @@ function isActive(href: string) {
 }
 ---
 
-<header class="sticky top-0 z-50 bg-cotton border-b border-noir/10" role="banner">
-
+<header
+  class="sticky top-0 z-50 bg-cotton border-b border-noir/10"
+  role="banner"
+>
   <!-- Row 1: Logo + Search + Subscribe -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex items-center justify-between h-16 md:h-20 gap-4">
-
       <!-- Full wordmark logo -->
-      <a href="/" class="shrink-0 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60" aria-label="Ncheta Magazine homepage">
-        <img src="/logo.svg" alt="Ncheta Magazine" class="h-10 md:h-14 w-auto" />
+      <a
+        href="/"
+        class="shrink-0 flex items-center focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60"
+        aria-label="Ncheta Magazine homepage"
+      >
+        <img src="/logo.svg" alt="Ncheta Magazine" class="h-8 md:h-10 w-auto" />
       </a>
 
       <!-- Right controls -->
       <div class="flex items-center gap-2 md:gap-3">
-
         <!-- Inline search input (hidden on mobile) -->
         <div class="relative hidden sm:flex items-center">
           <input
@@ -50,11 +54,22 @@ function isActive(href: string) {
           <button
             type="button"
             id="nav-search-btn"
-            class="absolute right-2 text-noir/40 hover:text-noir transition-colors"
+            class="absolute right-2 text-noir/40 hover:text-noir transition-colors cursor-pointer"
             aria-label="Submit search"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
           </button>
         </div>
@@ -84,42 +99,84 @@ function isActive(href: string) {
           class="sm:hidden p-1.5 text-noir/60 hover:text-noir transition-colors"
           aria-label="Search"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="1.75"
+            aria-hidden="true"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
           </svg>
         </button>
 
         <!-- Mobile menu toggle -->
         <details class="lg:hidden group relative">
-          <summary class="list-none cursor-pointer p-1.5 text-noir/60 hover:text-noir transition-colors" aria-label="Toggle menu">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-open:hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          <summary
+            class="list-none cursor-pointer p-1.5 text-noir/60 hover:text-noir transition-colors"
+            aria-label="Toggle menu"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 group-open:hidden"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.75"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M4 6h16M4 12h16M4 18h16"></path>
             </svg>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden group-open:block" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75" aria-hidden="true">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5 hidden group-open:block"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="1.75"
+              aria-hidden="true"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M6 18L18 6M6 6l12 12"></path>
             </svg>
           </summary>
-          <nav class="absolute top-full right-0 w-72 bg-cotton border border-noir/10 shadow-xl z-50" aria-label="Mobile navigation">
+          <nav
+            class="absolute top-full right-0 w-72 bg-cotton border border-noir/10 shadow-xl z-50"
+            aria-label="Mobile navigation"
+          >
             <div class="py-2">
-              {navItems.map((item) => {
-                const active = isActive(item.href);
-                return (
-                  <a
-                    href={item.href}
-                    aria-current={active ? "page" : undefined}
-                    class:list={[
-                      "flex items-center px-5 py-3 font-inter text-sm font-medium transition-colors duration-150 border-l-2",
-                      active ? "text-noir border-cherry bg-cherry/10" : "text-noir/65 hover:text-noir hover:bg-noir/5 border-transparent",
-                    ]}
-                  >
-                    {item.label}
-                  </a>
-                );
-              })}
+              {
+                navItems.map((item) => {
+                  const active = isActive(item.href);
+                  return (
+                    <a
+                      href={item.href}
+                      aria-current={active ? "page" : undefined}
+                      class:list={[
+                        "flex items-center px-5 py-3 font-inter text-sm font-medium transition-colors duration-150 border-l-2",
+                        active
+                          ? "text-noir border-cherry bg-cherry/10"
+                          : "text-noir/65 hover:text-noir hover:bg-noir/5 border-transparent",
+                      ]}
+                    >
+                      {item.label}
+                    </a>
+                  );
+                })
+              }
             </div>
           </nav>
         </details>
-
       </div>
     </div>
   </div>
@@ -127,26 +184,32 @@ function isActive(href: string) {
   <!-- Row 2: Nav links (desktop only) -->
   <div class="hidden lg:block border-t border-noir/10">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <nav class="flex items-center justify-around" aria-label="Primary navigation">
-        {navItems.map((item) => {
-          const active = isActive(item.href);
-          return (
-            <a
-              href={item.href}
-              aria-current={active ? "page" : undefined}
-              class:list={[
-                "relative px-3 py-2.5 font-inter text-[13px] font-medium tracking-wide transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60 rounded-sm nav-item",
-                active ? "text-noir nav-item--active" : "text-noir/60 hover:text-noir",
-              ]}
-            >
-              {item.label}
-            </a>
-          );
-        })}
+      <nav
+        class="flex items-center justify-around"
+        aria-label="Primary navigation"
+      >
+        {
+          navItems.map((item) => {
+            const active = isActive(item.href);
+            return (
+              <a
+                href={item.href}
+                aria-current={active ? "page" : undefined}
+                class:list={[
+                  "relative px-3 py-2.5 font-inter text-[13px] font-medium tracking-wide transition-colors whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60 rounded-sm nav-item",
+                  active
+                    ? "text-noir nav-item--active"
+                    : "text-noir/60 hover:text-noir",
+                ]}
+              >
+                {item.label}
+              </a>
+            );
+          })
+        }
       </nav>
     </div>
   </div>
-
 </header>
 
 <!-- Subscribe modal -->
@@ -158,20 +221,35 @@ function isActive(href: string) {
   aria-labelledby="modal-title"
 >
   <div id="modal-backdrop" class="absolute inset-0 bg-noir/50"></div>
-  <div class="relative bg-cotton border border-noir/15 shadow-2xl w-full max-w-md p-8 md:p-10">
+  <div
+    class="relative bg-cotton border border-noir/15 shadow-2xl w-full max-w-md p-8 md:p-10"
+  >
     <button
       id="modal-close"
       type="button"
       class="absolute top-4 right-4 p-1 text-noir/40 hover:text-noir transition-colors"
       aria-label="Close"
     >
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.75">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        class="h-5 w-5"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="1.75"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M6 18L18 6M6 6l12 12"></path>
       </svg>
     </button>
-    <h2 id="modal-title" class="font-cinzel font-bold text-2xl text-noir mb-2">Stay Informed</h2>
+    <h2 id="modal-title" class="font-cinzel font-bold text-2xl text-noir mb-2">
+      Stay Informed
+    </h2>
     <p class="font-inter text-sm text-noir/60 mb-6 leading-relaxed">
-      Weekly curation of the most important stories in African art — delivered to your inbox.
+      Weekly curation of the most important stories in African art — delivered
+      to your inbox.
     </p>
     <form id="modal-form" class="space-y-3" novalidate>
       <input
@@ -207,27 +285,33 @@ function isActive(href: string) {
     </form>
     <div id="modal-success" class="hidden text-center py-4">
       <p class="font-cinzel font-bold text-noir text-lg">You're in.</p>
-      <p class="font-inter text-sm text-noir/60 mt-1">Check your inbox for a confirmation email.</p>
+      <p class="font-inter text-sm text-noir/60 mt-1">
+        Check your inbox for a confirmation email.
+      </p>
     </div>
   </div>
 </div>
 
 <script>
   // Search
-  const searchInput = document.getElementById("nav-search") as HTMLInputElement | null;
+  const searchInput = document.getElementById(
+    "nav-search",
+  ) as HTMLInputElement | null;
   document.getElementById("nav-search-btn")?.addEventListener("click", () => {
     const q = searchInput?.value.trim();
-    if (q) window.location.href = `/resources/search?q=${encodeURIComponent(q)}`;
+    if (q) window.location.href = `/search?q=${encodeURIComponent(q)}`;
   });
   searchInput?.addEventListener("keydown", (e: KeyboardEvent) => {
     if (e.key === "Enter") {
       const q = (e.target as HTMLInputElement).value.trim();
-      if (q) window.location.href = `/resources/search?q=${encodeURIComponent(q)}`;
+      if (q) window.location.href = `/search?q=${encodeURIComponent(q)}`;
     }
   });
-  document.getElementById("mobile-search-btn")?.addEventListener("click", () => {
-    window.location.href = "/resources/search";
-  });
+  document
+    .getElementById("mobile-search-btn")
+    ?.addEventListener("click", () => {
+      window.location.href = "/search";
+    });
 
   // Subscribe modal
   const modal = document.getElementById("subscribe-modal") as HTMLElement;
@@ -235,33 +319,44 @@ function isActive(href: string) {
     modal.classList.remove("hidden");
     modal.classList.add("flex");
     document.body.style.overflow = "hidden";
-    (document.getElementById("modal-email") as HTMLInputElement | null)?.focus();
+    (
+      document.getElementById("modal-email") as HTMLInputElement | null
+    )?.focus();
   };
   const closeModal = () => {
     modal.classList.add("hidden");
     modal.classList.remove("flex");
     document.body.style.overflow = "";
   };
-  document.getElementById("subscribe-btn")?.addEventListener("click", openModal);
+  document
+    .getElementById("subscribe-btn")
+    ?.addEventListener("click", openModal);
   document.getElementById("modal-close")?.addEventListener("click", closeModal);
-  document.getElementById("modal-backdrop")?.addEventListener("click", closeModal);
-  document.addEventListener("keydown", (e: KeyboardEvent) => { if (e.key === "Escape") closeModal(); });
-
-  document.getElementById("modal-form")?.addEventListener("submit", async (e: SubmitEvent) => {
-    e.preventDefault();
-    const email = (document.getElementById("modal-email") as HTMLInputElement).value;
-    try {
-      await fetch("/api/newsletter", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      (window as any).umami?.track?.("Newsletter Signup");
-      document.getElementById("modal-form")!.classList.add("hidden");
-      document.getElementById("modal-success")!.classList.remove("hidden");
-      setTimeout(closeModal, 2500);
-    } catch {
-      alert("Something went wrong. Please try again.");
-    }
+  document
+    .getElementById("modal-backdrop")
+    ?.addEventListener("click", closeModal);
+  document.addEventListener("keydown", (e: KeyboardEvent) => {
+    if (e.key === "Escape") closeModal();
   });
+
+  document
+    .getElementById("modal-form")
+    ?.addEventListener("submit", async (e: SubmitEvent) => {
+      e.preventDefault();
+      const email = (document.getElementById("modal-email") as HTMLInputElement)
+        .value;
+      try {
+        await fetch("/api/newsletter", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        (window as any).umami?.track?.("Newsletter Signup");
+        document.getElementById("modal-form")!.classList.add("hidden");
+        document.getElementById("modal-success")!.classList.remove("hidden");
+        setTimeout(closeModal, 2500);
+      } catch {
+        alert("Something went wrong. Please try again.");
+      }
+    });
 </script>

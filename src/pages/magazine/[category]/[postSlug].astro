@@ -20,65 +20,125 @@ export async function getStaticPaths() {
 
 const { category: categorySlug, postSlug } = Astro.params;
 
-// Placeholder article — replaced by Sanity GROQ at build time
-const article = {
-  title: "Venice Biennale 2026: African Pavilions Take Center Stage",
-  category: { name: "Art News", slug: "art-news" },
-  publishedAt: "2026-06-28",
-  author: { name: "Emeka Okafor", title: "Senior Editor" },
-  excerpt:
-    "With a record number of African national pavilions, this year's Biennale signals a tectonic shift in how the global art world engages with the continent.",
-  heroImage: "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=1400&q=85",
-  heroImageAlt: "Installation view at the Venice Biennale 2026",
-  content: [
-    {
-      _type: "block",
-      style: "normal",
-      children: [{ _type: "span", text: "The 2026 Venice Biennale marks a historic turning point for African representation on the world's most prestigious art stage. With pavilions from Nigeria, Ghana, Kenya, Senegal, South Africa, Zimbabwe, Tanzania, and Rwanda — including first-time participants — the continent's presence has never been more visible, more ambitious, or more critically engaged." }],
-    },
-    {
-      _type: "block",
-      style: "h2",
-      children: [{ _type: "span", text: "A Record Year for African Pavilions" }],
-    },
-    {
-      _type: "block",
-      style: "normal",
-      children: [{ _type: "span", text: "The scale of the shift is unmistakable. Where once African nations struggled to secure adequate funding and exhibition space in the Arsenale and the Giardini, this year's Biennale sees several pavilions commanding some of the most coveted real estate at both sites. The Nigerian Pavilion, curated by Tosin Adesanya, presents a landmark intergenerational conversation between three generations of Nigerian artists, from the Zaria Art Society founding members through to the Yaba-trained painters of the 1980s and the digitally native artists who emerged in the last decade." }],
-    },
-    {
-      _type: "block",
-      style: "normal",
-      children: [{ _type: "span", text: "The Ghanaian Pavilion — mounted for the second time after its 2019 debut — has returned with a stronger institutional infrastructure and a markedly more confident curatorial voice. The presentation, themed around 'Radical Tenderness', brings together seven artists whose practices span painting, sculpture, photography, and performance." }],
-    },
-    {
-      _type: "block",
-      style: "h2",
-      children: [{ _type: "span", text: "What the Critics Are Saying" }],
-    },
-    {
-      _type: "block",
-      style: "normal",
-      children: [{ _type: "span", text: "Initial critical reception has been overwhelmingly positive. Artforum's lead review describes the Nigerian Pavilion as 'one of the most historically coherent and emotionally resonant presentations at this Biennale.' The Guardian's architecture critic singles out the Kenyan Pavilion's spatial design as 'a masterclass in how to transform a difficult inherited space into an immersive argument about contested landscape.'" }],
-    },
-    {
-      _type: "block",
-      style: "normal",
-      children: [{ _type: "span", text: "But beyond the critical praise, what is most significant is the structural shift this edition represents. The African pavilions are not being read as regional curiosities or as 'emerging' voices on the periphery of a Euro-American centre. They are being engaged on their own terms, as fully articulated positions within a global contemporary discourse." }],
-    },
-    {
-      _type: "block",
-      style: "h2",
-      children: [{ _type: "span", text: "The Funding Question" }],
-    },
-    {
-      _type: "block",
-      style: "normal",
-      children: [{ _type: "span", text: "Behind the scenes, the story is more complex. Several pavilions are still operating on shoestring budgets, reliant on a patchwork of government funding, diaspora philanthropy, and commercial gallery support. The disparity between well-resourced pavilions — those with dedicated national arts councils and strong private-sector backing — and those assembled through more precarious means remains stark." }],
-    },
-  ],
-  youtubeVideoUrl: "",
+// Lookup table of mock articles matching each generated static path
+const MOCK_ARTICLES: Record<string, any> = {
+  "venice-biennale-2026": {
+    title: "Venice Biennale 2026: African Pavilions Take Center Stage",
+    category: { name: "Art News", slug: "art-news" },
+    publishedAt: "2026-06-28",
+    author: { name: "Emeka Okafor", title: "Senior Editor" },
+    excerpt: "With a record number of African national pavilions, this year's Biennale signals a tectonic shift in how the global art world engages with the continent.",
+    heroImage: "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=1400&q=85",
+    heroImageAlt: "Installation view at the Venice Biennale 2026",
+    content: [
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "The 2026 Venice Biennale marks a historic turning point for African representation on the world's most prestigious art stage. With pavilions from Nigeria, Ghana, Kenya, Senegal, South Africa, Zimbabwe, Tanzania, and Rwanda — including first-time participants — the continent's presence has never been more visible, more ambitious, or more critically engaged." }],
+      },
+      {
+        _type: "block",
+        style: "h2",
+        children: [{ _type: "span", text: "A Record Year for African Pavilions" }],
+      },
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "The scale of the shift is unmistakable. Where once African nations struggled to secure adequate funding and exhibition space in the Arsenale and the Giardini, this year's Biennale sees several pavilions commanding some of the most coveted real estate at both sites. The Nigerian Pavilion, curated by Tosin Adesanya, presents a landmark intergenerational conversation between three generations of Nigerian artists, from the Zaria Art Society founding members through to the Yaba-trained painters of the 1980s and the digitally native artists who emerged in the last decade." }],
+      },
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "The Ghanaian Pavilion — mounted for the second time after its 2019 debut — has returned with a stronger institutional infrastructure and a markedly more confident curatorial voice. The presentation, themed around 'Radical Tenderness', brings together seven artists whose practices span painting, sculpture, photography, and performance." }],
+      }
+    ],
+    youtubeVideoUrl: ""
+  },
+  "ghana-art-market": {
+    title: "Ghana's Art Market Sees 300% Growth in Five Years",
+    category: { name: "Art News", slug: "art-news" },
+    publishedAt: "2026-06-22",
+    author: { name: "Samuel Agwu", title: "Contributing Editor" },
+    excerpt: "New data from the African Art Market Report reveals unprecedented growth driven by diaspora collectors and institutional acquisitions.",
+    heroImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=85",
+    heroImageAlt: "Gallery interior in Accra, Ghana",
+    content: [
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "Accra's visual arts ecosystem is experiencing an unprecedented surge. Over the past five years, total transaction volumes and auction results for Ghanaian artists have tripled, driven by a powerful mix of local gallery initiatives, international interest, and a highly active diaspora collector network." }],
+      },
+      {
+        _type: "block",
+        style: "h2",
+        children: [{ _type: "span", text: "Infrastructure and Institutional Support" }],
+      },
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "A key driver of this growth is the rapid development of local gallery infrastructure. Spaces like Gallery 1957, Nubuke Foundation, and Ada Contemporary Art Gallery have established international footprints, regularly participating in global fairs and introducing emerging talent to new audiences." }],
+      }
+    ],
+    youtubeVideoUrl: ""
+  },
+  "benin-bronzes-restitution": {
+    title: "The Benin Bronzes: Restitution and the Politics of Return",
+    category: { name: "Academia", slug: "academia" },
+    publishedAt: "2026-06-15",
+    author: { name: "Chisom Eze", title: "Academic Contributor" },
+    excerpt: "Five years after the landmark repatriation agreement, scholars and curators assess the lasting impact on global museum practice.",
+    heroImage: "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=1400&q=85",
+    heroImageAlt: "Historically significant artifacts and sculptures",
+    content: [
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "The dialogue surrounding the return of looted cultural heritage has shifted from theoretical debate to concrete action. The repatriation of the Benin Bronzes represents one of the most significant shifts in museum ethics since the mid-20th century." }],
+      },
+      {
+        _type: "block",
+        style: "h2",
+        children: [{ _type: "span", text: "Scholarly Assessments" }],
+      },
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "Across academic departments globally, curators and historians are rewriting catalogs, acknowledging provenance histories that were once downplayed, and exploring new models of collaborative guardianship." }],
+      }
+    ],
+    youtubeVideoUrl: ""
+  },
+  "wangechi-mutu": {
+    title: "Wangechi Mutu on World-Building and Afrofuturist Ecologies",
+    category: { name: "Interviews", slug: "interviews" },
+    publishedAt: "2026-06-18",
+    author: { name: "Adaeze Nwosu", title: "Features Writer" },
+    excerpt: "The Nairobi-born artist discusses her latest permanent commission at the Met and the role of myth-making in contemporary sculpture.",
+    heroImage: "https://images.unsplash.com/photo-1531913764164-f85c52e6e654?w=1400&q=85",
+    heroImageAlt: "A contemporary outdoor sculpture layout",
+    content: [
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "In this exclusive interview, Wangechi Mutu reflects on her path from Nairobi to global acclaim, her exploration of female representation, and the hybrid creatures that inhabit her landscapes." }],
+      },
+      {
+        _type: "block",
+        style: "h2",
+        children: [{ _type: "span", text: "Hybridity and the Natural World" }],
+      },
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "'My work has always been about combining forms to speak to how we are made of multiple materials, cultures, and species,' Mutu remarks. 'We are not singular entities; we are ecosystems.'" }],
+      }
+    ],
+    youtubeVideoUrl: ""
+  }
 };
+
+const article = MOCK_ARTICLES[postSlug] || MOCK_ARTICLES["venice-biennale-2026"];
+
 
 const { title, category: articleCategory, publishedAt, author, excerpt, heroImage, heroImageAlt, content, youtubeVideoUrl } = article;
 
@@ -97,123 +157,131 @@ function fmtDate(d: string) {
   <Header />
 
   <main>
-    <!-- ── Breadcrumb ──────────────────────────────────────────── -->
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-      <nav class="flex items-center gap-2 font-inter text-xs text-noir/40 mb-7" aria-label="Breadcrumb">
-        <a href="/" class=" transition-colors">Home</a>
-        <span aria-hidden="true">/</span>
-        <a href={`/magazine/${articleCategory.slug}`} class=" transition-colors capitalize">
+    <article data-pagefind-body>
+      <!-- ── Breadcrumb ──────────────────────────────────────────── -->
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+        <nav class="flex items-center gap-2 font-inter text-xs text-noir/40 mb-7" aria-label="Breadcrumb">
+          <a href="/" class=" transition-colors">Home</a>
+          <span aria-hidden="true">/</span>
+          <a href={`/magazine/${articleCategory.slug}`} class=" transition-colors capitalize">
+            {articleCategory.name}
+          </a>
+          <span aria-hidden="true">/</span>
+          <span class="text-noir/60 truncate max-w-50">{title}</span>
+        </nav>
+      </div>
+
+      <!-- ── Article header ─────────────────────────────────────── -->
+      <header class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
+        <!-- Category tag -->
+        <a
+          href={`/magazine/${articleCategory.slug}`}
+          class="tag-pill  transition-colors mb-4 block"
+          data-pagefind-meta="category"
+        >
           {articleCategory.name}
         </a>
-        <span aria-hidden="true">/</span>
-        <span class="text-noir/60 truncate max-w-50">{title}</span>
-      </nav>
-    </div>
 
-    <!-- ── Article header ─────────────────────────────────────── -->
-    <header class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mb-8">
-      <!-- Category tag -->
-      <a
-        href={`/magazine/${articleCategory.slug}`}
-        class="tag-pill  transition-colors mb-4 block"
-      >
-        {articleCategory.name}
-      </a>
-
-      <!-- Title -->
-      <h1 class="font-cinzel font-bold text-2xl md:text-3xl lg:text-4xl text-noir leading-tight mb-5">
-        {title}
-      </h1>
-
-      <!-- Excerpt / standfirst -->
-      <p class="font-inter text-base md:text-lg text-noir/60 leading-relaxed mb-6 border-l-2 border-cherry pl-4">
-        {excerpt}
-      </p>
-
-      <!-- Meta row: author + date + share -->
-      <div class="flex items-center justify-between border-y border-noir/10 py-4">
-        <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-full bg-noir/10 flex items-center justify-center shrink-0">
-            <span class="font-cinzel font-bold text-sm text-noir/50">
-              {author.name.charAt(0)}
-            </span>
-          </div>
-          <div>
-            <p class="font-inter text-sm font-medium text-noir">{author.name}</p>
-            <p class="font-inter text-xs text-noir/45">{author.title}</p>
-          </div>
-        </div>
-        <time
-          datetime={publishedAt}
-          class="font-inter text-xs text-noir/40"
+        <!-- Title -->
+        <h1
+          class="font-cinzel font-bold text-2xl md:text-3xl lg:text-4xl text-noir leading-tight mb-5"
+          data-pagefind-meta="title"
         >
-          {fmtDate(publishedAt)}
-        </time>
-      </div>
-    </header>
+          {title}
+        </h1>
 
-    <!-- ── Hero image ─────────────────────────────────────────── -->
-    {heroImage && (
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
-        <figure>
-          <img
-            src={heroImage}
-            alt={heroImageAlt || title}
-            class="w-full object-cover"
-            style="max-height: 520px;"
-            loading="eager"
-          />
-          {heroImageAlt && (
-            <figcaption class="mt-2 font-inter text-xs text-noir/40 text-center">
-              {heroImageAlt}
-            </figcaption>
-          )}
-        </figure>
-      </div>
-    )}
-
-    <!-- ── Prose content ──────────────────────────────────────── -->
-    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="prose-content">
-        <PortableText blocks={content} />
-      </div>
-
-      <!-- Mid-article newsletter CTA -->
-      <aside class="my-12 bg-noir px-7 py-8 md:px-10">
-        <p class="font-cinzel font-bold text-lg text-cotton mb-1">Subscribe to the Ncheta Newsletter</p>
-        <p class="font-inter text-sm text-cotton/55 mb-5">
-          The most important African art stories, weekly in your inbox.
+        <!-- Excerpt / standfirst -->
+        <p class="font-inter text-base md:text-lg text-noir/60 leading-relaxed mb-6 border-l-2 border-cherry pl-4">
+          {excerpt}
         </p>
-        <form
-          id="article-newsletter-form"
-          class="flex flex-col sm:flex-row gap-2"
-          novalidate
-        >
-          <input
-            id="article-email"
-            name="email"
-            type="email"
-            required
-            placeholder="your@email.com"
-            aria-label="Your email address"
-            class="flex-1 px-4 py-2.5 bg-cotton/10 border border-cotton/20 text-cotton placeholder:text-cotton/30 font-inter text-sm focus:outline-none focus:border-lime transition-colors"
-          />
-          <button
-            type="submit"
-            class="px-5 py-2.5 bg-lime text-noir font-inter font-medium text-sm hover:bg-lime/90 transition-colors whitespace-nowrap"
-          >
-            Subscribe
-          </button>
-        </form>
-      </aside>
 
-      <!-- YouTube embed if present -->
-      {youtubeVideoUrl && (
-        <div class="my-10">
-          <MediaEmbed youtubeUrl={youtubeVideoUrl} />
+        <!-- Meta row: author + date + share -->
+        <div class="flex items-center justify-between border-y border-noir/10 py-4">
+          <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-full bg-noir/10 flex items-center justify-center shrink-0">
+              <span class="font-cinzel font-bold text-sm text-noir/50">
+                {author.name.charAt(0)}
+              </span>
+            </div>
+            <div>
+              <p class="font-inter text-sm font-medium text-noir" data-pagefind-meta="author">{author.name}</p>
+              <p class="font-inter text-xs text-noir/45">{author.title}</p>
+            </div>
+          </div>
+          <time
+            datetime={publishedAt}
+            class="font-inter text-xs text-noir/40"
+            data-pagefind-meta="date"
+          >
+            {fmtDate(publishedAt)}
+          </time>
+        </div>
+      </header>
+
+      <!-- ── Hero image ─────────────────────────────────────────── -->
+      {heroImage && (
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 mb-10">
+          <figure>
+            <img
+              src={heroImage}
+              alt={heroImageAlt || title}
+              class="w-full object-cover"
+              style="max-height: 520px;"
+              loading="eager"
+              data-pagefind-meta="image[src]"
+            />
+            {heroImageAlt && (
+              <figcaption class="mt-2 font-inter text-xs text-noir/40 text-center">
+                {heroImageAlt}
+              </figcaption>
+            )}
+          </figure>
         </div>
       )}
-    </div>
+
+      <!-- ── Prose content ──────────────────────────────────────── -->
+      <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="prose-content">
+          <PortableText blocks={content} />
+        </div>
+
+        <!-- Mid-article newsletter CTA -->
+        <aside class="my-12 bg-noir px-7 py-8 md:px-10">
+          <p class="font-cinzel font-bold text-lg text-cotton mb-1">Subscribe to the Ncheta Newsletter</p>
+          <p class="font-inter text-sm text-cotton/55 mb-5">
+            The most important African art stories, weekly in your inbox.
+          </p>
+          <form
+            id="article-newsletter-form"
+            class="flex flex-col sm:flex-row gap-2"
+            novalidate
+          >
+            <input
+              id="article-email"
+              name="email"
+              type="email"
+              required
+              placeholder="your@email.com"
+              aria-label="Your email address"
+              class="flex-1 px-4 py-2.5 bg-cotton/10 border border-cotton/20 text-cotton placeholder:text-cotton/30 font-inter text-sm focus:outline-none focus:border-lime transition-colors"
+            />
+            <button
+              type="submit"
+              class="px-5 py-2.5 bg-lime text-noir font-inter font-medium text-sm hover:bg-lime/90 transition-colors whitespace-nowrap"
+            >
+              Subscribe
+            </button>
+          </form>
+        </aside>
+
+        <!-- YouTube embed if present -->
+        {youtubeVideoUrl && (
+          <div class="my-10">
+            <MediaEmbed youtubeUrl={youtubeVideoUrl} />
+          </div>
+        )}
+      </div>
+    </article>
 
     <!-- ── Related articles ───────────────────────────────────── -->
     <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-10 border-t border-noir/10">
@@ -234,6 +302,7 @@ function fmtDate(d: string) {
   </main>
 
   <Footer />
+
 </Layout>
 
 <script>

@@ -1,24 +1,221 @@
 ---
-// Search page — Pagefind shell
+/**
+ * search.astro — Search page
+ *
+ * Pattern: URL-driven, form-GET, no realtime
+ *   1. User types query → presses Search button or Enter
+ *   2. Form submits as GET /search?q=... (standard browser navigation)
+ *   3. Page reads ?q= from the URL, runs Pagefind JS API, renders results
+ *   4. Back/forward works; results are shareable via URL
+ *
+ * Pagefind JS API (not the web component) is used so we fully control
+ * the rendering — results appear only on explicit navigation.
+ *
+ * Button style: identical to Footer subscribe button per brand spec.
+ */
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
+import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
 ---
 
-<Layout title="Search" description="Search Ncheta Magazine articles and resources.">
+<Layout
+  title="Search"
+  description="Search Ncheta Magazine articles, interviews, and resources."
+>
   <Header />
+
   <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16 min-h-[60vh]">
-    <h1 class="font-cinzel font-bold text-3xl md:text-4xl text-noir mb-8">Search</h1>
-    <div id="search"></div>
+    <!-- Page heading -->
+    <h1 class="font-cinzel font-bold text-3xl md:text-4xl text-noir mb-10">
+      Search
+    </h1>
+
+    <!-- Search form — GET /search?q=... on submit or Enter -->
+    <form
+      id="search-form"
+      method="get"
+      action="/search"
+      role="search"
+      aria-label="Search Ncheta Magazine"
+      class="w-full flex flex-col sm:flex-row gap-0 mb-12"
+    >
+      <label for="search-input" class="sr-only">Search query</label>
+      <input
+        id="search-input"
+        name="q"
+        type="search"
+        required
+        placeholder="Search articles, interviews, art history…"
+        autocomplete="off"
+        autocorrect="off"
+        spellcheck="false"
+        aria-label="Search query"
+        class="flex-1 min-w-0 px-4 py-3
+          bg-cotton
+          border border-noir/25 border-r-0
+          font-inter text-sm text-noir
+          placeholder:text-noir/30
+          focus:outline-none
+          focus:border-cherry
+          focus:ring-2 focus:ring-cherry/35
+          transition-all duration-200
+          sm:border-r-0"
+
+      />
+      <button
+        id="search-btn"
+        type="submit"
+        aria-label="Run search"
+        class="px-6 py-3
+          bg-noir text-cotton
+          font-inter font-medium text-sm tracking-wide
+          border border-noir
+          transition-all duration-200
+          hover:bg-lime hover:text-noir hover:border-lime
+          focus:outline-none
+          focus:ring-2 focus:ring-lime/50
+          focus:ring-offset-2 focus:ring-offset-cotton
+          disabled:opacity-60 disabled:cursor-not-allowed
+          cursor-pointer
+          whitespace-nowrap"
+      >
+        Search
+      </button>
+    </form>
+
+    <!-- Results area — populated by client-side script -->
+    <div
+      id="search-status"
+      class="font-inter text-xs text-noir/50 uppercase tracking-widest mb-6 hidden"
+      aria-live="polite"
+    >
+      Searching…
+    </div>
+
+    <div id="search-results" aria-label="Search results" aria-live="polite">
+      <!-- Injected by script below when ?q= is present -->
+    </div>
+
+    <p id="search-placeholder" class="font-inter text-sm text-noir/45 mt-4">
+      Enter a search term above to find articles, interviews, and resources.
+    </p>
   </main>
+
   <Footer />
+  <PagefindConfig />
 </Layout>
 
 <script is:inline>
-  // Pagefind UI loads from post-build output
-  const s = document.createElement("script");
-  s.src = "/pagefind/pagefind-ui.js";
-  s.onload = () => { new PagefindUI({ element: "#search" }); };
-  document.head.appendChild(s);
+  /**
+   * Pagefind JS API search runner.
+   * Runs purely client-side to dynamically handle URL query params
+   * and manage DOM states (input value, title, loading status, and placeholder).
+   */
+  (async () => {
+    const params = new URLSearchParams(window.location.search);
+    const query = params.get("q")?.trim();
+    
+    const inputEl = document.getElementById("search-input");
+    const statusEl = document.getElementById("search-status");
+    const placeholderEl = document.getElementById("search-placeholder");
+    const resultsEl = document.getElementById("search-results");
+    
+    if (!resultsEl) return;
+
+    if (!query) {
+      if (statusEl) statusEl.classList.add("hidden");
+      if (placeholderEl) placeholderEl.classList.remove("hidden");
+      return;
+    }
+
+    // Pre-fill input value & update document title
+    if (inputEl) inputEl.value = query;
+    document.title = `Search: "${query}" — Ncheta Magazine`;
+
+    // Show searching state, hide empty placeholder
+    if (statusEl) {
+      statusEl.textContent = "Searching…";
+      statusEl.classList.remove("hidden");
+    }
+    if (placeholderEl) {
+      placeholderEl.classList.add("hidden");
+    }
+
+    // ── Load Pagefind JS API ──────────────────────────────────────
+    let pagefind;
+    try {
+      pagefind = await import("/pagefind/pagefind.js");
+      await pagefind.init();
+    } catch (err) {
+      console.warn("[search] Pagefind unavailable:", err);
+      if (statusEl) {
+        statusEl.textContent = "Search index unavailable. Run a production build first.";
+      }
+      return;
+    }
+
+    // ── Run search ────────────────────────────────────────────────
+    const { results } = await pagefind.search(query);
+
+    if (statusEl) {
+      statusEl.textContent = results.length
+        ? `${results.length} result${results.length === 1 ? "" : "s"} for "${query}"`
+        : `No results for "${query}"`;
+    }
+
+    if (results.length === 0) {
+      resultsEl.innerHTML = `
+        <p class="font-inter text-sm text-noir/50 mt-2">
+          Try a different search term or browse articles by
+          <a href="/magazine/art-news" class="underline decoration-cherry/50 hover:text-cherry transition-colors">category</a>.
+        </p>
+      `;
+      return;
+    }
+
+    // ── Render results ────────────────────────────────────────────
+    const LIMIT = 20;
+    const items = await Promise.all(
+      results.slice(0, LIMIT).map((r) => r.data()),
+    );
+
+    resultsEl.innerHTML = items
+      .map(
+        (item) => `
+      <a
+        href="${item.url}"
+        class="group block border-b border-noir/10 py-5 hover:bg-noir/[0.03] transition-colors duration-150 -mx-2 px-2"
+      >
+        ${
+          item.meta?.image
+            ? `
+          <div class="mb-3 overflow-hidden aspect-[16/6]">
+            <img
+              src="${item.meta.image}"
+              alt="${item.meta.image_alt ?? item.meta.title ?? ""}"
+              class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+              loading="lazy"
+            />
+          </div>`
+            : ""
+        }
+        <p class="font-inter text-[11px] font-semibold uppercase tracking-widest text-cherry mb-1">
+          ${item.meta?.category ?? "Article"}
+        </p>
+        <h2 class="font-cinzel font-bold text-base md:text-lg text-noir group-hover:text-cherry transition-colors duration-200 leading-snug mb-2">
+          ${item.meta?.title ?? item.url}
+        </h2>
+        <p class="font-inter text-sm text-noir/55 leading-relaxed line-clamp-3">
+          ${item.excerpt ?? ""}
+        </p>
+        <p class="mt-2 font-inter text-xs text-noir/35">
+          ${item.meta?.author ? `<span class="font-medium text-noir/50">${item.meta.author}</span> · ` : ""}
+          ${item.meta?.date ? new Date(item.meta.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}
+        </p>
+      </a>
+    `,
+      )
+      .join("");
+  })();
 </script>
-<link rel="stylesheet" href="/pagefind/pagefind-ui.css" />
