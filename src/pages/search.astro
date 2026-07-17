@@ -84,13 +84,42 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
       </button>
     </form>
 
-    <!-- Results area — populated by client-side script -->
+    <!-- Meta/Status row with Sort options -->
     <div
-      id="search-status"
-      class="font-inter text-xs text-noir/50 uppercase tracking-widest mb-6 hidden"
-      aria-live="polite"
+      id="search-meta-row"
+      class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8 hidden border-b border-noir/10 pb-4"
     >
-      Searching…
+      <div
+        id="search-status"
+        class="font-inter text-xs text-noir/50 uppercase tracking-widest"
+        aria-live="polite"
+      >
+        Searching…
+      </div>
+
+      <div id="search-sort-container" class="flex items-center gap-2 hidden">
+        <label for="search-sort" class="font-inter text-xs text-noir/50 uppercase tracking-widest">
+          Sort by:
+        </label>
+        <select
+          id="search-sort"
+          class="
+            px-3 py-1.5
+            bg-cotton
+            border border-noir/25
+            font-inter text-xs text-noir
+            focus:outline-none
+            focus:border-cherry
+            transition-colors duration-150
+            cursor-pointer
+            rounded-none
+          "
+        >
+          <option value="relevance">Relevance</option>
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+        </select>
+      </div>
     </div>
 
     <div id="search-results" aria-label="Search results" aria-live="polite">
@@ -117,14 +146,17 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
     const query = params.get("q")?.trim();
     
     const inputEl = document.getElementById("search-input");
+    const metaRowEl = document.getElementById("search-meta-row");
     const statusEl = document.getElementById("search-status");
+    const sortContainerEl = document.getElementById("search-sort-container");
+    const sortSelectEl = document.getElementById("search-sort");
     const placeholderEl = document.getElementById("search-placeholder");
     const resultsEl = document.getElementById("search-results");
     
     if (!resultsEl) return;
 
     if (!query) {
-      if (statusEl) statusEl.classList.add("hidden");
+      if (metaRowEl) metaRowEl.classList.add("hidden");
       if (placeholderEl) placeholderEl.classList.remove("hidden");
       return;
     }
@@ -134,9 +166,14 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
     document.title = `Search: "${query}" — Ncheta Magazine`;
 
     // Show searching state, hide empty placeholder
+    if (metaRowEl) {
+      metaRowEl.classList.remove("hidden");
+    }
     if (statusEl) {
       statusEl.textContent = "Searching…";
-      statusEl.classList.remove("hidden");
+    }
+    if (sortContainerEl) {
+      sortContainerEl.classList.add("hidden"); // hide sort selector until results load
     }
     if (placeholderEl) {
       placeholderEl.classList.add("hidden");
@@ -174,48 +211,90 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
       return;
     }
 
-    // ── Render results ────────────────────────────────────────────
-    const LIMIT = 20;
-    const items = await Promise.all(
-      results.slice(0, LIMIT).map((r) => r.data()),
+    // Show sort container since we have results
+    if (sortContainerEl) {
+      sortContainerEl.classList.remove("hidden");
+    }
+
+    // ── Fetch result data ─────────────────────────────────────────
+    // Load up to 50 results so that we can sort them in memory
+    const LIMIT = 50;
+    const rawItems = await Promise.all(
+      results.slice(0, LIMIT).map((r) => r.data())
     );
 
-    resultsEl.innerHTML = items
-      .map(
-        (item) => `
-      <a
-        href="${item.url}"
-        class="group block border-b border-noir/10 py-5 hover:bg-noir/[0.03] transition-colors duration-150 -mx-2 px-2"
-      >
-        ${
-          item.meta?.image
-            ? `
-          <div class="mb-3 overflow-hidden aspect-[16/6]">
-            <img
-              src="${item.meta.image}"
-              alt="${item.meta.image_alt ?? item.meta.title ?? ""}"
-              class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
-              loading="lazy"
-            />
-          </div>`
-            : ""
-        }
-        <p class="font-inter text-[11px] font-semibold uppercase tracking-widest text-cherry mb-1">
-          ${item.meta?.category ?? "Article"}
-        </p>
-        <h2 class="font-cinzel font-bold text-base md:text-lg text-noir group-hover:text-cherry transition-colors duration-200 leading-snug mb-2">
-          ${item.meta?.title ?? item.url}
-        </h2>
-        <p class="font-inter text-sm text-noir/55 leading-relaxed line-clamp-3">
-          ${item.excerpt ?? ""}
-        </p>
-        <p class="mt-2 font-inter text-xs text-noir/35">
-          ${item.meta?.author ? `<span class="font-medium text-noir/50">${item.meta.author}</span> · ` : ""}
-          ${item.meta?.date ? new Date(item.meta.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}
-        </p>
-      </a>
-    `,
-      )
-      .join("");
+    // Keep reference of items with score from Pagefind for relevance sorting
+    const items = rawItems.map((item, index) => ({
+      ...item,
+      score: results[index]?.score || 0,
+      index // original index to preserve relevance order precisely
+    }));
+
+    // Function to render items based on sorting
+    const renderSortedItems = (sortBy) => {
+      let sorted = [...items];
+
+      if (sortBy === "newest") {
+        sorted.sort((a, b) => {
+          const dateA = a.meta?.date ? new Date(a.meta.date).getTime() : 0;
+          const dateB = b.meta?.date ? new Date(b.meta.date).getTime() : 0;
+          return dateB - dateA; // Newest first
+        });
+      } else if (sortBy === "oldest") {
+        sorted.sort((a, b) => {
+          const dateA = a.meta?.date ? new Date(a.meta.date).getTime() : 0;
+          const dateB = b.meta?.date ? new Date(b.meta.date).getTime() : 0;
+          return dateA - dateB; // Oldest first
+        });
+      } else {
+        // relevance — sort by pagefind score (highest first), fallback to original index order
+        sorted.sort((a, b) => {
+          if (b.score !== a.score) return b.score - a.score;
+          return a.index - b.index;
+        });
+      }
+
+      resultsEl.innerHTML = sorted.map((item) => `
+        <a
+          href="${item.url}"
+          class="group block border-b border-noir/10 py-5 hover:bg-noir/[0.03] transition-colors duration-150 -mx-2 px-2"
+        >
+          ${item.meta?.image ? `
+            <div class="mb-3 overflow-hidden aspect-[16/6]">
+              <img
+                src="${item.meta.image}"
+                alt="${item.meta.image_alt ?? item.meta.title ?? ""}"
+                class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
+                loading="lazy"
+              />
+            </div>` : ""}
+          <p class="font-inter text-[11px] font-semibold uppercase tracking-widest text-cherry mb-1">
+            ${item.meta?.category ?? "Article"}
+          </p>
+          <h2 class="font-cinzel font-bold text-base md:text-lg text-noir group-hover:text-cherry transition-colors duration-200 leading-snug mb-2">
+            ${item.meta?.title ?? item.url}
+          </h2>
+          <p class="font-inter text-sm text-noir/55 leading-relaxed line-clamp-3">
+            ${item.excerpt ?? ""}
+          </p>
+          <p class="mt-2 font-inter text-xs text-noir/35">
+            ${item.meta?.author ? `<span class="font-medium text-noir/50">${item.meta.author}</span> · ` : ""}
+            ${item.meta?.date ? new Date(item.meta.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}
+          </p>
+        </a>
+      `).join("");
+    };
+
+    // Initial render using default Relevance sort
+    renderSortedItems(sortSelectEl?.value || "relevance");
+
+    // Re-render when sort dropdown selection changes
+    if (sortSelectEl) {
+      sortSelectEl.addEventListener("change", (e) => {
+        renderSortedItems(e.target.value);
+      });
+    }
+
   })();
 </script>
+
