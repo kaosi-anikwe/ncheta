@@ -3,6 +3,7 @@
 import Layout from "../layouts/Layout.astro";
 import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
+import { contactServices } from "./services.astro";
 ---
 
 <Layout
@@ -12,18 +13,25 @@ import Footer from "../components/navigation/Footer.astro";
   <Header />
   <main class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
     <!-- Breadcrumb -->
-    <nav class="mb-8 font-inter text-xs text-noir/40 flex gap-2" aria-label="Breadcrumb">
-      <a href="/" class=" transition-colors">Home</a>
+    <nav
+      class="mb-8 font-inter text-xs text-noir/40 flex gap-2"
+      aria-label="Breadcrumb"
+    >
+      <a href="/" class="transition-colors">Home</a>
       <span>/</span>
       <span class="text-noir/60">Contact</span>
     </nav>
 
-    <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-noir mb-3">Contact Us</h1>
-    <p class="font-inter text-base text-noir/55 mb-10 border-l-2 border-cherry pl-4">
-      Story tips, press enquiries, editorial pitches, or partnership proposals — we read everything.
+    <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-noir mb-3">
+      Contact Us
+    </h1>
+    <p
+      class="font-inter text-base text-noir/55 mb-10 border-l-2 border-cherry pl-4"
+    >
+      Story tips, press enquiries, editorial pitches, or partnership proposals —
+      we read everything.
     </p>
 
-    <!-- Contact form: flat borders, Lime focus, Noir submit button -->
     <form
       id="contact-form"
       class="space-y-5"
@@ -32,22 +40,34 @@ import Footer from "../components/navigation/Footer.astro";
     >
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
         <div class="space-y-1.5">
-          <label for="firstName" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+          <label
+            for="firstName"
+            class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider"
+          >
             First Name <span class="text-cherry" aria-hidden="true">*</span>
           </label>
           <input
-            id="firstName" name="firstName" type="text" required
+            id="firstName"
+            name="firstName"
+            type="text"
+            required
             placeholder="First name"
             aria-required="true"
             class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
           />
         </div>
         <div class="space-y-1.5">
-          <label for="lastName" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+          <label
+            for="lastName"
+            class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider"
+          >
             Last Name <span class="text-cherry" aria-hidden="true">*</span>
           </label>
           <input
-            id="lastName" name="lastName" type="text" required
+            id="lastName"
+            name="lastName"
+            type="text"
+            required
             placeholder="Last name"
             aria-required="true"
             class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
@@ -56,11 +76,17 @@ import Footer from "../components/navigation/Footer.astro";
       </div>
 
       <div class="space-y-1.5">
-        <label for="email" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+        <label
+          for="email"
+          class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider"
+        >
           Email <span class="text-cherry" aria-hidden="true">*</span>
         </label>
         <input
-          id="email" name="email" type="email" required
+          id="email"
+          name="email"
+          type="email"
+          required
           placeholder="your@email.com"
           aria-required="true"
           class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
@@ -68,38 +94,65 @@ import Footer from "../components/navigation/Footer.astro";
       </div>
 
       <div class="space-y-1.5">
-        <label for="subject" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
-          Subject <span class="text-cherry" aria-hidden="true">*</span>
+        <label
+          for="serviceType"
+          class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider"
+        >
+          Service Type <span class="text-cherry" aria-hidden="true">*</span>
         </label>
-        <input
-          id="subject" name="subject" type="text" required
-          placeholder="What is your enquiry about?"
+        <select
+          id="serviceType"
+          name="serviceType"
+          required
           aria-required="true"
-          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all"
-        />
+          class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all appearance-none cursor-pointer"
+        >
+          <option value="">Select a service…</option>
+          {
+            contactServices.map((s) => (
+              <option value={s.slug}>{s.title}</option>
+            ))
+          }
+        </select>
       </div>
 
       <div class="space-y-1.5">
-        <label for="message" class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider">
+        <label
+          for="message"
+          class="block font-inter text-xs font-medium text-noir/55 uppercase tracking-wider"
+        >
           Message <span class="text-cherry" aria-hidden="true">*</span>
         </label>
         <textarea
-          id="message" name="message" required rows={5}
+          id="message"
+          name="message"
+          required
+          rows={5}
           placeholder="Tell us about your enquiry..."
           aria-required="true"
           class="w-full px-4 py-3 bg-cotton border border-noir/20 font-inter text-sm text-noir placeholder:text-noir/30 focus:outline-none focus:border-cherry focus:ring-2 focus:ring-cherry/30 transition-all resize-y min-h-30"
         ></textarea>
       </div>
 
-      <!-- Submit: Noir bg / Cotton text → Lime bg / Noir text on hover -->
+      <p class="font-inter text-xs text-noir/45 leading-relaxed">
+        By submitting this form, you also agree to subscribe to our weekly newsletter. You can unsubscribe at any time.
+      </p>
+
+      <!-- Noir/Cotton submit → Lime hover -->
       <button
         type="submit"
-        class="w-full px-6 py-3 bg-noir text-cotton font-inter font-medium text-sm border border-noir hover:bg-cherry hover:text-noir hover:border-cherry focus:outline-none focus:ring-2 focus:ring-cherry/50 focus:ring-offset-2 focus:ring-offset-cotton transition-all duration-200"
+        class="w-full px-6 py-3 bg-noir text-cotton font-inter font-medium text-sm border border-noir hover:bg-lime hover:text-noir hover:border-lime focus:outline-none focus:ring-2 focus:ring-lime/50 focus:ring-offset-2 focus:ring-offset-cotton transition-all duration-200 disabled:opacity-60 cursor-pointer"
       >
-        Send Message
+        Submit Enquiry
       </button>
 
-      <p id="contact-status" role="status" aria-live="polite" class="font-inter text-sm hidden"></p>
+      <p
+        id="contact-status"
+        role="status"
+        aria-live="polite"
+        class="font-inter text-sm hidden"
+      >
+      </p>
     </form>
   </main>
   <Footer />
@@ -107,17 +160,30 @@ import Footer from "../components/navigation/Footer.astro";
 
 <script>
   (() => {
-    const form = document.getElementById("contact-form") as HTMLFormElement | null;
-    const status = document.getElementById("contact-status") as HTMLParagraphElement | null;
+    const form = document.getElementById(
+      "contact-form",
+    ) as HTMLFormElement | null;
+    const status = document.getElementById(
+      "contact-status",
+    ) as HTMLParagraphElement | null;
     if (!form || !status) return;
     form.addEventListener("submit", async (e: Event) => {
       e.preventDefault();
       const data = Object.fromEntries(new FormData(form).entries());
-      const btn = form.querySelector("button[type=submit]") as HTMLButtonElement;
+      const btn = form.querySelector(
+        "button[type=submit]",
+      ) as HTMLButtonElement;
       btn.disabled = true;
       btn.textContent = "Sending…";
       try {
-        await fetch("/api/inbound", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) });
+        await fetch("/api/inbound", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+        (window as any).umami?.track?.("B2B Service Inquiry", {
+          type: data.serviceType,
+        });
         form.innerHTML = `<div class="py-8 text-center"><p class="font-cinzel font-bold text-xl text-noir mb-2">Message received</p><p class="font-inter text-sm text-noir/55">We'll be in touch within 48 hours.</p></div>`;
       } catch {
         btn.disabled = false;

@@ -27,6 +27,24 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
               { name: "service_type_of_interest", value: serviceType },
               { name: "message", value: message },
             ],
+            legalConsentOptions: {
+              consent: {
+                consentToProcess: true,
+                text: "By submitting this form, you also agree to subscribe to our weekly newsletter.",
+                communications: [
+                  {
+                    value: true,
+                    subscriptionTypeId: 3093178206,
+                    text: "I agree to receive marketing communications and newsletters."
+                  },
+                  {
+                    value: true,
+                    subscriptionTypeId: 3093178198,
+                    text: "I agree to receive sales and one-to-one communications."
+                  }
+                ]
+              }
+            }
           }),
         }
       );
