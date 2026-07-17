@@ -24,7 +24,7 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
               { name: "firstname", value: firstName },
               { name: "lastname", value: lastName },
               { name: "email", value: email },
-              { name: "service_type", value: serviceType },
+              { name: "service_type_of_interest", value: serviceType },
               { name: "message", value: message },
             ],
           }),
