@@ -3,9 +3,19 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
 import ArticleCard from "../components/cards/ArticleCard.astro";
+import { getAllEditorials } from "../sanity/queries";
+import { urlFor } from "../sanity/image";
 
-// ── Static placeholder data (replaced by Sanity GROQ at build time) ──
-const sections = [
+// Fetch Sanity articles dynamically
+let sanityArticles = [];
+try {
+  sanityArticles = await getAllEditorials();
+} catch (err) {
+  console.warn("Failed to fetch editorials from Sanity, using fallback.", err);
+}
+
+// ── Static placeholder data (fallback if Sanity is empty) ──
+const fallbackSections = [
   {
     title: "Latest",
     slug: "art-news",
@@ -226,6 +236,117 @@ const sections = [
     ],
   },
 ];
+
+// Map Sanity articles to our sections if they exist, otherwise use fallbacks
+let sections = [];
+
+if (sanityArticles && sanityArticles.length > 0) {
+  const latestHero = sanityArticles[0];
+  const latestSmall = sanityArticles.slice(1, 5);
+  const latestText = sanityArticles.slice(5, 9);
+  
+  const marketArticles = sanityArticles.filter((art: any) => 
+    art.primaryCategory?.slug?.current === "art-news" || 
+    art.primaryCategory?.slug?.current === "collecting-now"
+  );
+  const marketHero = marketArticles[0] || latestHero;
+  const marketSmall = marketArticles.slice(1, 5);
+  const marketText = marketArticles.slice(5, 9);
+
+  const luxuryArticles = sanityArticles.filter((art: any) => 
+    art.primaryCategory?.slug?.current === "collecting-now" || 
+    art.primaryCategory?.slug?.current === "interviews"
+  );
+  const luxuryHero = luxuryArticles[0] || latestHero;
+  const luxurySmall = luxuryArticles.slice(1, 5);
+  const luxuryText = luxuryArticles.slice(5, 9);
+
+  sections = [
+    {
+      title: "Latest",
+      slug: "art-news",
+      hero: latestHero ? {
+        title: latestHero.title,
+        excerpt: latestHero.excerpt,
+        category: latestHero.primaryCategory?.name || "Art News",
+        href: `/magazine/${latestHero.primaryCategory?.slug?.current || "art-news"}/${latestHero.slug?.current}`,
+        imageUrl: latestHero.featuredImage ? urlFor(latestHero.featuredImage).width(900).url() : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=900&q=80",
+        date: latestHero.publishedAt,
+        author: latestHero.author?.name || "Ncheta Team"
+      } : null,
+      small: latestSmall.map((art: any) => ({
+        title: art.title,
+        category: art.primaryCategory?.name || "Art News",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=400&q=80",
+        date: art.publishedAt
+      })),
+      text: latestText.map((art: any) => ({
+        title: art.title,
+        category: art.primaryCategory?.name || "Art News",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
+        date: art.publishedAt,
+        author: art.author?.name || "Ncheta Team"
+      }))
+    },
+    {
+      title: "Art Market",
+      slug: "art-news",
+      hero: marketHero ? {
+        title: marketHero.title,
+        excerpt: marketHero.excerpt,
+        category: marketHero.primaryCategory?.name || "Art News",
+        href: `/magazine/${marketHero.primaryCategory?.slug?.current || "art-news"}/${marketHero.slug?.current}`,
+        imageUrl: marketHero.featuredImage ? urlFor(marketHero.featuredImage).width(900).url() : "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=900&q=80",
+        date: marketHero.publishedAt,
+        author: marketHero.author?.name || "Ncheta Team"
+      } : null,
+      small: marketSmall.map((art: any) => ({
+        title: art.title,
+        category: art.primaryCategory?.name || "Art News",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : "https://images.unsplash.com/photo-1560343090-f0409e9791a?w=400&q=80",
+        date: art.publishedAt
+      })),
+      text: marketText.map((art: any) => ({
+        title: art.title,
+        category: art.primaryCategory?.name || "Art News",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
+        date: art.publishedAt,
+        author: art.author?.name || "Ncheta Team"
+      }))
+    },
+    {
+      title: "The Art of Luxury",
+      slug: "collecting-now",
+      hero: luxuryHero ? {
+        title: luxuryHero.title,
+        excerpt: luxuryHero.excerpt,
+        category: luxuryHero.primaryCategory?.name || "Collecting Now",
+        href: `/magazine/${luxuryHero.primaryCategory?.slug?.current || "collecting-now"}/${luxuryHero.slug?.current}`,
+        imageUrl: luxuryHero.featuredImage ? urlFor(luxuryHero.featuredImage).width(900).url() : "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=80",
+        date: luxuryHero.publishedAt,
+        author: luxuryHero.author?.name || "Ncheta Team"
+      } : null,
+      small: luxurySmall.map((art: any) => ({
+        title: art.title,
+        category: art.primaryCategory?.name || "Collecting Now",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "collecting-now"}/${art.slug?.current}`,
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=400&q=80",
+        date: art.publishedAt
+      })),
+      text: luxuryText.map((art: any) => ({
+        title: art.title,
+        category: art.primaryCategory?.name || "Collecting Now",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "collecting-now"}/${art.slug?.current}`,
+        date: art.publishedAt,
+        author: art.author?.name || "Ncheta Team"
+      }))
+    }
+  ];
+} else {
+  sections = fallbackSections;
+}
 ---
 
 <Layout
@@ -266,21 +387,23 @@ const sections = [
         <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr] xl:grid-cols-[3fr_2fr] gap-6 mb-0">
           <!-- Hero card -->
           <div>
-            <ArticleCard
-              variant="hero"
-              title={section.hero.title}
-              excerpt={section.hero.excerpt}
-              category={section.hero.category}
-              href={section.hero.href}
-              imageUrl={section.hero.imageUrl}
-              author={section.hero.author}
-              date={section.hero.date}
-            />
+            {section.hero && (
+              <ArticleCard
+                variant="hero"
+                title={section.hero.title}
+                excerpt={section.hero.excerpt}
+                category={section.hero.category}
+                href={section.hero.href}
+                imageUrl={section.hero.imageUrl}
+                author={section.hero.author}
+                date={section.hero.date}
+              />
+            )}
           </div>
 
           <!-- 4 small cards in a 2×2 grid -->
           <div class="grid grid-cols-2 gap-4 mt-4 lg:mt-0">
-            {section.small.map((card) => (
+            {section.small.map((card: any) => (
               <ArticleCard
                 variant="small"
                 title={card.title}
@@ -295,7 +418,7 @@ const sections = [
 
         <!-- 4 text-only article links below -->
         <div class="border-t border-noir/10 mt-5 pt-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
-          {section.text.map((card, i) => (
+          {section.text.map((card: any) => (
             <ArticleCard
               variant="text"
               title={card.title}

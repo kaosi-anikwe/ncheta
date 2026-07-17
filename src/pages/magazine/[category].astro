@@ -1,9 +1,10 @@
 ---
-// Category index page — medium article grid with pagination
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/navigation/Header.astro";
 import Footer from "../../components/navigation/Footer.astro";
 import ArticleCard from "../../components/cards/ArticleCard.astro";
+import { getEditorialsByCategory } from "../../sanity/queries";
+import { urlFor } from "../../sanity/image";
 
 export async function getStaticPaths() {
   return [
@@ -16,9 +17,7 @@ export async function getStaticPaths() {
     { params: { category: "galleries-museums" } },
     { params: { category: "awards" } },
   ];
-}
-
-const { category } = Astro.params;
+}const { category } = Astro.params;
 const categoryName =
   category === "art-news"
     ? "Art News"
@@ -30,8 +29,18 @@ const categoryName =
     ? "African Art History"
     : category?.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) || "Category";
 
-// Placeholder articles — replaced by Sanity GROQ at build time
-const articles = [
+// Fetch Sanity articles dynamically
+let sanityArticles = [];
+try {
+  if (category) {
+    sanityArticles = await getEditorialsByCategory(category);
+  }
+} catch (err) {
+  console.warn("Failed to fetch editorials from Sanity, using fallback.", err);
+}
+
+// Placeholder articles — fallback if Sanity is empty
+const fallbackArticles = [
   { title: "Venice Biennale 2026: African Pavilions Take Center Stage", excerpt: "With a record number of African national pavilions, this year's Biennale signals a tectonic shift in global contemporary art.", category: categoryName, date: "2026-06-28", author: "Emeka Okafor", imageUrl: "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=600&q=75", href: `/magazine/${category}/venice-biennale` },
   { title: "The Benin Bronzes: Restitution and the Politics of Return", excerpt: "Five years after the landmark repatriation agreement, scholars and curators assess the lasting impact on global museum practice.", category: categoryName, date: "2026-06-22", author: "Chisom Eze", imageUrl: "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=600&q=75", href: `/magazine/${category}/benin-bronzes` },
   { title: "Wangechi Mutu on World-Building and Afrofuturist Ecologies", excerpt: "The Nairobi-born artist discusses her latest permanent commission at the Met and the role of myth-making in contemporary sculpture.", category: categoryName, date: "2026-06-18", author: "Adaeze Nwosu", imageUrl: "https://images.unsplash.com/photo-1531913764164-f85c52e6e654?w=600&q=75", href: `/magazine/${category}/wangechi-mutu` },
@@ -43,8 +52,23 @@ const articles = [
   { title: "Tate Modern Acquires Major African Photography Archive", excerpt: "The acquisition of the landmark collection signals a long-overdue shift in how Western institutions are approaching the African photographic tradition.", category: categoryName, date: "2026-05-20", author: "Yemi Hassan", imageUrl: "https://images.unsplash.com/photo-1568097904979-f6e3f1c6a5d4?w=600&q=75", href: `/magazine/${category}/tate-acquisition` },
   { title: "Inside 1-54 London 2026: The Premier African Art Fair", excerpt: "This year's edition set new records for attendance and sales, cementing London's position as a global hub for the African art market.", category: categoryName, date: "2026-05-15", author: "Bisi Afolabi", imageUrl: "https://images.unsplash.com/photo-1518998053901-5348d3961a04?w=600&q=75", href: `/magazine/${category}/1-54-london` },
   { title: "Collecting Now: Five Artists Reshaping the Market", excerpt: "From Lagos to Accra to Cape Town, these five artists are commanding serious attention from collectors and institutions worldwide.", category: categoryName, date: "2026-05-10", author: "Fatima Diallo", imageUrl: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=600&q=75", href: `/magazine/${category}/five-artists` },
-  { title: "African Art History: The Missing Decades", excerpt: "A new generation of scholars is working to fill the gaps left by colonial-era historiography, recovering the voices and works that were silenced.", category: categoryName, date: "2026-05-05", author: "Dr. Amara Diallo", imageUrl: "https://images.unsplash.com/photo-1560343090-f0409e92791a?w=600&q=75", href: `/magazine/${category}/missing-decades` },
+  { title: "African Art History: The Missing Decades", excerpt: "A new generation of scholars is working to fill the gaps left by colonial-era historiography, recovering the voices and works that were silenced.", category: categoryName, date: "2026-05-05", author: "Dr. Amara Diallo", imageUrl: "https://images.unsplash.com/photo-1560343090-f0409e9791a?w=600&q=75", href: `/magazine/${category}/missing-decades` },
 ];
+
+let articles = [];
+if (sanityArticles && sanityArticles.length > 0) {
+  articles = sanityArticles.map((art: any) => ({
+    title: art.title,
+    excerpt: art.excerpt,
+    category: art.primaryCategory?.name || categoryName,
+    date: art.publishedAt ? new Date(art.publishedAt).toISOString().split('T')[0] : "2026-07-01",
+    author: art.author?.name || "Ncheta Team",
+    imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(600).url() : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=600&q=75",
+    href: `/magazine/${category}/${art.slug?.current}`
+  }));
+} else {
+  articles = fallbackArticles;
+}
 
 const ARTICLES_PER_PAGE = 12;
 const totalPages = Math.ceil(articles.length / ARTICLES_PER_PAGE);
@@ -77,7 +101,7 @@ const currentPage = 1;
 
     <!-- Article grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-      {articles.slice(0, ARTICLES_PER_PAGE).map((article) => (
+      {articles.slice(0, ARTICLES_PER_PAGE).map((article: any) => (
         <ArticleCard
           variant="medium"
           title={article.title}

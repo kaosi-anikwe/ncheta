@@ -10,7 +10,7 @@ export const getNavigationSettings = async () => {
   return sanityClient.fetch(`*[_type == "navigationSettings"][0]{ menuItems }`);
 };
 
-// Fetch editorial articles with category references expanded
+// Fetch editorial articles with category and author references expanded
 export const getAllEditorials = async () => {
   return sanityClient.fetch(`*[_type == "editorial"] | order(publishedAt desc) {
     _id,
@@ -20,7 +20,8 @@ export const getAllEditorials = async () => {
     publishedAt,
     featuredImage,
     primaryCategory->{ name, slug },
-    metaCategories[]->{ name, slug }
+    metaCategories[]->{ name, slug },
+    author->{ name, title, avatar }
   }`);
 };
 
@@ -38,7 +39,8 @@ export const getEditorialBySlug = async (slug: string) => {
       youtubeVideoUrl,
       transistorEpisodeGuid,
       primaryCategory->{ name, slug },
-      metaCategories[]->{ name, slug }
+      metaCategories[]->{ name, slug },
+      author->{ name, title, avatar }
     }`,
     { slug }
   );
@@ -55,7 +57,8 @@ export const getEditorialsByCategory = async (categorySlug: string) => {
       publishedAt,
       featuredImage,
       primaryCategory->{ name, slug },
-      metaCategories[]->{ name, slug }
+      metaCategories[]->{ name, slug },
+      author->{ name, title, avatar }
     }`,
     { categorySlug }
   );

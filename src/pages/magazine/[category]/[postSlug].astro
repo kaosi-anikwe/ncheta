@@ -10,12 +10,39 @@ import MediaEmbed from "../../../components/ui/MediaEmbed.astro";
 import ArticleCard from "../../../components/cards/ArticleCard.astro";
 
 export async function getStaticPaths() {
-  return [
+  const paths = [
     { params: { category: "art-news",   postSlug: "venice-biennale-2026" } },
     { params: { category: "art-news",   postSlug: "ghana-art-market" } },
     { params: { category: "academia",   postSlug: "benin-bronzes-restitution" } },
     { params: { category: "interviews", postSlug: "wangechi-mutu" } },
   ];
+
+  try {
+    const { getAllEditorials } = await import("../../../sanity/queries");
+    const sanityArts = await getAllEditorials();
+    if (sanityArts && sanityArts.length > 0) {
+      sanityArts.forEach((art: any) => {
+        if (art.slug?.current && art.primaryCategory?.slug?.current) {
+          // Avoid duplicate routes
+          const exists = paths.some(
+            (p) => p.params.postSlug === art.slug.current
+          );
+          if (!exists) {
+            paths.push({
+              params: {
+                category: art.primaryCategory.slug.current,
+                postSlug: art.slug.current,
+              },
+            });
+          }
+        }
+      });
+    }
+  } catch (err) {
+    console.warn("getStaticPaths failed to query Sanity paths, using default:", err);
+  }
+
+  return paths;
 }
 
 const { category: categorySlug, postSlug } = Astro.params;
@@ -44,13 +71,8 @@ const MOCK_ARTICLES: Record<string, any> = {
       {
         _type: "block",
         style: "normal",
-        children: [{ _type: "span", text: "The scale of the shift is unmistakable. Where once African nations struggled to secure adequate funding and exhibition space in the Arsenale and the Giardini, this year's Biennale sees several pavilions commanding some of the most coveted real estate at both sites. The Nigerian Pavilion, curated by Tosin Adesanya, presents a landmark intergenerational conversation between three generations of Nigerian artists, from the Zaria Art Society founding members through to the Yaba-trained painters of the 1980s and the digitally native artists who emerged in the last decade." }],
+        children: [{ _type: "span", text: "Curated under the overarching themes of historical recovery and ecological balance, the national presentations are generating substantial critical consensus. From large-scale architectural pavilions to intimate photographic archives, the curated projects underscore the complex, multi-dimensional modernities of contemporary African life." }],
       },
-      {
-        _type: "block",
-        style: "normal",
-        children: [{ _type: "span", text: "The Ghanaian Pavilion — mounted for the second time after its 2019 debut — has returned with a stronger institutional infrastructure and a markedly more confident curatorial voice. The presentation, themed around 'Radical Tenderness', brings together seven artists whose practices span painting, sculpture, photography, and performance." }],
-      }
     ],
     youtubeVideoUrl: ""
   },
@@ -59,24 +81,14 @@ const MOCK_ARTICLES: Record<string, any> = {
     category: { name: "Art News", slug: "art-news" },
     publishedAt: "2026-06-22",
     author: { name: "Samuel Agwu", title: "Contributing Editor" },
-    excerpt: "New data from the African Art Market Report reveals unprecedented growth driven by diaspora collectors and institutional acquisitions.",
+    excerpt: "New data from the annual African Art Market Report reveals unprecedented growth in Accra's secondary market, driven by diaspora collectors.",
     heroImage: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1400&q=85",
-    heroImageAlt: "Gallery interior in Accra, Ghana",
+    heroImageAlt: "Art collector viewing contemporary paintings in Accra",
     content: [
       {
         _type: "block",
         style: "normal",
-        children: [{ _type: "span", text: "Accra's visual arts ecosystem is experiencing an unprecedented surge. Over the past five years, total transaction volumes and auction results for Ghanaian artists have tripled, driven by a powerful mix of local gallery initiatives, international interest, and a highly active diaspora collector network." }],
-      },
-      {
-        _type: "block",
-        style: "h2",
-        children: [{ _type: "span", text: "Infrastructure and Institutional Support" }],
-      },
-      {
-        _type: "block",
-        style: "normal",
-        children: [{ _type: "span", text: "A key driver of this growth is the rapid development of local gallery infrastructure. Spaces like Gallery 1957, Nubuke Foundation, and Ada Contemporary Art Gallery have established international footprints, regularly participating in global fairs and introducing emerging talent to new audiences." }],
+        children: [{ _type: "span", text: "Accra's emerging galleries and resident curators are capturing the global secondary art market, creating sustainable local structures for young creators." }]
       }
     ],
     youtubeVideoUrl: ""
@@ -85,25 +97,15 @@ const MOCK_ARTICLES: Record<string, any> = {
     title: "The Benin Bronzes: Restitution and the Politics of Return",
     category: { name: "Academia", slug: "academia" },
     publishedAt: "2026-06-15",
-    author: { name: "Chisom Eze", title: "Academic Contributor" },
+    author: { name: "Chisom Eze", title: "Associate Editor" },
     excerpt: "Five years after the landmark repatriation agreement, scholars and curators assess the lasting impact on global museum practice.",
     heroImage: "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=1400&q=85",
-    heroImageAlt: "Historically significant artifacts and sculptures",
+    heroImageAlt: "Repatriated Benin Bronze sculpture displayed in museum",
     content: [
       {
         _type: "block",
         style: "normal",
-        children: [{ _type: "span", text: "The dialogue surrounding the return of looted cultural heritage has shifted from theoretical debate to concrete action. The repatriation of the Benin Bronzes represents one of the most significant shifts in museum ethics since the mid-20th century." }],
-      },
-      {
-        _type: "block",
-        style: "h2",
-        children: [{ _type: "span", text: "Scholarly Assessments" }],
-      },
-      {
-        _type: "block",
-        style: "normal",
-        children: [{ _type: "span", text: "Across academic departments globally, curators and historians are rewriting catalogs, acknowledging provenance histories that were once downplayed, and exploring new models of collaborative guardianship." }],
+        children: [{ _type: "span", text: "Restitution is no longer a localized debate; it is a global cultural reorganization. This paper examines how returning historic bronzes directly enriches community history and sets legal precedents." }]
       }
     ],
     youtubeVideoUrl: ""
@@ -111,34 +113,61 @@ const MOCK_ARTICLES: Record<string, any> = {
   "wangechi-mutu": {
     title: "Wangechi Mutu on World-Building and Afrofuturist Ecologies",
     category: { name: "Interviews", slug: "interviews" },
-    publishedAt: "2026-06-18",
-    author: { name: "Adaeze Nwosu", title: "Features Writer" },
+    publishedAt: "2026-06-12",
+    author: { name: "Adaeze Nwosu", title: "Art Critic" },
     excerpt: "The Nairobi-born artist discusses her latest permanent commission at the Met and the role of myth-making in contemporary sculpture.",
     heroImage: "https://images.unsplash.com/photo-1531913764164-f85c52e6e654?w=1400&q=85",
-    heroImageAlt: "A contemporary outdoor sculpture layout",
+    heroImageAlt: "Wangechi Mutu standing beside bronze sculpture",
     content: [
       {
         _type: "block",
         style: "normal",
-        children: [{ _type: "span", text: "In this exclusive interview, Wangechi Mutu reflects on her path from Nairobi to global acclaim, her exploration of female representation, and the hybrid creatures that inhabit her landscapes." }],
-      },
-      {
-        _type: "block",
-        style: "h2",
-        children: [{ _type: "span", text: "Hybridity and the Natural World" }],
-      },
-      {
-        _type: "block",
-        style: "normal",
-        children: [{ _type: "span", text: "'My work has always been about combining forms to speak to how we are made of multiple materials, cultures, and species,' Mutu remarks. 'We are not singular entities; we are ecosystems.'" }],
+        children: [{ _type: "span", text: "In this exclusive interview, Wangechi Mutu unpacks the ecological metaphors in her work, detailing how merging organic mud models with machinery challenges Western depictions." }]
       }
     ],
     youtubeVideoUrl: ""
   }
 };
 
-const article = MOCK_ARTICLES[postSlug] || MOCK_ARTICLES["venice-biennale-2026"];
+import { getEditorialBySlug } from "../../../sanity/queries";
+import { urlFor } from "../../../sanity/image";
 
+let sanityArticle = null;
+try {
+  if (postSlug) {
+    sanityArticle = await getEditorialBySlug(postSlug);
+  }
+} catch (err) {
+  console.warn("Failed to fetch article details from Sanity, using fallback.", err);
+}
+
+// Unified mapping
+let article = null;
+if (sanityArticle) {
+  article = {
+    title: sanityArticle.title,
+    category: {
+      name: sanityArticle.primaryCategory?.name || "Art News",
+      slug: sanityArticle.primaryCategory?.slug?.current || "art-news"
+    },
+    publishedAt: sanityArticle.publishedAt ? new Date(sanityArticle.publishedAt).toISOString().split('T')[0] : "2026-07-01",
+    author: {
+      name: sanityArticle.author?.name || "Ncheta Team",
+      title: sanityArticle.author?.title || "Staff Writer"
+    },
+    excerpt: sanityArticle.excerpt,
+    heroImage: sanityArticle.featuredImage ? urlFor(sanityArticle.featuredImage).width(1400).url() : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=1400&q=85",
+    heroImageAlt: sanityArticle.title,
+    content: sanityArticle.content || [],
+    youtubeVideoUrl: sanityArticle.youtubeVideoUrl || ""
+  };
+} else {
+  const fallback = MOCK_ARTICLES[postSlug] || MOCK_ARTICLES["venice-biennale-2026"];
+  article = {
+    ...fallback,
+    category: typeof fallback.category === "string" ? { name: fallback.category, slug: categorySlug } : fallback.category
+  };
+}
 
 const { title, category: articleCategory, publishedAt, author, excerpt, heroImage, heroImageAlt, content, youtubeVideoUrl } = article;
 
