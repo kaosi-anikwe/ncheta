@@ -31,6 +31,13 @@ export const editorialSchema = {
       of: [{ type: "reference", to: [{ type: "category" }] }],
     },
     {
+      name: "author",
+      type: "reference",
+      title: "Author",
+      to: [{ type: "author" }],
+      validation: (Rule: any) => Rule.required(),
+    },
+    {
       name: "featuredImage",
       type: "image",
       title: "Featured Image",
