@@ -291,35 +291,6 @@ try {
   );
 }
 
-if (relatedArticles.length === 0) {
-  relatedArticles = [
-    {
-      title: "Ghana's Art Market Sees 300% Growth in Five Years",
-      category: "Art Market",
-      date: "2026-06-22",
-      href: "/magazine/art-news/ghana-art-market",
-      imageUrl:
-        "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=75",
-    },
-    {
-      title: "Nigerian Government Launches National Arts Endowment",
-      category: "Art News",
-      date: "2026-06-15",
-      href: "/magazine/art-news/nigerian-arts-endowment",
-      imageUrl:
-        "https://images.unsplash.com/photo-1536924940846-227afb31e2a5?w=600&q=75",
-    },
-    {
-      title: "In Conversation with El Anatsui: Material and Memory",
-      category: "Interviews",
-      date: "2026-06-12",
-      href: "/magazine/interviews/el-anatsui",
-      imageUrl:
-        "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=600&q=75",
-    },
-  ];
-}
-
 function fmtDate(d: string) {
   return new Date(d).toLocaleDateString("en-US", {
     year: "numeric",
@@ -496,27 +467,27 @@ function fmtDate(d: string) {
     </article>
 
     <!-- ── Related articles ───────────────────────────────────── -->
-    <section
-      class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-10 border-t border-noir/10"
-    >
-      <h2 class="font-cinzel font-bold text-xl md:text-2xl text-noir mb-8">
-        Related Stories
-      </h2>
-      <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
-        {
-          relatedArticles.map((a: any) => (
-            <ArticleCard
-              variant="medium"
-              title={a.title}
-              category={a.category}
-              date={a.date}
-              imageUrl={a.imageUrl}
-              href={a.href}
-            />
-          ))
-        }
-      </div>
-    </section>
+    {
+      relatedArticles.length > 0 && (
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-16 pt-10 border-t border-noir/10">
+          <h2 class="font-cinzel font-bold text-xl md:text-2xl text-noir mb-8">
+            Related Stories
+          </h2>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            {relatedArticles.map((a: any) => (
+              <ArticleCard
+                variant="medium"
+                title={a.title}
+                category={a.category}
+                date={a.date}
+                imageUrl={a.imageUrl}
+                href={a.href}
+              />
+            ))}
+          </div>
+        </section>
+      )
+    }
   </main>
 
   <Footer />
