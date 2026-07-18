@@ -1,7 +1,19 @@
 ---
+import { getNavigationSettings } from "../../sanity/queries";
+
 const pathname = Astro.url.pathname;
 
-const navItems = [
+let sanityNav = null;
+try {
+  sanityNav = await getNavigationSettings();
+} catch (err) {
+  console.warn(
+    "Failed to fetch navigation settings from Sanity, using fallback.",
+    err,
+  );
+}
+
+const fallbackNavItems = [
   { label: "Art News", href: "/magazine/art-news" },
   { label: "Academia", href: "/magazine/academia" },
   { label: "Interviews", href: "/magazine/interviews" },
@@ -11,6 +23,27 @@ const navItems = [
   { label: "Galleries & Museums", href: "/magazine/galleries-museums" },
   { label: "Awards", href: "/magazine/awards" },
 ];
+
+let navItems = [];
+if (sanityNav && sanityNav.menuItems && sanityNav.menuItems.length > 0) {
+  navItems = sanityNav.menuItems.map((item: any) => {
+    if (item._type === "categoryLink") {
+      const catName = item.category?.name || "Category";
+      const catSlug = item.category?.slug?.current || "art-news";
+      return {
+        label: item.customLabel || catName,
+        href: `/magazine/${catSlug}`,
+      };
+    } else {
+      return {
+        label: item.label || "Link",
+        href: item.url || "#",
+      };
+    }
+  });
+} else {
+  navItems = fallbackNavItems;
+}
 
 function isActive(href: string) {
   return pathname === href || pathname.startsWith(href + "/");
@@ -156,7 +189,7 @@ function isActive(href: string) {
           >
             <div class="py-2">
               {
-                navItems.map((item) => {
+                navItems.map((item: any) => {
                   const active = isActive(item.href);
                   return (
                     <a
@@ -189,7 +222,7 @@ function isActive(href: string) {
         aria-label="Primary navigation"
       >
         {
-          navItems.map((item) => {
+          navItems.map((item: any) => {
             const active = isActive(item.href);
             return (
               <a

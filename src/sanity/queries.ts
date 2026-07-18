@@ -5,9 +5,17 @@ export const getAllCategories = async () => {
   return sanityClient.fetch(`*[_type == "category"]{ _id, name, slug, description }`);
 };
 
-// Fetch navigation settings (single document)
+// Fetch navigation settings (single document) with category references expanded
 export const getNavigationSettings = async () => {
-  return sanityClient.fetch(`*[_type == "navigationSettings"][0]{ menuItems }`);
+  return sanityClient.fetch(`*[_type == "navigationSettings"][0]{
+    menuItems[] {
+      _type,
+      _key,
+      label,
+      url,
+      category->{ name, slug }
+    }
+  }`);
 };
 
 // Fetch editorial articles with category and author references expanded
