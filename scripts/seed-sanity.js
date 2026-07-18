@@ -127,7 +127,7 @@ const ARTICLES = [
 async function deleteEverything() {
   console.log("Cleaning up Sanity Studio documents...");
   try {
-    const docTypes = ["editorial", "category", "author", "navigationSettings", "sanity.imageAsset"];
+    const docTypes = ["editorial", "navigationSettings", "category", "author", "sanity.imageAsset"];
     for (const type of docTypes) {
       const docs = await client.fetch(`*[_type == $type]._id`, { type });
       if (docs.length > 0) {

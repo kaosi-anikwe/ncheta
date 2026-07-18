@@ -3,15 +3,17 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
 import ArticleCard from "../components/cards/ArticleCard.astro";
-import { getAllEditorials } from "../sanity/queries";
+import { getAllEditorials, getAllCategories } from "../sanity/queries";
 import { urlFor } from "../sanity/image";
 
-// Fetch Sanity articles dynamically
+// Fetch Sanity articles and categories dynamically
 let sanityArticles = [];
+let sanityCategories = [];
 try {
   sanityArticles = await getAllEditorials();
+  sanityCategories = await getAllCategories();
 } catch (err) {
-  console.warn("Failed to fetch editorials from Sanity, using fallback.", err);
+  console.warn("Failed to fetch editorials/categories from Sanity, using fallback.", err);
 }
 
 // ── Static placeholder data (fallback if Sanity is empty) ──
@@ -240,35 +242,19 @@ const fallbackSections = [
 // Map Sanity articles to our sections if they exist, otherwise use fallbacks
 let sections = [];
 
-if (sanityArticles && sanityArticles.length > 0) {
+if (sanityArticles && sanityArticles.length > 0 && sanityCategories && sanityCategories.length > 0) {
   const latestHero = sanityArticles[0];
   const latestSmall = sanityArticles.slice(1, 5);
   const latestText = sanityArticles.slice(5, 9);
   
-  const marketArticles = sanityArticles.filter((art: any) => 
-    art.primaryCategory?.slug?.current === "art-news" || 
-    art.primaryCategory?.slug?.current === "collecting-now"
-  );
-  const marketHero = marketArticles[0] || latestHero;
-  const marketSmall = marketArticles.slice(1, 5);
-  const marketText = marketArticles.slice(5, 9);
-
-  const luxuryArticles = sanityArticles.filter((art: any) => 
-    art.primaryCategory?.slug?.current === "collecting-now" || 
-    art.primaryCategory?.slug?.current === "interviews"
-  );
-  const luxuryHero = luxuryArticles[0] || latestHero;
-  const luxurySmall = luxuryArticles.slice(1, 5);
-  const luxuryText = luxuryArticles.slice(5, 9);
-
   sections = [
     {
       title: "Latest",
-      slug: "art-news",
+      slug: "latest",
       hero: latestHero ? {
         title: latestHero.title,
         excerpt: latestHero.excerpt,
-        category: latestHero.primaryCategory?.name || "Art News",
+        category: latestHero.primaryCategory?.name || "Latest",
         href: `/magazine/${latestHero.primaryCategory?.slug?.current || "art-news"}/${latestHero.slug?.current}`,
         imageUrl: latestHero.featuredImage ? urlFor(latestHero.featuredImage).width(900).url() : undefined,
         date: latestHero.publishedAt,
@@ -276,74 +262,61 @@ if (sanityArticles && sanityArticles.length > 0) {
       } : null,
       small: latestSmall.map((art: any) => ({
         title: art.title,
-        category: art.primaryCategory?.name || "Art News",
+        category: art.primaryCategory?.name || "Latest",
         href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
         imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
         date: art.publishedAt
       })),
       text: latestText.map((art: any) => ({
         title: art.title,
-        category: art.primaryCategory?.name || "Art News",
+        category: art.primaryCategory?.name || "Latest",
         href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        date: art.publishedAt,
-        author: art.author?.name || "Ncheta Team"
-      }))
-    },
-    {
-      title: "Art Market",
-      slug: "art-news",
-      hero: marketHero ? {
-        title: marketHero.title,
-        excerpt: marketHero.excerpt,
-        category: marketHero.primaryCategory?.name || "Art News",
-        href: `/magazine/${marketHero.primaryCategory?.slug?.current || "art-news"}/${marketHero.slug?.current}`,
-        imageUrl: marketHero.featuredImage ? urlFor(marketHero.featuredImage).width(900).url() : undefined,
-        date: marketHero.publishedAt,
-        author: marketHero.author?.name || "Ncheta Team"
-      } : null,
-      small: marketSmall.map((art: any) => ({
-        title: art.title,
-        category: art.primaryCategory?.name || "Art News",
-        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
-        date: art.publishedAt
-      })),
-      text: marketText.map((art: any) => ({
-        title: art.title,
-        category: art.primaryCategory?.name || "Art News",
-        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        date: art.publishedAt,
-        author: art.author?.name || "Ncheta Team"
-      }))
-    },
-    {
-      title: "The Art of Luxury",
-      slug: "collecting-now",
-      hero: luxuryHero ? {
-        title: luxuryHero.title,
-        excerpt: luxuryHero.excerpt,
-        category: luxuryHero.primaryCategory?.name || "Collecting Now",
-        href: `/magazine/${luxuryHero.primaryCategory?.slug?.current || "collecting-now"}/${luxuryHero.slug?.current}`,
-        imageUrl: luxuryHero.featuredImage ? urlFor(luxuryHero.featuredImage).width(900).url() : undefined,
-        date: luxuryHero.publishedAt,
-        author: luxuryHero.author?.name || "Ncheta Team"
-      } : null,
-      small: luxurySmall.map((art: any) => ({
-        title: art.title,
-        category: art.primaryCategory?.name || "Collecting Now",
-        href: `/magazine/${art.primaryCategory?.slug?.current || "collecting-now"}/${art.slug?.current}`,
-        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
-        date: art.publishedAt
-      })),
-      text: luxuryText.map((art: any) => ({
-        title: art.title,
-        category: art.primaryCategory?.name || "Collecting Now",
-        href: `/magazine/${art.primaryCategory?.slug?.current || "collecting-now"}/${art.slug?.current}`,
         date: art.publishedAt,
         author: art.author?.name || "Ncheta Team"
       }))
     }
   ];
+
+  // Dynamically add a section for every category in Sanity that has at least 1 article
+  for (const category of sanityCategories) {
+    const catArticles = sanityArticles.filter((art: any) => 
+      art.primaryCategory?.slug?.current === category.slug?.current
+    );
+    
+    if (catArticles.length === 0) continue;
+
+    const hero = catArticles[0];
+    const small = catArticles.slice(1, 5);
+    const text = catArticles.slice(5, 9);
+
+    sections.push({
+      title: category.name,
+      slug: category.slug?.current || "art-news",
+      hero: hero ? {
+        title: hero.title,
+        excerpt: hero.excerpt,
+        category: category.name,
+        href: `/magazine/${category.slug?.current || "art-news"}/${hero.slug?.current}`,
+        imageUrl: hero.featuredImage ? urlFor(hero.featuredImage).width(900).url() : undefined,
+        date: hero.publishedAt,
+        author: hero.author?.name || "Ncheta Team"
+      } : null,
+      small: small.map((art: any) => ({
+        title: art.title,
+        category: category.name,
+        href: `/magazine/${category.slug?.current || "art-news"}/${art.slug?.current}`,
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
+        date: art.publishedAt
+      })),
+      text: text.map((art: any) => ({
+        title: art.title,
+        category: category.name,
+        href: `/magazine/${category.slug?.current || "art-news"}/${art.slug?.current}`,
+        date: art.publishedAt,
+        author: art.author?.name || "Ncheta Team"
+      }))
+    });
+  }
 } else {
   sections = fallbackSections;
 }
@@ -371,7 +344,7 @@ if (sanityArticles && sanityArticles.length > 0) {
           ]}
         >
           <!-- Section header -->
-          <div class="flex items-baseline justify-between mb-6">
+          <div class="flex items-baseline justify-between mb-12">
           <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-noir">
             {section.title}
           </h2>
@@ -402,7 +375,7 @@ if (sanityArticles && sanityArticles.length > 0) {
           </div>
 
           <!-- 4 small cards in a 2×2 grid -->
-          <div class="grid grid-cols-2 gap-4 mt-4 lg:mt-0">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 lg:mt-0">
             {section.small.map((card: any) => (
               <ArticleCard
                 variant="small"
@@ -417,7 +390,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         </div>
 
         <!-- 4 text-only article links below -->
-        <div class="border-t border-noir/10 mt-5 pt-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
+        <div class="border-t border-noir/10 mt-24 pt-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
           {section.text.map((card: any) => (
             <ArticleCard
               variant="text"
