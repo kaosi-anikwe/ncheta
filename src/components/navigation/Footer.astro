@@ -60,7 +60,7 @@ const legalLinks = [
         <!-- Wordmark / Logo -->
         <a
           href="/"
-          class="inline-flex items-center gap-2 mb-8 group focus:outline-none focus-visible:ring-2 focus-visible:ring-cherry/60"
+          class="inline-flex items-center gap-2 mb-8 group focus:outline-none focus-visible:ring-2 focus-visible:ring-maroon/60"
           aria-label="Ncheta Magazine — go to homepage"
         >
           <img
@@ -88,8 +88,8 @@ const legalLinks = [
                     font-inter text-sm text-noir/75
                     
                     transition-colors duration-200
-                    underline-offset-4 hover:underline decoration-cherry/60
-                    focus:outline-none focus-visible:text-cherry focus-visible:underline
+                    underline-offset-4 hover:underline decoration-maroon/60
+                    focus:outline-none focus-visible:text-maroon focus-visible:underline
                   "
                   >
                     {item.label}
@@ -122,8 +122,8 @@ const legalLinks = [
                     font-inter text-sm text-noir/75
                     
                     transition-colors duration-200
-                    underline-offset-4 hover:underline decoration-cherry/60
-                    focus:outline-none focus-visible:text-cherry focus-visible:underline
+                    underline-offset-4 hover:underline decoration-maroon/60
+                    focus:outline-none focus-visible:text-maroon focus-visible:underline
                     leading-snug inline-block
                   "
                     {...(item.external
@@ -175,7 +175,7 @@ const legalLinks = [
               class="block font-inter text-[11px] font-medium text-noir/55 uppercase tracking-wider mb-2"
             >
               Email address
-              <span class="text-cherry ml-0.5" aria-hidden="true">*</span>
+              <span class="text-maroon ml-0.5" aria-hidden="true">*</span>
             </label>
 
             <!-- Input: flat architecture, Lime focus ring as per Figma spec -->
@@ -194,8 +194,8 @@ const legalLinks = [
                 font-inter text-sm text-noir
                 placeholder:text-noir/30
                 focus:outline-none
-                focus:border-cherry
-                focus:ring-2 focus:ring-cherry/35
+                focus:border-maroon
+                focus:ring-2 focus:ring-maroon/35
                 transition-all duration-200"
             />
           </div>
@@ -253,7 +253,7 @@ const legalLinks = [
         >
           <a
             href="/site-policy"
-            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
+            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-maroon"
           >
             Privacy
           </a>
@@ -262,7 +262,7 @@ const legalLinks = [
           >
           <a
             href="/terms"
-            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
+            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-maroon"
           >
             Terms
           </a>
@@ -271,7 +271,7 @@ const legalLinks = [
           >
           <a
             href="/sitemap-index.xml"
-            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-cherry"
+            class="font-inter text-xs text-noir/45 transition-colors duration-200 focus:outline-none focus-visible:text-maroon"
           >
             Sitemap
           </a>
@@ -311,7 +311,7 @@ const legalLinks = [
       const email = emailInput.value.trim();
       if (!email) {
         status.textContent = "Please enter a valid email address.";
-        status.className = "font-inter text-xs text-cherry block mt-1";
+        status.className = "font-inter text-xs text-maroon block mt-1";
         return;
       }
 
@@ -333,7 +333,7 @@ const legalLinks = [
           (window as any).umami?.track?.("Newsletter Signup");
 
           form.innerHTML = `
-            <p class="font-inter text-sm text-noir/75 py-3 px-4 border border-cherry/50 bg-cherry/10">
+            <p class="font-inter text-sm text-noir/75 py-3 px-4 border border-maroon/50 bg-maroon/10">
               ✓ You're in! Check your inbox for a confirmation.
             </p>
           `;
@@ -344,7 +344,7 @@ const legalLinks = [
         btn.disabled = false;
         btn.textContent = "Subscribe";
         status.textContent = "Something went wrong. Please try again.";
-        status.className = "font-inter text-xs text-cherry block mt-1";
+        status.className = "font-inter text-xs text-maroon block mt-1";
       }
     });
   })();

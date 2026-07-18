@@ -57,11 +57,10 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
           font-inter text-sm text-noir
           placeholder:text-noir/30
           focus:outline-none
-          focus:border-cherry
-          focus:ring-2 focus:ring-cherry/35
+          focus:border-maroon
+          focus:ring-2 focus:ring-maroon/35
           transition-all duration-200
           sm:border-r-0"
-
       />
       <button
         id="search-btn"
@@ -98,22 +97,23 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
       </div>
 
       <div id="search-sort-container" class="flex items-center gap-2 hidden">
-        <label for="search-sort" class="font-inter text-xs text-noir/50 uppercase tracking-widest">
+        <label
+          for="search-sort"
+          class="font-inter text-xs text-noir/50 uppercase tracking-widest"
+        >
           Sort by:
         </label>
         <select
           id="search-sort"
-          class="
-            px-3 py-1.5
+          class="px-3 py-1.5
             bg-cotton
             border border-noir/25
             font-inter text-xs text-noir
             focus:outline-none
-            focus:border-cherry
+            focus:border-maroon
             transition-colors duration-150
             cursor-pointer
-            rounded-none
-          "
+            rounded-none"
         >
           <option value="relevance">Relevance</option>
           <option value="newest">Newest</option>
@@ -144,7 +144,7 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
   (async () => {
     const params = new URLSearchParams(window.location.search);
     const query = params.get("q")?.trim();
-    
+
     const inputEl = document.getElementById("search-input");
     const metaRowEl = document.getElementById("search-meta-row");
     const statusEl = document.getElementById("search-status");
@@ -152,7 +152,7 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
     const sortSelectEl = document.getElementById("search-sort");
     const placeholderEl = document.getElementById("search-placeholder");
     const resultsEl = document.getElementById("search-results");
-    
+
     if (!resultsEl) return;
 
     if (!query) {
@@ -187,7 +187,8 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
     } catch (err) {
       console.warn("[search] Pagefind unavailable:", err);
       if (statusEl) {
-        statusEl.textContent = "Search index unavailable. Run a production build first.";
+        statusEl.textContent =
+          "Search index unavailable. Run a production build first.";
       }
       return;
     }
@@ -205,7 +206,7 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
       resultsEl.innerHTML = `
         <p class="font-inter text-sm text-noir/50 mt-2">
           Try a different search term or browse articles by
-          <a href="/magazine/art-news" class="underline decoration-cherry/50 hover:text-cherry transition-colors">category</a>.
+          <a href="/magazine/art-news" class="underline decoration-maroon/50 hover:text-maroon transition-colors">category</a>.
         </p>
       `;
       return;
@@ -220,14 +221,14 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
     // Load up to 50 results so that we can sort them in memory
     const LIMIT = 50;
     const rawItems = await Promise.all(
-      results.slice(0, LIMIT).map((r) => r.data())
+      results.slice(0, LIMIT).map((r) => r.data()),
     );
 
     // Keep reference of items with score from Pagefind for relevance sorting
     const items = rawItems.map((item, index) => ({
       ...item,
       score: results[index]?.score || 0,
-      index // original index to preserve relevance order precisely
+      index, // original index to preserve relevance order precisely
     }));
 
     // Function to render items based on sorting
@@ -254,12 +255,16 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
         });
       }
 
-      resultsEl.innerHTML = sorted.map((item) => `
+      resultsEl.innerHTML = sorted
+        .map(
+          (item) => `
         <a
           href="${item.url}"
           class="group block border-b border-noir/10 py-5 hover:bg-noir/[0.03] transition-colors duration-150 -mx-2 px-2"
         >
-          ${item.meta?.image ? `
+          ${
+            item.meta?.image
+              ? `
             <div class="mb-3 overflow-hidden aspect-[16/6]">
               <img
                 src="${item.meta.image}"
@@ -267,11 +272,13 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
                 class="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-500"
                 loading="lazy"
               />
-            </div>` : ""}
-          <p class="font-inter text-[11px] font-semibold uppercase tracking-widest text-cherry mb-1">
+            </div>`
+              : ""
+          }
+          <p class="font-inter text-[11px] font-semibold uppercase tracking-widest text-maroon mb-1">
             ${item.meta?.category ?? "Article"}
           </p>
-          <h2 class="font-cinzel font-bold text-base md:text-lg text-noir group-hover:text-cherry transition-colors duration-200 leading-snug mb-2">
+          <h2 class="font-cinzel font-bold text-base md:text-lg text-noir group-hover:text-maroon transition-colors duration-200 leading-snug mb-2">
             ${item.meta?.title ?? item.url}
           </h2>
           <p class="font-inter text-sm text-noir/55 leading-relaxed line-clamp-3">
@@ -282,7 +289,9 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
             ${item.meta?.date ? new Date(item.meta.date).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" }) : ""}
           </p>
         </a>
-      `).join("");
+      `,
+        )
+        .join("");
     };
 
     // Initial render using default Relevance sort
@@ -294,7 +303,5 @@ import PagefindConfig from "astro-pagefind/components/PagefindConfig.astro";
         renderSortedItems(e.target.value);
       });
     }
-
   })();
 </script>
-

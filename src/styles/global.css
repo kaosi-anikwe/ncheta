@@ -3,7 +3,7 @@
 /* ── Ncheta Brand Design Tokens ──────────────────────────────── */
 @theme {
   --color-noir: #181717;
-  --color-cherry: #650606;
+  --color-cherry: #b50606;
   --color-maroon: #630000;
   --color-cotton: #e7d7b6;
   --color-lime: #b3d67c;
@@ -42,10 +42,10 @@
     @apply text-xl md:text-2xl font-semibold mt-10 mb-4 text-noir font-cinzel;
   }
   .prose-content a {
-    @apply text-cherry underline decoration-cherry/40 hover:decoration-cherry transition-colors;
+    @apply text-maroon underline decoration-maroon/40 hover:decoration-maroon transition-colors;
   }
   .prose-content blockquote {
-    @apply border-l-4 border-cherry pl-6 italic text-noir/60 my-10 text-xl;
+    @apply border-l-4 border-maroon pl-6 italic text-noir/60 my-10 text-xl;
   }
   .prose-content ul,
   .prose-content ol {
@@ -99,7 +99,7 @@
   /* Nav active indicator */
   .nav-item--active::after {
     content: "";
-    @apply absolute bottom-0 left-3 right-3 h-[2px] bg-cherry rounded-full;
+    @apply absolute bottom-0 left-3 right-3 h-[2px] bg-maroon rounded-full;
   }
 }
 
@@ -111,90 +111,104 @@
  *   3. Element rules  → reference the same --pf-brand-* vars
  *
  * The @theme block provides: --color-noir, --color-cotton,
- * --color-cherry, --color-lime.  All Pagefind styling flows from those.
+ * --color-maroon, --color-lime.  All Pagefind styling flows from those.
  */
 /* Specificity trick: :root:root = (0,2,0) beats Pagefind's own :root = (0,1,0)
  * so our variable values win regardless of stylesheet load order.         */
 :root:root {
   /* ── 1. Brand aliases ────────────────────────────────────────── */
-  --pf-brand-noir:   var(--color-noir);        /* #181717 */
-  --pf-brand-cotton: var(--color-cotton);      /* #e7d7b6 */
-  --pf-brand-cherry: var(--color-cherry);      /* #650606 */
-  --pf-brand-lime:   var(--color-lime);        /* #b3d67c */
+  --pf-brand-noir: var(--color-noir); /* #181717 */
+  --pf-brand-cotton: var(--color-cotton); /* #e7d7b6 */
+  --pf-brand-maroon: var(--color-maroon); /* #650606 */
+  --pf-brand-lime: var(--color-lime); /* #b3d67c */
 
   /* Derived alpha variants (modern color-mix) */
-  --pf-brand-noir-80:   color-mix(in srgb, var(--pf-brand-noir) 80%,  transparent);
-  --pf-brand-noir-60:   color-mix(in srgb, var(--pf-brand-noir) 60%,  transparent);
-  --pf-brand-noir-15:   color-mix(in srgb, var(--pf-brand-noir) 15%,  transparent);
-  --pf-brand-noir-10:   color-mix(in srgb, var(--pf-brand-noir) 10%,  transparent);
-  --pf-brand-noir-6:    color-mix(in srgb, var(--pf-brand-noir) 6%,   transparent);
-  --pf-brand-cotton-80: color-mix(in srgb, var(--pf-brand-cotton) 80%, transparent);
+  --pf-brand-noir-80: color-mix(in srgb, var(--pf-brand-noir) 80%, transparent);
+  --pf-brand-noir-60: color-mix(in srgb, var(--pf-brand-noir) 60%, transparent);
+  --pf-brand-noir-15: color-mix(in srgb, var(--pf-brand-noir) 15%, transparent);
+  --pf-brand-noir-10: color-mix(in srgb, var(--pf-brand-noir) 10%, transparent);
+  --pf-brand-noir-6: color-mix(in srgb, var(--pf-brand-noir) 6%, transparent);
+  --pf-brand-cotton-80: color-mix(
+    in srgb,
+    var(--pf-brand-cotton) 80%,
+    transparent
+  );
 
   /* ── 2. Pagefind CSS-variable tokens ────────────────────────── */
 
   /* Core colours */
-  --pf-text:           var(--pf-brand-noir);
+  --pf-text: var(--pf-brand-noir);
   --pf-text-secondary: var(--pf-brand-noir-80);
-  --pf-text-muted:     var(--pf-brand-noir-60);
-  --pf-background:     var(--pf-brand-cotton);
-  --pf-border:         var(--pf-brand-noir-15);
-  --pf-border-focus:   var(--pf-brand-cherry);
-  --pf-hover:          var(--pf-brand-noir-6);
-  --pf-skeleton:       var(--pf-brand-noir-10);
+  --pf-text-muted: var(--pf-brand-noir-60);
+  --pf-background: var(--pf-brand-cotton);
+  --pf-border: var(--pf-brand-noir-15);
+  --pf-border-focus: var(--pf-brand-maroon);
+  --pf-hover: var(--pf-brand-noir-6);
+  --pf-skeleton: var(--pf-brand-noir-10);
   --pf-skeleton-shine: var(--pf-brand-cotton-80);
-  --pf-mark:           var(--pf-brand-lime);
-  --pf-scroll-shadow:  color-mix(in srgb, var(--pf-brand-noir) 8%, transparent);
+  --pf-mark: var(--pf-brand-lime);
+  --pf-scroll-shadow: color-mix(in srgb, var(--pf-brand-noir) 8%, transparent);
 
   /* Shadows */
-  --pf-shadow-sm: 0 2px 8px   color-mix(in srgb, var(--pf-brand-noir) 8%,  transparent);
-  --pf-shadow-md: 0 4px 16px  color-mix(in srgb, var(--pf-brand-noir) 12%, transparent);
-  --pf-shadow-lg: 0 20px 56px color-mix(in srgb, var(--pf-brand-noir) 22%, transparent);
+  --pf-shadow-sm: 0 2px 8px
+    color-mix(in srgb, var(--pf-brand-noir) 8%, transparent);
+  --pf-shadow-md: 0 4px 16px
+    color-mix(in srgb, var(--pf-brand-noir) 12%, transparent);
+  --pf-shadow-lg: 0 20px 56px
+    color-mix(in srgb, var(--pf-brand-noir) 22%, transparent);
 
   /* Error states */
-  --pf-error-bg:             #fef2f2;
-  --pf-error-border:         var(--pf-brand-cherry);
-  --pf-error-text:           var(--pf-brand-cherry);
-  --pf-error-text-secondary: color-mix(in srgb, var(--pf-brand-cherry) 75%, black);
+  --pf-error-bg: #fef2f2;
+  --pf-error-border: var(--pf-brand-maroon);
+  --pf-error-text: var(--pf-brand-maroon);
+  --pf-error-text-secondary: color-mix(
+    in srgb,
+    var(--pf-brand-maroon) 75%,
+    black
+  );
 
   /* Focus ring */
-  --pf-outline-focus:  var(--pf-brand-cherry);
-  --pf-outline-width:  2px;
+  --pf-outline-focus: var(--pf-brand-maroon);
+  --pf-outline-width: 2px;
   --pf-outline-offset: 3px;
 
   /* Typography */
   --pf-font: "Inter", system-ui, -apple-system, sans-serif;
 
   /* Sizing */
-  --pf-input-height:             44px;
-  --pf-input-font-size:          16px; /* ≥16px prevents iOS zoom */
-  --pf-summary-font-size:        12px;
-  --pf-result-title-font-size:   15px;
+  --pf-input-height: 44px;
+  --pf-input-font-size: 16px; /* ≥16px prevents iOS zoom */
+  --pf-summary-font-size: 12px;
+  --pf-result-title-font-size: 15px;
   --pf-result-excerpt-font-size: 13px;
 
   /* Results layout */
-  --pf-results-display:        flex;
+  --pf-results-display: flex;
   --pf-results-flex-direction: column;
-  --pf-results-flex-wrap:      nowrap;
-  --pf-results-columns:        none;
-  --pf-results-gap:            0px; /* rows separated by border-bottom instead */
+  --pf-results-flex-wrap: nowrap;
+  --pf-results-columns: none;
+  --pf-results-gap: 0px; /* rows separated by border-bottom instead */
 
-  --pf-border-radius: 0px;          /* flat / square — matches brand inputs */
-  --pf-image-width:   72px;
-  --pf-image-height:  54px;
+  --pf-border-radius: 0px; /* flat / square — matches brand inputs */
+  --pf-image-width: 72px;
+  --pf-image-height: 54px;
 
   /* Modal */
-  --pf-modal-backdrop:   color-mix(in srgb, var(--pf-brand-noir) 55%, transparent);
-  --pf-modal-max-width:  620px;
+  --pf-modal-backdrop: color-mix(
+    in srgb,
+    var(--pf-brand-noir) 55%,
+    transparent
+  );
+  --pf-modal-max-width: 620px;
   --pf-modal-max-height: min(82dvh, 820px);
-  --pf-modal-top:        9dvh;
+  --pf-modal-top: 9dvh;
 
   /* Searchbox / Dropdown */
-  --pf-searchbox-max-width:           100%;
+  --pf-searchbox-max-width: 100%;
   --pf-searchbox-dropdown-max-height: 360px;
-  --pf-dropdown-max-height:           320px;
-  --pf-dropdown-z-index:              9999;
+  --pf-dropdown-max-height: 320px;
+  --pf-dropdown-z-index: 9999;
 }
-
 
 /* ── 3. Element-level overrides ──────────────────────────────── */
 /*
@@ -214,8 +228,8 @@ pagefind-searchbox,
 }
 pagefind-searchbox:focus-within,
 .pagefind-ui__search-input:focus {
-  border-color: var(--pf-brand-cherry) !important;
-  outline: var(--pf-outline-width) solid var(--pf-brand-cherry) !important;
+  border-color: var(--pf-brand-maroon) !important;
+  outline: var(--pf-outline-width) solid var(--pf-brand-maroon) !important;
   outline-offset: var(--pf-outline-offset) !important;
   box-shadow: none !important;
 }
@@ -226,7 +240,7 @@ pagefind-searchbox:focus-within,
   background: transparent !important;
 }
 .pagefind-ui__search-clear:hover {
-  color: var(--pf-brand-cherry) !important;
+  color: var(--pf-brand-maroon) !important;
 }
 
 /* Result rows — Cotton bg, hairline bottom border */
@@ -248,7 +262,7 @@ pagefind-searchbox:focus-within,
   font-size: var(--pf-result-title-font-size) !important;
 }
 .pagefind-ui__result-title a:hover {
-  color: var(--pf-brand-cherry) !important;
+  color: var(--pf-brand-maroon) !important;
 }
 
 /* Result excerpt — Inter, 60% Noir */
@@ -288,7 +302,10 @@ mark {
   font-size: 13px !important;
   padding: 10px 24px !important;
   cursor: pointer !important;
-  transition: background 150ms, color 150ms, border-color 150ms !important;
+  transition:
+    background 150ms,
+    color 150ms,
+    border-color 150ms !important;
 }
 .pagefind-ui__button:hover {
   background: var(--pf-brand-lime) !important;
