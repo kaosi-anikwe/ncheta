@@ -270,7 +270,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         excerpt: latestHero.excerpt,
         category: latestHero.primaryCategory?.name || "Art News",
         href: `/magazine/${latestHero.primaryCategory?.slug?.current || "art-news"}/${latestHero.slug?.current}`,
-        imageUrl: latestHero.featuredImage ? urlFor(latestHero.featuredImage).width(900).url() : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=900&q=80",
+        imageUrl: latestHero.featuredImage ? urlFor(latestHero.featuredImage).width(900).url() : undefined,
         date: latestHero.publishedAt,
         author: latestHero.author?.name || "Ncheta Team"
       } : null,
@@ -278,7 +278,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         title: art.title,
         category: art.primaryCategory?.name || "Art News",
         href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=400&q=80",
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
         date: art.publishedAt
       })),
       text: latestText.map((art: any) => ({
@@ -297,7 +297,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         excerpt: marketHero.excerpt,
         category: marketHero.primaryCategory?.name || "Art News",
         href: `/magazine/${marketHero.primaryCategory?.slug?.current || "art-news"}/${marketHero.slug?.current}`,
-        imageUrl: marketHero.featuredImage ? urlFor(marketHero.featuredImage).width(900).url() : "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=900&q=80",
+        imageUrl: marketHero.featuredImage ? urlFor(marketHero.featuredImage).width(900).url() : undefined,
         date: marketHero.publishedAt,
         author: marketHero.author?.name || "Ncheta Team"
       } : null,
@@ -305,7 +305,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         title: art.title,
         category: art.primaryCategory?.name || "Art News",
         href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : "https://images.unsplash.com/photo-1560343090-f0409e9791a?w=400&q=80",
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
         date: art.publishedAt
       })),
       text: marketText.map((art: any) => ({
@@ -324,7 +324,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         excerpt: luxuryHero.excerpt,
         category: luxuryHero.primaryCategory?.name || "Collecting Now",
         href: `/magazine/${luxuryHero.primaryCategory?.slug?.current || "collecting-now"}/${luxuryHero.slug?.current}`,
-        imageUrl: luxuryHero.featuredImage ? urlFor(luxuryHero.featuredImage).width(900).url() : "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=80",
+        imageUrl: luxuryHero.featuredImage ? urlFor(luxuryHero.featuredImage).width(900).url() : undefined,
         date: luxuryHero.publishedAt,
         author: luxuryHero.author?.name || "Ncheta Team"
       } : null,
@@ -332,7 +332,7 @@ if (sanityArticles && sanityArticles.length > 0) {
         title: art.title,
         category: art.primaryCategory?.name || "Collecting Now",
         href: `/magazine/${art.primaryCategory?.slug?.current || "collecting-now"}/${art.slug?.current}`,
-        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=400&q=80",
+        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
         date: art.publishedAt
       })),
       text: luxuryText.map((art: any) => ({

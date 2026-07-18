@@ -63,7 +63,7 @@ if (sanityArticles && sanityArticles.length > 0) {
     category: art.primaryCategory?.name || categoryName,
     date: art.publishedAt ? new Date(art.publishedAt).toISOString().split('T')[0] : "2026-07-01",
     author: art.author?.name || "Ncheta Team",
-    imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(600).url() : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=600&q=75",
+    imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(600).url() : undefined,
     href: `/magazine/${category}/${art.slug?.current}`
   }));
 } else {
