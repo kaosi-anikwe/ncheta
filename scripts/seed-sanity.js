@@ -48,17 +48,23 @@ const AUTHORS = [
 
 const CATEGORIES = [
   { _id: "cat-art-news", _type: "category", name: "Art News", slug: { _type: "slug", current: "art-news" } },
+  { _id: "cat-west-african-art-history", _type: "category", name: "West African Art History", slug: { _type: "slug", current: "west-african-art-history" } },
   { _id: "cat-academia", _type: "category", name: "Academia", slug: { _type: "slug", current: "academia" } },
-  { _id: "cat-interviews", _type: "category", name: "Interviews", slug: { _type: "slug", current: "interviews" } },
-  { _id: "cat-collecting-now", _type: "category", name: "Collecting Now", slug: { _type: "slug", current: "collecting-now" } },
-  { _id: "cat-african-art-history", _type: "category", name: "African Art History", slug: { _type: "slug", current: "african-art-history" } },
-  { _id: "cat-exhibitions-fairs", _type: "category", name: "Exhibitions & Fairs", slug: { _type: "slug", current: "exhibitions-fairs" } },
-  { _id: "cat-galleries-museums", _type: "category", name: "Galleries & Museums", slug: { _type: "slug", current: "galleries-museums" } },
   { _id: "cat-awards", _type: "category", name: "Awards", slug: { _type: "slug", current: "awards" } },
+  { _id: "cat-interviews", _type: "category", name: "Interviews", slug: { _type: "slug", current: "interviews" } },
+  { _id: "cat-meet-the-artist", _type: "category", name: "Meet the Artist", slug: { _type: "slug", current: "meet-the-artist" }, parentCategory: { _type: "reference", _ref: "cat-interviews" } },
+  { _id: "cat-curators-notes", _type: "category", name: "Curator's Notes", slug: { _type: "slug", current: "curators-notes" }, parentCategory: { _type: "reference", _ref: "cat-interviews" } },
+  { _id: "cat-behind-the-scenes", _type: "category", name: "Behind the Scenes", slug: { _type: "slug", current: "behind-the-scenes" }, parentCategory: { _type: "reference", _ref: "cat-interviews" } },
+  { _id: "cat-the-wet-paint-series", _type: "category", name: "The Wet Paint Series", slug: { _type: "slug", current: "the-wet-paint-series" }, parentCategory: { _type: "reference", _ref: "cat-interviews" } },
+  { _id: "cat-emerging-artists", _type: "category", name: "Emerging Artists", slug: { _type: "slug", current: "emerging-artists" }, parentCategory: { _type: "reference", _ref: "cat-interviews" } },
+  { _id: "cat-exhibitions-fairs", _type: "category", name: "Exhibitions and Fairs", slug: { _type: "slug", current: "exhibitions-fairs" } },
+  { _id: "cat-reviews", _type: "category", name: "Reviews", slug: { _type: "slug", current: "reviews" }, parentCategory: { _type: "reference", _ref: "cat-exhibitions-fairs" } },
+  { _id: "cat-critique", _type: "category", name: "Critique", slug: { _type: "slug", current: "critique" }, parentCategory: { _type: "reference", _ref: "cat-exhibitions-fairs" } },
 ];
 
 const ARTICLES = [
   {
+    _id: "art-venice-2026",
     title: "Venice Biennale 2026: African Pavilions Take Center Stage",
     slug: "venice-biennale-2026",
     primaryCategory: { _type: "reference", _ref: "cat-art-news" },
@@ -75,13 +81,14 @@ const ARTICLES = [
     ]
   },
   {
+    _id: "art-benin-bronzes",
     title: "The Benin Bronzes: Restitution and the Politics of Return",
     slug: "benin-bronzes-restitution",
-    primaryCategory: { _type: "reference", _ref: "cat-academia" },
+    primaryCategory: { _type: "reference", _ref: "cat-west-african-art-history" },
     publishedAt: "2026-06-22T12:00:00Z",
     author: { _type: "reference", _ref: "author-chisom" },
     excerpt: "Five years after the landmark repatriation agreement, scholars and curators assess the lasting impact on global museum practice.",
-    imageUrl: "https://images.unsplash.com/photo-1603039155534-f4a5d97be7a3?w=1200&q=80",
+    imageUrl: "https://images.unsplash.com/photo-1698121815703-c32c8b637bde?w=1200&q=80",
     content: [
       {
         _type: "block",
@@ -91,9 +98,10 @@ const ARTICLES = [
     ]
   },
   {
+    _id: "art-wangechi-mutu",
     title: "Wangechi Mutu on World-Building and Afrofuturist Ecologies",
     slug: "wangechi-mutu",
-    primaryCategory: { _type: "reference", _ref: "cat-interviews" },
+    primaryCategory: { _type: "reference", _ref: "cat-meet-the-artist" },
     publishedAt: "2026-06-18T12:00:00Z",
     author: { _type: "reference", _ref: "author-adaeze" },
     excerpt: "The Nairobi-born artist discusses her latest permanent commission at the Met and the role of myth-making in contemporary sculpture.",
@@ -107,6 +115,7 @@ const ARTICLES = [
     ]
   },
   {
+    _id: "art-ghana-market",
     title: "Ghana's Art Market Sees 300% Growth in Five Years",
     slug: "ghana-art-market",
     primaryCategory: { _type: "reference", _ref: "cat-art-news" },
@@ -119,6 +128,23 @@ const ARTICLES = [
         _type: "block",
         style: "normal",
         children: [{ _type: "span", text: "Accra's emerging galleries and resident curators are capturing the global secondary art market, creating sustainable local structures for young creators." }]
+      }
+    ]
+  },
+  {
+    _id: "art-exhibition-review",
+    title: "Review: 1-54 London 2026 Pavilion Highlights",
+    slug: "1-54-london-review",
+    primaryCategory: { _type: "reference", _ref: "cat-reviews" },
+    publishedAt: "2026-06-10T12:00:00Z",
+    author: { _type: "reference", _ref: "author-emeka" },
+    excerpt: "A critical review of the outstanding installations and solo exhibitions at this year's 1-54 fair.",
+    imageUrl: "https://images.unsplash.com/photo-1554907984-15263bfd63bd?w=1200&q=80",
+    content: [
+      {
+        _type: "block",
+        style: "normal",
+        children: [{ _type: "span", text: "This year's 1-54 London pavilion displayed unmatched artistic rigor across sculpture and textile installations." }]
       }
     ]
   }
@@ -192,6 +218,7 @@ async function seedEverything() {
       }
 
       const doc = {
+        _id: art._id,
         _type: "editorial",
         title: art.title,
         slug: { _type: "slug", current: art.slug },
@@ -203,42 +230,104 @@ async function seedEverything() {
         featuredImage: imageAsset || undefined,
       };
 
-      const result = await client.create(doc);
+      const result = await client.createOrReplace(doc);
       console.log(`Created article: "${result.title}"`);
     }
 
-    // 4. Create Navigation Settings (Header Menu link references)
-    console.log("Creating navigation settings...");
+    // Update categories with featured articles
+    console.log("Setting featured articles on categories...");
+    await client.patch("cat-art-news").set({
+      featuredArticles: [{ _type: "reference", _ref: "art-venice-2026" }]
+    }).commit();
+
+    // 4. Create Navigation Settings
+    console.log("Creating navigation settings with nested subcategories...");
     const navDoc = {
       _id: "navigation-settings-global",
       _type: "navigationSettings",
+      maxHomepageCategories: 5,
+      maxArticlesPerCategory: 9,
       menuItems: [
         {
-          _key: "nav-cat-1",
-          _type: "categoryLink",
-          category: { _type: "reference", _ref: "cat-art-news" },
+          _key: "nav-custom-about",
+          _type: "customLink",
+          label: "About",
+          url: "/about",
         },
         {
-          _key: "nav-cat-2",
-          _type: "categoryLink",
-          category: { _type: "reference", _ref: "cat-academia" },
-        },
-        {
-          _key: "nav-cat-3",
-          _type: "categoryLink",
-          category: { _type: "reference", _ref: "cat-interviews" },
-        },
-        {
-          _key: "nav-custom-1",
+          _key: "nav-custom-services",
           _type: "customLink",
           label: "Services",
           url: "/services",
         },
         {
-          _key: "nav-custom-2",
-          _type: "customLink",
-          label: "About",
-          url: "/about",
+          _key: "nav-cat-art-news",
+          _type: "categoryLink",
+          category: { _type: "reference", _ref: "cat-art-news" },
+        },
+        {
+          _key: "nav-cat-west-african-art-history",
+          _type: "categoryLink",
+          category: { _type: "reference", _ref: "cat-west-african-art-history" },
+        },
+        {
+          _key: "nav-cat-academia",
+          _type: "categoryLink",
+          category: { _type: "reference", _ref: "cat-academia" },
+        },
+        {
+          _key: "nav-cat-awards",
+          _type: "categoryLink",
+          category: { _type: "reference", _ref: "cat-awards" },
+        },
+        {
+          _key: "nav-cat-interviews",
+          _type: "categoryLink",
+          category: { _type: "reference", _ref: "cat-interviews" },
+          subItems: [
+            {
+              _key: "sub-meet-the-artist",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-meet-the-artist" },
+            },
+            {
+              _key: "sub-curators-notes",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-curators-notes" },
+            },
+            {
+              _key: "sub-behind-the-scenes",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-behind-the-scenes" },
+            },
+            {
+              _key: "sub-the-wet-paint-series",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-the-wet-paint-series" },
+            },
+            {
+              _key: "sub-emerging-artists",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-emerging-artists" },
+            },
+          ]
+        },
+        {
+          _key: "nav-cat-exhibitions-fairs",
+          _type: "categoryLink",
+          category: { _type: "reference", _ref: "cat-exhibitions-fairs" },
+          subItems: [
+            {
+              _key: "sub-reviews",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-reviews" },
+            },
+            {
+              _key: "sub-critique",
+              _type: "subCategoryLink",
+              category: { _type: "reference", _ref: "cat-critique" },
+            },
+          ]
         },
       ],
     };

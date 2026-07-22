@@ -22,5 +22,19 @@ export const categorySchema = {
       type: "text",
       title: "Description",
     },
+    {
+      name: "parentCategory",
+      type: "reference",
+      title: "Parent Category",
+      description: "Optional parent category for subcategories (e.g. Auctions under Art News)",
+      to: [{ type: "category" }],
+    },
+    {
+      name: "featuredArticles",
+      type: "array",
+      title: "Featured Articles (Homepage)",
+      description: "Select and order specific articles to feature for this category on the homepage",
+      of: [{ type: "reference", to: [{ type: "editorial" }] }],
+    },
   ],
 };

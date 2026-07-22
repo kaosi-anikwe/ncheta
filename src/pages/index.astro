@@ -3,24 +3,34 @@ import Layout from "../layouts/Layout.astro";
 import Header from "../components/navigation/Header.astro";
 import Footer from "../components/navigation/Footer.astro";
 import ArticleCard from "../components/cards/ArticleCard.astro";
-import { getAllEditorials, getAllCategories } from "../sanity/queries";
+import { getAllEditorials, getAllCategories, getNavigationSettings } from "../sanity/queries";
+import type { Category, Article, NavigationSettings } from "../sanity/types";
 import { urlFor } from "../sanity/image";
 
-// Fetch Sanity articles and categories dynamically
-let sanityArticles = [];
-let sanityCategories = [];
+// Fetch Sanity articles, categories, and settings dynamically
+let sanityArticles: Article[] = [];
+let sanityCategories: Category[] = [];
+let navSettings: NavigationSettings | null = null;
 try {
   sanityArticles = await getAllEditorials();
   sanityCategories = await getAllCategories();
+  navSettings = await getNavigationSettings();
 } catch (err) {
-  console.warn("Failed to fetch editorials/categories from Sanity, using fallback.", err);
+  console.warn("Failed to fetch data from Sanity, using fallback.", err);
 }
+
+// Configurable limits from Sanity or fallbacks
+const MAX_HOMEPAGE_CATEGORIES = navSettings?.maxHomepageCategories || 5;
+const MAX_ARTICLES_PER_CATEGORY = navSettings?.maxArticlesPerCategory || 9;
 
 // ── Static placeholder data (fallback if Sanity is empty) ──
 const fallbackSections = [
   {
     title: "Latest",
     slug: "art-news",
+    subCategories: [
+      { name: "Auctions", slug: "auctions" },
+    ],
     hero: {
       title: "President and general manager of Sotheby's on revitalising the auction house for a new generation of collectors",
       excerpt: "In a wide-ranging conversation, the new leadership team outlines a bold plan to remake the storied auction house for the digital era.",
@@ -94,6 +104,7 @@ const fallbackSections = [
   {
     title: "Art Market",
     slug: "art-news",
+    subCategories: [],
     hero: {
       title: "19th-century bronze: Laceeba leads Lceeba Old Master auctions, selling for £1.5m at Sotheby's",
       excerpt: "A spectacular result for the historic bronze underscores growing institutional appetite for pre-colonial African objects.",
@@ -164,160 +175,75 @@ const fallbackSections = [
       },
     ],
   },
-  {
-    title: "The Art of Luxury",
-    slug: "collecting-now",
-    hero: {
-      title: "From the Hamptons to Saint-Tropez: design fairs, P&D and festival failures",
-      excerpt: "As the summer circuit winds down, we examine which design fairs delivered and which failed to live up to their own billing.",
-      category: "Collecting Now",
-      href: "/magazine/collecting-now/summer-fairs-review",
-      imageUrl: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=900&q=80",
-      date: "2026-05-18",
-      author: "Adaeze Nwosu",
-    },
-    small: [
-      {
-        title: "Mexican chef brings spirit of Frida Kahlo to São Paulo pop-up",
-        category: "The Art of Luxury",
-        href: "/magazine/collecting-now/frida-kahlo-popup",
-        imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400&q=80",
-        date: "2026-05-15",
-      },
-      {
-        title: "Perfectly poached: the rise of art-focused hospitality experiences",
-        category: "The Art of Luxury",
-        href: "/magazine/collecting-now/art-hospitality",
-        imageUrl: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&q=80",
-        date: "2026-05-12",
-      },
-      {
-        title: "International: the new power season in contemporary art",
-        category: "Exhibitions",
-        href: "/magazine/exhibitions-fairs/power-season",
-        imageUrl: "https://images.unsplash.com/photo-1535591273668-578e31182c4f?w=400&q=80",
-        date: "2026-05-10",
-      },
-      {
-        title: "Tate Modern acquires landmark collection of African photography",
-        category: "Galleries & Museums",
-        href: "/magazine/galleries-museums/tate-african-photography",
-        imageUrl: "https://images.unsplash.com/photo-1568097904979-f6e3f1c6a5d4?w=400&q=80",
-        date: "2026-05-08",
-      },
-    ],
-    text: [
-      {
-        title: "A guide to the best African art residencies accepting applications this year",
-        category: "Resources",
-        href: "/resources/art-residencies-2026",
-        date: "2026-05-06",
-        author: "Sade Johnson",
-      },
-      {
-        title: "Luxury, craft, and identity: the new generation of African fashion and fine art crossovers",
-        category: "Collecting Now",
-        href: "/magazine/collecting-now/fashion-art-crossover",
-        date: "2026-05-04",
-        author: "Fatima Diallo",
-      },
-      {
-        title: "Five African museums that are quietly building world-class permanent collections",
-        category: "Galleries & Museums",
-        href: "/magazine/galleries-museums/five-african-museums",
-        date: "2026-05-02",
-        author: "Chukwuemeka Osei",
-      },
-      {
-        title: "The Zeitz MOCAA at five: how it changed Cape Town's cultural landscape",
-        category: "Galleries & Museums",
-        href: "/magazine/galleries-museums/zeitz-mocaa-five-years",
-        date: "2026-04-30",
-        author: "Nomvula Dlamini",
-      },
-    ],
-  },
 ];
 
 // Map Sanity articles to our sections if they exist, otherwise use fallbacks
-let sections = [];
+let sections: any[] = [];
 
 if (sanityArticles && sanityArticles.length > 0 && sanityCategories && sanityCategories.length > 0) {
-  const latestHero = sanityArticles[0];
-  const latestSmall = sanityArticles.slice(1, 5);
-  const latestText = sanityArticles.slice(5, 9);
-  
-  sections = [
-    {
-      title: "Latest",
-      slug: "latest",
-      hero: latestHero ? {
-        title: latestHero.title,
-        excerpt: latestHero.excerpt,
-        category: latestHero.primaryCategory?.name || "Latest",
-        href: `/magazine/${latestHero.primaryCategory?.slug?.current || "art-news"}/${latestHero.slug?.current}`,
-        imageUrl: latestHero.featuredImage ? urlFor(latestHero.featuredImage).width(900).url() : undefined,
-        date: latestHero.publishedAt,
-        author: latestHero.author?.name || "Ncheta Team"
-      } : null,
-      small: latestSmall.map((art: any) => ({
-        title: art.title,
-        category: art.primaryCategory?.name || "Latest",
-        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
-        date: art.publishedAt
-      })),
-      text: latestText.map((art: any) => ({
-        title: art.title,
-        category: art.primaryCategory?.name || "Latest",
-        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
-        date: art.publishedAt,
-        author: art.author?.name || "Ncheta Team"
-      }))
-    }
-  ];
+  // Top-level categories (those without a parent category)
+  const topCategories = sanityCategories.filter((cat: any) => !cat.parentCategory);
 
-  // Dynamically add a section for every category in Sanity that has at least 1 article
-  for (const category of sanityCategories) {
-    const catArticles = sanityArticles.filter((art: any) => 
-      art.primaryCategory?.slug?.current === category.slug?.current
+  // Apply MAX_HOMEPAGE_CATEGORIES limit
+  const activeCategories = topCategories.slice(0, MAX_HOMEPAGE_CATEGORIES);
+
+  sections = activeCategories.map((category: any) => {
+    // Find subcategories of this category
+    const subCats = sanityCategories.filter(
+      (c: any) => c.parentCategory && (c.parentCategory._id === category._id || c.parentCategory.slug?.current === category.slug?.current)
     );
-    
-    if (catArticles.length === 0) continue;
 
-    const hero = catArticles[0];
-    const small = catArticles.slice(1, 5);
-    const text = catArticles.slice(5, 9);
+    // Find all articles belonging to this category OR its subcategories
+    const categoryArticles = sanityArticles.filter((art: any) => {
+      const artCatSlug = art.primaryCategory?.slug?.current;
+      const artParentSlug = art.primaryCategory?.parentCategory?.slug?.current;
+      return artCatSlug === category.slug?.current || artParentSlug === category.slug?.current;
+    });
 
-    sections.push({
+    // Handle manually chosen featured articles per category
+    const featuredArticles: any[] = category.featuredArticles || [];
+    const featuredIds = new Set(featuredArticles.map((a: any) => a._id));
+    const unfeaturedArticles = categoryArticles.filter((a: any) => !featuredIds.has(a._id));
+
+    // Combine featured + remaining articles up to MAX_ARTICLES_PER_CATEGORY limit
+    const combinedArticles = [...featuredArticles, ...unfeaturedArticles].slice(0, MAX_ARTICLES_PER_CATEGORY);
+
+    const hero = combinedArticles[0];
+    const small = combinedArticles.slice(1, 5);
+    const text = combinedArticles.slice(5, MAX_ARTICLES_PER_CATEGORY);
+
+    return {
       title: category.name,
       slug: category.slug?.current || "art-news",
+      subCategories: subCats.map((s: any) => ({ name: s.name, slug: s.slug?.current })),
       hero: hero ? {
         title: hero.title,
         excerpt: hero.excerpt,
-        category: category.name,
-        href: `/magazine/${category.slug?.current || "art-news"}/${hero.slug?.current}`,
+        category: hero.primaryCategory?.name || category.name,
+        href: `/magazine/${hero.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${hero.slug?.current}`,
         imageUrl: hero.featuredImage ? urlFor(hero.featuredImage).width(900).url() : undefined,
         date: hero.publishedAt,
         author: hero.author?.name || "Ncheta Team"
       } : null,
       small: small.map((art: any) => ({
         title: art.title,
-        category: category.name,
-        href: `/magazine/${category.slug?.current || "art-news"}/${art.slug?.current}`,
+        category: art.primaryCategory?.name || category.name,
+        href: `/magazine/${art.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${art.slug?.current}`,
         imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
         date: art.publishedAt
       })),
       text: text.map((art: any) => ({
         title: art.title,
-        category: category.name,
-        href: `/magazine/${category.slug?.current || "art-news"}/${art.slug?.current}`,
+        category: art.primaryCategory?.name || category.name,
+        href: `/magazine/${art.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${art.slug?.current}`,
         date: art.publishedAt,
         author: art.author?.name || "Ncheta Team"
       }))
-    });
-  }
-} else {
+    };
+  }).filter((section: any) => section.hero !== null);
+}
+
+if (sections.length === 0) {
   sections = fallbackSections;
 }
 ---
@@ -343,66 +269,82 @@ if (sanityArticles && sanityArticles.length > 0 && sanityCategories && sanityCat
             sectionIndex === 0 ? "pt-8 pb-10" : "pt-6 pb-10",
           ]}
         >
-          <!-- Section header -->
-          <div class="flex items-baseline justify-between mb-12">
-          <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-noir">
-            {section.title}
-          </h2>
-          <a
-            href={`/magazine/${section.slug}`}
-            class="font-inter text-xs font-medium text-maroon  transition-colors duration-150 uppercase tracking-widest"
-          >
-            Read all →
-          </a>
-        </div>
-
-        <!-- Hero + 2×2 grid of small cards -->
-        <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr] xl:grid-cols-[3fr_2fr] gap-6 mb-0">
-          <!-- Hero card -->
-          <div>
-            {section.hero && (
-              <ArticleCard
-                variant="hero"
-                title={section.hero.title}
-                excerpt={section.hero.excerpt}
-                category={section.hero.category}
-                href={section.hero.href}
-                imageUrl={section.hero.imageUrl}
-                author={section.hero.author}
-                date={section.hero.date}
-              />
-            )}
+          <!-- Section header with Subcategory chips -->
+          <div class="flex flex-col sm:flex-row sm:items-baseline justify-between mb-8 gap-3">
+            <div class="flex items-center gap-3 flex-wrap">
+              <h2 class="font-cinzel font-bold text-2xl md:text-3xl text-noir">
+                {section.title}
+              </h2>
+              {section.subCategories && section.subCategories.length > 0 && (
+                <div class="flex items-center gap-1.5 flex-wrap">
+                  {section.subCategories.map((sub: any) => (
+                    <a
+                      href={`/magazine/${sub.slug}`}
+                      class="px-2.5 py-0.5 font-inter text-[11px] font-medium bg-noir/5 hover:bg-noir/10 text-noir/70 hover:text-noir rounded-full transition-colors"
+                    >
+                      {sub.name}
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+            <a
+              href={`/magazine/${section.slug}`}
+              class="font-inter text-xs font-medium text-maroon transition-colors duration-150 uppercase tracking-widest shrink-0"
+            >
+              Read all →
+            </a>
           </div>
 
-          <!-- 4 small cards in a 2×2 grid -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 lg:mt-0">
-            {section.small.map((card: any) => (
-              <ArticleCard
-                variant="small"
-                title={card.title}
-                category={card.category}
-                href={card.href}
-                imageUrl={card.imageUrl}
-                date={card.date}
-              />
-            ))}
-          </div>
-        </div>
+          <!-- Hero + 2×2 grid of small cards -->
+          <div class="grid grid-cols-1 lg:grid-cols-[1fr_1fr] xl:grid-cols-[3fr_2fr] gap-6 mb-0">
+            <!-- Hero card -->
+            <div>
+              {section.hero && (
+                <ArticleCard
+                  variant="hero"
+                  title={section.hero.title}
+                  excerpt={section.hero.excerpt}
+                  category={section.hero.category}
+                  href={section.hero.href}
+                  imageUrl={section.hero.imageUrl}
+                  author={section.hero.author}
+                  date={section.hero.date}
+                />
+              )}
+            </div>
 
-        <!-- 4 text-only article links below -->
-        <div class="border-t border-noir/10 mt-24 pt-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
-          {section.text.map((card: any) => (
-            <ArticleCard
-              variant="text"
-              title={card.title}
-              category={card.category}
-              href={card.href}
-              date={card.date}
-              author={card.author}
-              bordered
-            />
-          ))}
-        </div>
+            <!-- Small cards grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-4 lg:mt-0">
+              {section.small.map((card: any) => (
+                <ArticleCard
+                  variant="small"
+                  title={card.title}
+                  category={card.category}
+                  href={card.href}
+                  imageUrl={card.imageUrl}
+                  date={card.date}
+                />
+              ))}
+            </div>
+          </div>
+
+          <!-- Text-only article links below -->
+          {section.text && section.text.length > 0 && (
+            <div class="border-t border-noir/10 mt-12 pt-1 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-8">
+              {section.text.map((card: any) => (
+                <ArticleCard
+                  variant="text"
+                  title={card.title}
+                  category={card.category}
+                  href={card.href}
+                  date={card.date}
+                  author={card.author}
+                  bordered
+                />
+              ))}
+            </div>
+          )}
         </section>
       </>
     ))}
