@@ -1,0 +1,49 @@
+---
+// Copyright & Fair Use page — Cotton background, Noir text
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/navigation/Header.astro";
+import Footer from "../components/navigation/Footer.astro";
+---
+
+<Layout
+  title="Copyright & Fair Use"
+  description="Ncheta Magazine — documenting African art narratives, from historical scholarship to the contemporary market."
+>
+  <Header />
+  <main class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+    <!-- Breadcrumb -->
+    <nav
+      class="mb-8 font-inter text-xs text-noir/40 flex gap-2"
+      aria-label="Breadcrumb"
+    >
+      <a href="/" class="transition-colors">Home</a>
+      <span>/</span>
+      <span class="text-noir/60">Copyright & Fair Use</span>
+    </nav>
+
+    <h1 class="font-cinzel font-bold text-4xl md:text-5xl text-noir mb-3">
+      Copyright & Fair Use
+    </h1>
+
+    <div class="prose-content">
+      <p>
+        All texts, layout, design, drawings, photos, films and other parts of
+        this website are protected by copyright. Any copy, adaptation,
+        modification, translation, arrangement, public communication, rental or
+        other form of exploitation of all or part of this website, in any form
+        and by any means, such as electronic, mechanical or other means, is
+        completely prohibited except with the prior written consent of Ncheta
+        Magazine.
+      </p>
+      <p>
+        Every effort has been made to trace copyright holders concerning the use
+        of images, text, video, and other forms of intellectual property. If,
+        however, you feel you have inadvertently been overlooked, please contact
+        the editors of Ncheta Magazine issue by mailing to <a
+          href="mailto:hello@nchetamagzine.com">hello@nchetamagzine.com</a
+        >.
+      </p>
+    </div>
+  </main>
+  <Footer />
+</Layout>
