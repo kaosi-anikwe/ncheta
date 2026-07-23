@@ -11,9 +11,15 @@ export interface Props {
 const { title, description, ogImage, schema } = Astro.props;
 const siteTitle = "Ncheta Magazine";
 const fullTitle = title === "Home" ? siteTitle : `${title} — ${siteTitle}`;
-const siteUrl = Astro.site ? Astro.site.href : "https://nchetamagazine.com";
+const siteUrl = Astro.site ? Astro.site.href.replace(/\/$/, "") : "https://nchetamagazine.com";
 const canonicalUrl = new URL(Astro.url.pathname, siteUrl).href;
 const resolvedDescription = description || "Ncheta Magazine — documenting African art narratives, from historical scholarship to the contemporary market.";
+
+const resolvedOgImage = ogImage
+  ? ogImage.startsWith("http")
+    ? ogImage
+    : `${siteUrl}${ogImage.startsWith("/") ? "" : "/"}${ogImage}`
+  : "PLACEHOLDER_OG_IMAGE";
 ---
 
 <!doctype html>
@@ -27,19 +33,24 @@ const resolvedDescription = description || "Ncheta Magazine — documenting Afri
     <meta name="description" content={resolvedDescription} />
     <link rel="canonical" href={canonicalUrl} />
 
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={resolvedDescription} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:site_name" content="Ncheta Magazine" />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content={ogImage || "PLACEHOLDER_OG_IMAGE"} />
+    <meta property="og:type" content="article" />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:image:secure_url" content={resolvedOgImage} />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={fullTitle} />
 
     <!-- Twitter Cards -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={resolvedDescription} />
-    <meta name="twitter:image" content={ogImage || "PLACEHOLDER_OG_IMAGE"} />
+    <meta name="twitter:image" content={resolvedOgImage} />
     <meta name="twitter:url" content={canonicalUrl} />
 
     <!-- Google Fonts: Cinzel + Inter -->

@@ -192,12 +192,13 @@ async function processHtmlFile(filePath) {
     .png()
     .toFile(imagePath);
 
-  // 7. Update HTML to reference the generated image
-  const ogImageUrl = `/og/${imageFilename}`;
+  // 7. Update HTML to reference the generated image with absolute URL for WhatsApp / social crawlers
+  const siteDomain = process.env.SITE_URL || "https://nchetamagazine.com";
+  const ogImageUrl = `${siteDomain.replace(/\/$/, "")}/og/${imageFilename}`;
   html = html.replace(/PLACEHOLDER_OG_IMAGE/g, ogImageUrl);
   fs.writeFileSync(filePath, html, "utf-8");
 
-  console.log(`[OG Generator] Rendered ${relativePath} -> /og/${imageFilename}`);
+  console.log(`[OG Generator] Rendered ${relativePath} -> ${ogImageUrl}`);
 }
 
 async function main() {

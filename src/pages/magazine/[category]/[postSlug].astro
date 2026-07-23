@@ -8,6 +8,7 @@ import Footer from "../../../components/navigation/Footer.astro";
 import PortableText from "../../../components/ui/PortableText.astro";
 import MediaEmbed from "../../../components/ui/MediaEmbed.astro";
 import ArticleCard from "../../../components/cards/ArticleCard.astro";
+import { type Article } from "../../../sanity/types";
 
 export async function getStaticPaths() {
   const paths = [
@@ -263,7 +264,7 @@ const articleSchema = {
   },
 };
 
-let relatedArticles = [];
+let relatedArticles: Article[] | any[] = [];
 try {
   if (categorySlug) {
     const sanityRelated = await getEditorialsByCategory(categorySlug);
