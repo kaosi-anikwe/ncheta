@@ -180,67 +180,101 @@ const fallbackSections = [
 // Map Sanity articles to our sections if they exist, otherwise use fallbacks
 let sections: any[] = [];
 
-if (sanityArticles && sanityArticles.length > 0 && sanityCategories && sanityCategories.length > 0) {
-  // Top-level categories (those without a parent category)
-  const topCategories = sanityCategories.filter((cat: any) => !cat.parentCategory);
+if (sanityArticles && sanityArticles.length > 0) {
+  // 1. "Latest" section (always at top, fixed maximum of 9 articles across all categories)
+  const latestHero = sanityArticles[0];
+  const latestSmall = sanityArticles.slice(1, 5);
+  const latestText = sanityArticles.slice(5, 9);
 
-  // Apply MAX_HOMEPAGE_CATEGORIES limit
-  const activeCategories = topCategories.slice(0, MAX_HOMEPAGE_CATEGORIES);
-
-  sections = activeCategories.map((category: any) => {
-    // Find subcategories of this category
-    const subCats = sanityCategories.filter(
-      (c: any) => c.parentCategory && (c.parentCategory._id === category._id || c.parentCategory.slug?.current === category.slug?.current)
-    );
-
-    // Find all articles belonging to this category OR its subcategories
-    const categoryArticles = sanityArticles.filter((art: any) => {
-      const artCatSlug = art.primaryCategory?.slug?.current;
-      const artParentSlug = art.primaryCategory?.parentCategory?.slug?.current;
-      return artCatSlug === category.slug?.current || artParentSlug === category.slug?.current;
-    });
-
-    // Handle manually chosen featured articles per category
-    const featuredArticles: any[] = category.featuredArticles || [];
-    const featuredIds = new Set(featuredArticles.map((a: any) => a._id));
-    const unfeaturedArticles = categoryArticles.filter((a: any) => !featuredIds.has(a._id));
-
-    // Combine featured + remaining articles up to MAX_ARTICLES_PER_CATEGORY limit
-    const combinedArticles = [...featuredArticles, ...unfeaturedArticles].slice(0, MAX_ARTICLES_PER_CATEGORY);
-
-    const hero = combinedArticles[0];
-    const small = combinedArticles.slice(1, 5);
-    const text = combinedArticles.slice(5, MAX_ARTICLES_PER_CATEGORY);
-
-    return {
-      title: category.name,
-      slug: category.slug?.current || "art-news",
-      subCategories: subCats.map((s: any) => ({ name: s.name, slug: s.slug?.current })),
-      hero: hero ? {
-        title: hero.title,
-        excerpt: hero.excerpt,
-        category: hero.primaryCategory?.name || category.name,
-        href: `/magazine/${hero.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${hero.slug?.current}`,
-        imageUrl: hero.featuredImage ? urlFor(hero.featuredImage).width(900).url() : undefined,
-        date: hero.publishedAt,
-        author: hero.author?.name || "Ncheta Team"
-      } : null,
-      small: small.map((art: any) => ({
+  if (latestHero) {
+    sections.push({
+      title: "Latest",
+      slug: latestHero.primaryCategory?.slug?.current || "art-news",
+      subCategories: [],
+      hero: {
+        title: latestHero.title,
+        excerpt: latestHero.excerpt,
+        category: latestHero.primaryCategory?.name || "Latest",
+        href: `/magazine/${latestHero.primaryCategory?.slug?.current || "art-news"}/${latestHero.slug?.current}`,
+        imageUrl: latestHero.featuredImage ? urlFor(latestHero.featuredImage).width(900).url() : undefined,
+        date: latestHero.publishedAt,
+        author: latestHero.author?.name || "Ncheta Team"
+      },
+      small: latestSmall.map((art: any) => ({
         title: art.title,
-        category: art.primaryCategory?.name || category.name,
-        href: `/magazine/${art.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${art.slug?.current}`,
+        category: art.primaryCategory?.name || "Latest",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
         imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
         date: art.publishedAt
       })),
-      text: text.map((art: any) => ({
+      text: latestText.map((art: any) => ({
         title: art.title,
-        category: art.primaryCategory?.name || category.name,
-        href: `/magazine/${art.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${art.slug?.current}`,
+        category: art.primaryCategory?.name || "Latest",
+        href: `/magazine/${art.primaryCategory?.slug?.current || "art-news"}/${art.slug?.current}`,
         date: art.publishedAt,
         author: art.author?.name || "Ncheta Team"
       }))
-    };
-  }).filter((section: any) => section.hero !== null);
+    });
+  }
+
+  // 2. Category sections below Latest (capped by MAX_HOMEPAGE_CATEGORIES)
+  if (sanityCategories && sanityCategories.length > 0) {
+    const topCategories = sanityCategories.filter((cat: any) => !cat.parentCategory);
+    const activeCategories = topCategories.slice(0, MAX_HOMEPAGE_CATEGORIES);
+
+    for (const category of activeCategories) {
+      const subCats = sanityCategories.filter(
+        (c: any) => c.parentCategory && (c.parentCategory._id === category._id || c.parentCategory.slug?.current === category.slug?.current)
+      );
+
+      const categoryArticles = sanityArticles.filter((art: any) => {
+        const artCatSlug = art.primaryCategory?.slug?.current;
+        const artParentSlug = art.primaryCategory?.parentCategory?.slug?.current;
+        return artCatSlug === category.slug?.current || artParentSlug === category.slug?.current;
+      });
+
+      if (categoryArticles.length === 0) continue;
+
+      const featuredArticles: any[] = category.featuredArticles || [];
+      const featuredIds = new Set(featuredArticles.map((a: any) => a._id));
+      const unfeaturedArticles = categoryArticles.filter((a: any) => !featuredIds.has(a._id));
+
+      const combinedArticles = [...featuredArticles, ...unfeaturedArticles].slice(0, MAX_ARTICLES_PER_CATEGORY);
+
+      const hero = combinedArticles[0];
+      const small = combinedArticles.slice(1, 5);
+      const text = combinedArticles.slice(5, MAX_ARTICLES_PER_CATEGORY);
+
+      sections.push({
+        title: category.name,
+        slug: category.slug?.current || "art-news",
+        subCategories: subCats.map((s: any) => ({ name: s.name, slug: s.slug?.current })),
+        hero: hero ? {
+          title: hero.title,
+          excerpt: hero.excerpt,
+          category: hero.primaryCategory?.name || category.name,
+          href: `/magazine/${hero.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${hero.slug?.current}`,
+          imageUrl: hero.featuredImage ? urlFor(hero.featuredImage).width(900).url() : undefined,
+          date: hero.publishedAt,
+          author: hero.author?.name || "Ncheta Team"
+        } : null,
+        small: small.map((art: any) => ({
+          title: art.title,
+          category: art.primaryCategory?.name || category.name,
+          href: `/magazine/${art.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${art.slug?.current}`,
+          imageUrl: art.featuredImage ? urlFor(art.featuredImage).width(400).url() : undefined,
+          date: art.publishedAt
+        })),
+        text: text.map((art: any) => ({
+          title: art.title,
+          category: art.primaryCategory?.name || category.name,
+          href: `/magazine/${art.primaryCategory?.slug?.current || category.slug?.current || "art-news"}/${art.slug?.current}`,
+          date: art.publishedAt,
+          author: art.author?.name || "Ncheta Team"
+        }))
+      });
+    }
+  }
 }
 
 if (sections.length === 0) {
