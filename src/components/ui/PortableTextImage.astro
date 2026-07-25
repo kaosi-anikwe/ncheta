@@ -1,0 +1,35 @@
+---
+import { urlFor } from "../../sanity/image";
+
+// astro-portabletext passes `node` as a prop to custom type components
+const { node } = Astro.props;
+const block = node?.value || node || Astro.props.value;
+
+let imageUrl = "";
+if (block) {
+  try {
+    imageUrl = urlFor(block).url();
+  } catch (e) {
+    imageUrl = block.asset?.url || block.url || "";
+  }
+}
+
+const captionText = block?.caption || block?.description || "";
+const altText = block?.alt || captionText || "";
+---
+
+{imageUrl && (
+  <figure class="my-8">
+    <img
+      src={imageUrl}
+      alt={altText}
+      class="rounded-lg w-full"
+      loading="lazy"
+    />
+    {captionText && (
+      <figcaption class="mt-2.5 font-inter text-xs text-noir/50 text-center italic leading-relaxed">
+        {captionText}
+      </figcaption>
+    )}
+  </figure>
+)}

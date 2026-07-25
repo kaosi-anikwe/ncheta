@@ -42,6 +42,20 @@ export const editorialSchema = {
       type: "image",
       title: "Featured Image",
       options: { hotspot: true },
+      fields: [
+        {
+          name: "caption",
+          type: "string",
+          title: "Caption / Description",
+          description: "Caption or description displayed beneath the image",
+        },
+        {
+          name: "alt",
+          type: "string",
+          title: "Alternative Text (Alt)",
+          description: "Accessibility text for screen readers and SEO",
+        },
+      ],
     },
     {
       name: "excerpt",
@@ -53,7 +67,27 @@ export const editorialSchema = {
       name: "content",
       type: "array",
       title: "Body Content",
-      of: [{ type: "block" }, { type: "image" }],
+      of: [
+        { type: "block" },
+        {
+          type: "image",
+          options: { hotspot: true },
+          fields: [
+            {
+              name: "caption",
+              type: "string",
+              title: "Caption / Description",
+              description: "Caption or description displayed beneath the image",
+            },
+            {
+              name: "alt",
+              type: "string",
+              title: "Alternative Text (Alt)",
+              description: "Accessibility text for screen readers and SEO",
+            },
+          ],
+        },
+      ],
     },
     {
       name: "youtubeVideoUrl",

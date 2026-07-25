@@ -1,7 +1,7 @@
 ---
 // PortableText — renders Sanity block content via astro-portabletext
 import { PortableText } from "astro-portabletext";
-import { urlFor } from "../../sanity/image";
+import PortableTextImage from "./PortableTextImage.astro";
 
 export interface Props {
   blocks: any[];
@@ -15,39 +15,7 @@ const { blocks } = Astro.props;
     value={blocks}
     components={{
       type: {
-        image: ({ value }: any) => {
-          let imageUrl = "";
-          try {
-            imageUrl = urlFor(value).url();
-          } catch (e) {
-            imageUrl = value.asset?.url || value.url || "";
-          }
-          return (
-            <figure class="my-8">
-              <img
-                src={imageUrl}
-                alt={value.alt || ""}
-                class="rounded-lg w-full"
-                loading="lazy"
-              />
-              {value.caption && (
-                <figcaption class="mt-2 text-sm text-noir/50 italic text-center">{value.caption}</figcaption>
-              )}
-            </figure>
-          );
-        },
-      },
-      mark: {
-        link: ({ children, value }: any) => (
-          <a
-            href={value.href}
-            target={value.href?.startsWith("http") ? "_blank" : undefined}
-            rel={value.href?.startsWith("http") ? "noopener noreferrer" : undefined}
-            class="text-lime underline decoration-lime/50 hover:decoration-lime"
-          >
-            {children}
-          </a>
-        ),
+        image: PortableTextImage,
       },
     }}
   />

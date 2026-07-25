@@ -207,7 +207,8 @@ if (sanityArticle) {
     heroImage: sanityArticle.featuredImage
       ? urlFor(sanityArticle.featuredImage).width(1400).url()
       : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=1400&q=85",
-    heroImageAlt: sanityArticle.title,
+    heroImageAlt: sanityArticle.featuredImage?.alt || sanityArticle.title,
+    heroImageCaption: sanityArticle.featuredImage?.caption || sanityArticle.featuredImage?.description || "",
     content: sanityArticle.content || [],
     youtubeVideoUrl: sanityArticle.youtubeVideoUrl || "",
   };
@@ -235,6 +236,7 @@ const {
   excerpt,
   heroImage,
   heroImageAlt,
+  heroImageCaption,
   content,
   youtubeVideoUrl,
 } = article;
@@ -438,9 +440,9 @@ function fmtDate(d: string) {
                 loading="eager"
                 data-pagefind-meta="image[src]"
               />
-              {heroImageAlt && (
-                <figcaption class="mt-2 font-inter text-xs text-noir/40 text-center">
-                  {heroImageAlt}
+              {(heroImageCaption || (heroImageAlt && heroImageAlt !== title)) && (
+                <figcaption class="mt-2.5 font-inter text-xs text-noir/50 text-center italic leading-relaxed">
+                  {heroImageCaption || heroImageAlt}
                 </figcaption>
               )}
             </figure>
