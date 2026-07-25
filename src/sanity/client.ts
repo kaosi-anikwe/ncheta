@@ -1,8 +1,8 @@
 import { createClient } from "@sanity/client";
 
 export const sanityClient = createClient({
-  projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID,
+  projectId: import.meta.env.PUBLIC_SANITY_PROJECT_ID || "fn5p79dp",
   dataset: import.meta.env.PUBLIC_SANITY_DATASET || "production",
   apiVersion: import.meta.env.PUBLIC_SANITY_API_VERSION || "2026-07-02",
-  useCdn: true,
+  useCdn: false,
 });
