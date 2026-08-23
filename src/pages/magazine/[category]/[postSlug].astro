@@ -208,7 +208,7 @@ if (sanityArticle) {
       ? urlFor(sanityArticle.featuredImage).width(1400).url()
       : "https://images.unsplash.com/photo-1578926375605-eaf7559b1458?w=1400&q=85",
     heroImageAlt: sanityArticle.featuredImage?.alt || sanityArticle.title,
-    heroImageCaption: sanityArticle.featuredImage?.caption || sanityArticle.featuredImage?.description || "",
+    heroImageCaption: sanityArticle.featuredImage?.caption ?? "",
     content: sanityArticle.content || [],
     youtubeVideoUrl: sanityArticle.youtubeVideoUrl || "",
   };
@@ -440,10 +440,29 @@ function fmtDate(d: string) {
                 loading="eager"
                 data-pagefind-meta="image[src]"
               />
-              {(heroImageCaption || (heroImageAlt && heroImageAlt !== title)) && (
-                <figcaption class="mt-2.5 font-inter text-xs text-noir/50 text-center italic leading-relaxed">
-                  {heroImageCaption || heroImageAlt}
-                </figcaption>
+              {(heroImageCaption ||
+                (heroImageAlt && heroImageAlt !== title)) && (
+                <figcaption
+                  class="mt-2.5 font-inter text-xs text-noir/50 text-center italic leading-relaxed"
+                  set:html={
+                    Array.isArray(heroImageCaption)
+                      ? heroImageCaption
+                          .map((b: any) =>
+                            b.children
+                              ?.map((s: any) => {
+                                let t = s.text || "";
+                                if (s.marks?.includes("strong"))
+                                  t = `<strong>${t}</strong>`;
+                                if (s.marks?.includes("em"))
+                                  t = `<em>${t}</em>`;
+                                return t;
+                              })
+                              .join(""),
+                          )
+                          .join(" ")
+                      : heroImageCaption || heroImageAlt
+                  }
+                />
               )}
             </figure>
           </div>

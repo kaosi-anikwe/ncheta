@@ -14,22 +14,47 @@ if (block) {
   }
 }
 
-const captionText = block?.caption || block?.description || "";
+const caption = block?.caption;
+const captionText = typeof caption === "string" ? caption : "";
 const altText = block?.alt || captionText || "";
+
+// Render portable text caption blocks to HTML
+function renderCaption(blocks: any[]): string {
+  return blocks
+    .map((b) => {
+      if (b._type !== "block" || !b.children) return "";
+      return b.children
+        .map((span: any) => {
+          let text = span.text || "";
+          if (span.marks?.includes("strong")) text = `<strong>${text}</strong>`;
+          if (span.marks?.includes("em")) text = `<em>${text}</em>`;
+          return text;
+        })
+        .join("");
+    })
+    .join(" ");
+}
+
+const captionHtml = Array.isArray(caption)
+  ? renderCaption(caption)
+  : captionText;
 ---
 
-{imageUrl && (
-  <figure class="my-8">
-    <img
-      src={imageUrl}
-      alt={altText}
-      class="rounded-lg w-full"
-      loading="lazy"
-    />
-    {captionText && (
-      <figcaption class="mt-2.5 font-inter text-xs text-noir/50 text-center italic leading-relaxed">
-        {captionText}
-      </figcaption>
-    )}
-  </figure>
-)}
+{
+  imageUrl && (
+    <figure class="my-8">
+      <img
+        src={imageUrl}
+        alt={altText}
+        class="rounded-lg w-full"
+        loading="lazy"
+      />
+      {captionHtml && (
+        <figcaption
+          class="mt-2.5 font-inter text-xs text-noir/50 text-center italic leading-relaxed"
+          set:html={captionHtml}
+        />
+      )}
+    </figure>
+  )
+}
