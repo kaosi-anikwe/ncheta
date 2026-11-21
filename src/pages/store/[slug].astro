@@ -5,15 +5,16 @@ import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/navigation/Header.astro";
 import Footer from "../../components/navigation/Footer.astro";
 import PortableText from "../../components/ui/PortableText.astro";
-import { getBookBySlug } from "../../sanity/queries";
+import { getBookBySlug, getStoreSettings } from "../../sanity/queries";
 import { urlFor } from "../../sanity/image";
 import type { BookFormat } from "../../sanity/types";
 
 const { slug } = Astro.params;
 if (!slug) return Astro.redirect("/store", 301);
 
-const book = await getBookBySlug(slug);
+const [book, settings] = await Promise.all([getBookBySlug(slug), getStoreSettings()]);
 if (!book) return new Response(null, { status: 404 });
+if (!settings?.storeOpen) return Astro.redirect("/store", 302);
 
 const coverUrl = book.coverImage
   ? urlFor(book.coverImage).width(560).height(784).fit("crop").url()

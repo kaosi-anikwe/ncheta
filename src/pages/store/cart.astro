@@ -4,6 +4,10 @@ export const prerender = false;
 import Layout from "../../layouts/Layout.astro";
 import Header from "../../components/navigation/Header.astro";
 import Footer from "../../components/navigation/Footer.astro";
+import { getStoreSettings } from "../../sanity/queries";
+
+const settings = await getStoreSettings();
+if (!settings?.storeOpen) return Astro.redirect("/store", 302);
 ---
 
 <Layout title="Your Cart" description="Review your cart before checkout.">
