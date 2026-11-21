@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { getBookBySlug, getStoreSettings } from "../../../sanity/queries";
 
 export const prerender = false;
@@ -35,7 +36,6 @@ interface CheckoutBody {
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
 
   try {
     const body = (await request.json()) as CheckoutBody;

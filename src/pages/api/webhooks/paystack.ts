@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
@@ -14,7 +15,6 @@ interface OrderItemRow {
 }
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
 
   // Read raw body BEFORE parsing — required for HMAC verification
   const rawBody = await request.text();

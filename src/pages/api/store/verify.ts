@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
@@ -14,7 +15,6 @@ interface OrderItemRow {
 }
 
 export const GET: APIRoute = async ({ url, locals }) => {
-  const env = locals.runtime.env;
   const reference = url.searchParams.get("reference");
 
   if (!reference) return json({ success: false, error: "reference required" }, 400);
@@ -80,7 +80,7 @@ export const GET: APIRoute = async ({ url, locals }) => {
     }
 
     // Fire-and-forget email (non-blocking)
-    env.ctx?.waitUntil?.(sendOrderEmails(env, order, items.results, downloadTokenExpiryHours));
+    await sendOrderEmails(env, order, items.results, downloadTokenExpiryHours);
 
     return buildSuccessResponse(env, { ...order, status: "paid" });
   } catch (err) {

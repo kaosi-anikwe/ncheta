@@ -1,9 +1,9 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
-  const env = context.locals.runtime.env;
   const { ref } = context.params;
 
   if (!ref) return context.redirect("/admin/orders", 302);

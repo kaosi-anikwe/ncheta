@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/wrangler/config-schema.json",
-  "name": "ncheta-magazine",
+  "name": "ncheta",
   "compatibility_date": "2026-07-03",
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "./dist",

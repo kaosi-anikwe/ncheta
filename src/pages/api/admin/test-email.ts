@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { sendEmail, sendOrderConfirmationEmail, sendDispatchEmail } from "../../../lib/email";
 
 export const prerender = false;
@@ -6,7 +7,6 @@ export const prerender = false;
 // Protected by middleware — only reachable when admin session cookie is valid
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
 
   let body: { type?: string; to?: string };
   try {

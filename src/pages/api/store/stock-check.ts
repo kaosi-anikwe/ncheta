@@ -1,9 +1,9 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
 export const GET: APIRoute = async ({ url, locals }) => {
-  const env = locals.runtime.env;
   const bookId = url.searchParams.get("bookId");
   const format = url.searchParams.get("format") ?? "physical";
   const qty = parseInt(url.searchParams.get("qty") ?? "1", 10);

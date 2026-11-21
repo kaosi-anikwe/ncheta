@@ -1,12 +1,12 @@
 ---
 export const prerender = false;
+import { env } from "cloudflare:workers";
 
 import Layout from "../../../layouts/Layout.astro";
 
 const { ref } = Astro.params;
 if (!ref) return Astro.redirect("/admin/orders", 301);
 
-const env = Astro.locals.runtime.env;
 
 type OrderRow = {
   id: string; reference: string; status: string; order_type: string;

@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { getBookBySlug, getStoreSettings } from "../../../sanity/queries";
 
 export const prerender = false;
@@ -13,7 +14,6 @@ interface DhlRateResult {
 }
 
 export const GET: APIRoute = async ({ url, locals }) => {
-  const env = locals.runtime.env;
   const bookId = url.searchParams.get("bookId");
   const country = url.searchParams.get("country");
   const city = url.searchParams.get("city") ?? "";

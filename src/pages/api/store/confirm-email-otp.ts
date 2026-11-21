@@ -1,9 +1,9 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  const env = locals.runtime.env;
 
   try {
     const { email, code } = (await request.json()) as { email?: string; code?: string };

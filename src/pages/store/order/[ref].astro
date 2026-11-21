@@ -1,5 +1,6 @@
 ---
 export const prerender = false;
+import { env } from "cloudflare:workers";
 
 import Layout from "../../../layouts/Layout.astro";
 import Header from "../../../components/navigation/Header.astro";
@@ -9,7 +10,6 @@ const { ref } = Astro.params;
 if (!ref) return Astro.redirect("/store", 301);
 
 // Fetch order from D1 directly (we're in SSR context)
-const env = Astro.locals.runtime.env;
 
 interface OrderRow {
   id: string; reference: string; status: string; order_type: string;

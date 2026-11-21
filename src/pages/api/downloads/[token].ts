@@ -1,4 +1,5 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
@@ -13,7 +14,6 @@ interface TokenRow {
 }
 
 export const GET: APIRoute = async ({ params, locals }) => {
-  const env = locals.runtime.env;
   const { token } = params;
 
   if (!token) return errorPage(400, "Invalid download link.");

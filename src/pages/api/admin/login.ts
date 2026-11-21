@@ -1,10 +1,10 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 import { createAdminSession } from "../../../lib/admin-auth";
 
 export const prerender = false;
 
 export const POST: APIRoute = async (context) => {
-  const env = context.locals.runtime.env;
 
   let username: string | null = null;
   let password: string | null = null;

@@ -1,11 +1,11 @@
 import type { APIRoute } from "astro";
+import { env } from "cloudflare:workers";
 
 export const prerender = false;
 
 const MAX_SIZE = 100 * 1024 * 1024; // 100 MB
 
 export const POST: APIRoute = async (context) => {
-  const env = context.locals.runtime.env;
 
   let form: FormData;
   try {
@@ -64,18 +64,11 @@ export const POST: APIRoute = async (context) => {
       useCdn: false,
     });
 
-    // Use unset + set patch to update the specific format's r2Key
-    // We use a JSONmatch patch since formats is an array
-    await writeClient
-      .patch(bookId)
-      .setIfMissing({ formats: [] })
-      .run();
-
-    // Fetch current formats to find the right index
-    const bookData = await writeClient.fetch(
+    // Fetch current formats to find the right array index
+    const bookData = await writeClient.fetch<{ formats?: Array<{ format: string; r2Key?: string }> }>(
       `*[_id == $id][0]{ formats }`,
       { id: bookId }
-    ) as { formats?: Array<{ format: string; r2Key?: string }> } | null;
+    );
 
     const formats = bookData?.formats ?? [];
     const idx = formats.findIndex((f) => f.format === format);
