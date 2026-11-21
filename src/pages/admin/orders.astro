@@ -2,7 +2,7 @@
 export const prerender = false;
 import { env } from "cloudflare:workers";
 
-import Layout from "../../layouts/Layout.astro";
+import AdminLayout from "../../layouts/AdminLayout.astro";
 
 
 const page = Number(Astro.url.searchParams.get("page") ?? "1");
@@ -74,24 +74,7 @@ function buildUrl(params: Record<string, string>): string {
 }
 ---
 
-<Layout title="Orders — Admin" description="Ncheta admin orders">
-  <div class="min-h-screen bg-cotton">
-
-    <!-- Nav -->
-    <header class="border-b border-noir/10 bg-cotton px-6 py-4 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-6">
-        <span class="font-cinzel text-sm font-bold text-noir tracking-widest uppercase">Ncheta Admin</span>
-        <nav class="hidden sm:flex items-center gap-4 font-inter text-sm">
-          <a href="/admin/orders" class="text-noir font-semibold">Orders</a>
-          <a href="/admin/inventory" class="text-noir/50 hover:text-noir transition-colors">Inventory</a>
-          <a href="/admin/upload" class="text-noir/50 hover:text-noir transition-colors">Upload</a>
-        </nav>
-      </div>
-      <form method="POST" action="/api/admin/logout">
-        <button class="font-inter text-xs text-noir/40 hover:text-noir transition-colors">Sign out</button>
-      </form>
-    </header>
-
+<AdminLayout title="Orders" activePage="orders">
     <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
       <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
@@ -198,5 +181,4 @@ function buildUrl(params: Record<string, string>): string {
         </div>
       )}
     </main>
-  </div>
-</Layout>
+</AdminLayout>

@@ -1,7 +1,7 @@
 ---
 export const prerender = false;
 
-import Layout from "../../layouts/Layout.astro";
+import AdminLayout from "../../layouts/AdminLayout.astro";
 import { getStoreBooks } from "../../sanity/queries";
 
 const books = await getStoreBooks().catch(() => []);
@@ -11,18 +11,8 @@ const uploadedKey = Astro.url.searchParams.get("key") ?? "";
 const uploadError = Astro.url.searchParams.get("error") ?? "";
 ---
 
-<Layout title="Upload — Admin" description="Upload digital book files">
-  <div class="min-h-screen bg-cotton">
-    <header class="border-b border-noir/10 bg-cotton px-6 py-4 flex items-center gap-6">
-      <span class="font-cinzel text-sm font-bold text-noir tracking-widest uppercase">Ncheta Admin</span>
-      <nav class="flex items-center gap-4 font-inter text-sm">
-        <a href="/admin/orders" class="text-noir/50 hover:text-noir transition-colors">Orders</a>
-        <a href="/admin/inventory" class="text-noir/50 hover:text-noir transition-colors">Inventory</a>
-        <a href="/admin/upload" class="text-noir font-semibold">Upload</a>
-      </nav>
-    </header>
-
-    <main class="max-w-xl mx-auto px-4 sm:px-6 py-8">
+<AdminLayout title="Upload" activePage="upload">
+    <div class="max-w-xl mx-auto px-4 sm:px-6 py-8">
       <h1 class="font-cinzel font-bold text-2xl text-noir mb-6">Upload Digital Book</h1>
 
       {uploaded && (
@@ -114,9 +104,8 @@ const uploadError = Astro.url.searchParams.get("error") ?? "";
           </button>
         </form>
       )}
-    </main>
-  </div>
-</Layout>
+    </div>
+</AdminLayout>
 
 <script>
   const form = document.getElementById("upload-form") as HTMLFormElement | null;

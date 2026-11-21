@@ -1,0 +1,31 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Header from "../components/navigation/Header.astro";
+import Footer from "../components/navigation/Footer.astro";
+---
+
+<Layout title="Something Went Wrong" description="An unexpected error occurred.">
+  <Header />
+
+  <main class="flex-1 flex items-center justify-center px-4 py-24">
+    <div class="max-w-md text-center">
+      <p class="font-cinzel text-6xl font-bold text-noir/10 mb-6 tracking-widest">500</p>
+      <h1 class="font-cinzel text-2xl font-bold text-noir mb-4">Something Went Wrong</h1>
+      <p class="font-inter text-sm text-noir/60 leading-relaxed mb-8">
+        An unexpected error occurred on our end. Please try again in a moment.<br />
+        If the problem persists, contact
+        <a href="mailto:hello@nchetamagazine.com" class="underline hover:text-maroon">
+          hello@nchetamagazine.com
+        </a>.
+      </p>
+      <a
+        href="/"
+        class="h-11 px-6 bg-noir text-cotton font-inter text-sm font-medium hover:bg-maroon transition-colors inline-flex items-center justify-center"
+      >
+        Go to Homepage
+      </a>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

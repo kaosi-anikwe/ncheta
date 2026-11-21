@@ -2,7 +2,7 @@
 export const prerender = false;
 import { env } from "cloudflare:workers";
 
-import Layout from "../../layouts/Layout.astro";
+import AdminLayout from "../../layouts/AdminLayout.astro";
 import { sanityClient } from "../../sanity/client";
 
 
@@ -45,17 +45,7 @@ const deleted = Astro.url.searchParams.get("deleted");
 const error = Astro.url.searchParams.get("error");
 ---
 
-<Layout title="Inventory — Admin" description="Manage physical book inventory">
-  <div class="min-h-screen bg-cotton">
-    <header class="border-b border-noir/10 bg-cotton px-6 py-4 flex items-center gap-6">
-      <span class="font-cinzel text-sm font-bold text-noir tracking-widest uppercase">Ncheta Admin</span>
-      <nav class="flex items-center gap-4 font-inter text-sm">
-        <a href="/admin/orders" class="text-noir/50 hover:text-noir transition-colors">Orders</a>
-        <a href="/admin/inventory" class="text-noir font-semibold">Inventory</a>
-        <a href="/admin/upload" class="text-noir/50 hover:text-noir transition-colors">Upload</a>
-      </nav>
-    </header>
-
+<AdminLayout title="Inventory" activePage="inventory">
     <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div class="flex items-center justify-between gap-4 mb-6">
         <h1 class="font-cinzel font-bold text-2xl text-noir">Physical Inventory</h1>
@@ -246,5 +236,4 @@ const error = Astro.url.searchParams.get("error");
         </div>
       )}
     </main>
-  </div>
-</Layout>
+</AdminLayout>

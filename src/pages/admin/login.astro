@@ -1,14 +1,14 @@
 ---
 export const prerender = false;
 
-import Layout from "../../layouts/Layout.astro";
+import AdminLayout from "../../layouts/AdminLayout.astro";
 
 const error = Astro.url.searchParams.has("error");
 const next = Astro.url.searchParams.get("next") ?? "/admin/orders";
 ---
 
-<Layout title="Admin Login" description="Ncheta admin login">
-  <main class="min-h-screen bg-cotton flex items-center justify-center px-4">
+<AdminLayout title="Login">
+  <div class="h-full flex items-center justify-center px-4">
     <div class="w-full max-w-sm">
       <p class="font-cinzel text-2xl font-bold text-noir text-center mb-8 tracking-widest uppercase">
         Ncheta
@@ -61,5 +61,5 @@ const next = Astro.url.searchParams.get("next") ?? "/admin/orders";
         </button>
       </form>
     </div>
-  </main>
-</Layout>
+  </div>
+</AdminLayout>
