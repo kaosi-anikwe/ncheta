@@ -1,0 +1,205 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import { sanityClient } from "../../sanity/client";
+
+const env = Astro.locals.runtime.env;
+
+// Fetch all Sanity books that have at least one physical format
+const sanityBooks = await sanityClient.fetch<Array<{
+  _id: string;
+  title: string;
+  slug: { current: string };
+  formats: Array<{ format: string; weightKg?: number }>;
+}>>(
+  `*[_type == "book" && "physical" in formats[].format] | order(title asc) {
+    _id, title, slug, formats[]{ format, weightKg }
+  }`
+);
+
+// Fetch all physical inventory rows from D1
+type InventoryRow = {
+  id: string; book_id: string; book_slug: string;
+  stock: number; reserved: number; sold: number; updated_at: string;
+};
+
+const inventoryResult = await env.DB.prepare(
+  "SELECT id, book_id, book_slug, stock, reserved, sold, updated_at FROM book_inventory WHERE format = 'physical'"
+).all<InventoryRow>();
+
+const inventoryByBookId = new Map(inventoryResult.results.map((r) => [r.book_id, r]));
+
+// Cross-reference: build unified list
+const books = sanityBooks.map((book) => ({
+  ...book,
+  inventory: inventoryByBookId.get(book._id) ?? null,
+}));
+
+const updated = Astro.url.searchParams.get("updated");
+const error = Astro.url.searchParams.get("error");
+---
+
+<Layout title="Inventory — Admin" description="Manage physical book inventory">
+  <div class="min-h-screen bg-cotton">
+    <header class="border-b border-noir/10 bg-cotton px-6 py-4 flex items-center gap-6">
+      <span class="font-cinzel text-sm font-bold text-noir tracking-widest uppercase">Ncheta Admin</span>
+      <nav class="flex items-center gap-4 font-inter text-sm">
+        <a href="/admin/orders" class="text-noir/50 hover:text-noir transition-colors">Orders</a>
+        <a href="/admin/inventory" class="text-noir font-semibold">Inventory</a>
+        <a href="/admin/upload" class="text-noir/50 hover:text-noir transition-colors">Upload</a>
+      </nav>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <h1 class="font-cinzel font-bold text-2xl text-noir">Physical Inventory</h1>
+        <p class="font-inter text-xs text-noir/40">{books.length} book{books.length !== 1 ? "s" : ""} with physical format</p>
+      </div>
+
+      {updated && (
+        <div class="mb-5 p-4 border border-lime/30 bg-lime/10 font-inter text-sm text-noir">
+          Inventory updated for <strong>{updated}</strong>.
+        </div>
+      )}
+      {error === "not_found" && (
+        <div class="mb-5 p-4 border border-cherry/20 bg-cherry/5 font-inter text-sm text-cherry">
+          Book not found. Refresh and try again.
+        </div>
+      )}
+      {error === "failed" && (
+        <div class="mb-5 p-4 border border-cherry/20 bg-cherry/5 font-inter text-sm text-cherry">
+          Failed to update inventory. Please try again.
+        </div>
+      )}
+
+      {books.length === 0 ? (
+        <div class="text-center py-16 font-inter text-noir/30">
+          No books with a physical format found in Sanity.<br />
+          Add a book with a physical format in the studio first.
+        </div>
+      ) : (
+        <div class="space-y-4">
+          {books.map((book) => {
+            const inv = book.inventory;
+            const available = inv ? inv.stock - inv.reserved : null;
+
+            return (
+              <div class="border border-noir/10 p-5">
+                <div class="flex items-start justify-between gap-4 mb-4">
+                  <div>
+                    <h2 class="font-cinzel font-bold text-base text-noir">{book.title}</h2>
+                    <p class="font-inter text-xs text-noir/40 mt-0.5">{book.slug.current}</p>
+                  </div>
+                  {!inv ? (
+                    <span class="font-inter text-xs font-semibold text-cherry bg-cherry/10 px-2 py-1">
+                      Not configured
+                    </span>
+                  ) : available !== null && available <= 0 ? (
+                    <span class="font-inter text-xs font-semibold text-cherry bg-cherry/10 px-2 py-1">
+                      Out of stock
+                    </span>
+                  ) : available !== null && available <= 3 ? (
+                    <span class="font-inter text-xs font-semibold text-amber-700 bg-amber-50 px-2 py-1">
+                      Low stock
+                    </span>
+                  ) : (
+                    <span class="font-inter text-xs font-semibold text-lime bg-lime/10 px-2 py-1">
+                      In stock
+                    </span>
+                  )}
+                </div>
+
+                {inv ? (
+                  <div class="grid grid-cols-4 gap-3 mb-5">
+                    {[
+                      { label: "Stock", value: inv.stock },
+                      { label: "Reserved", value: inv.reserved },
+                      { label: "Available", value: available ?? 0 },
+                      { label: "Sold", value: inv.sold },
+                    ].map(({ label, value }) => (
+                      <div class="border border-noir/8 p-3 text-center">
+                        <p class="font-inter text-xl font-bold text-noir tabular-nums">{value}</p>
+                        <p class="font-inter text-xs text-noir/40 mt-0.5">{label}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p class="font-inter text-sm text-noir/50 mb-5">
+                    No inventory record exists. Initialize it to start tracking stock.
+                  </p>
+                )}
+
+                <div class="flex flex-wrap gap-3 items-end">
+                  <!-- Add stock form -->
+                  <form method="POST" action="/api/admin/inventory/adjust" class="flex items-end gap-2">
+                    <input type="hidden" name="book_id" value={book._id} />
+                    <input type="hidden" name="book_slug" value={book.slug.current} />
+                    <input type="hidden" name="book_title" value={book.title} />
+                    <input type="hidden" name="action" value="add" />
+                    <div>
+                      <label class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+                        Add stock
+                      </label>
+                      <input
+                        name="qty"
+                        type="number"
+                        min="1"
+                        max="9999"
+                        required
+                        placeholder="e.g. 50"
+                        class="w-24 h-9 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir placeholder:text-noir/30"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      class="h-9 px-4 bg-noir text-cotton font-inter text-xs font-semibold hover:bg-maroon transition-colors"
+                    >
+                      {inv ? "Add" : "Initialize"}
+                    </button>
+                  </form>
+
+                  <!-- Set stock form (only shown if row already exists) -->
+                  {inv && (
+                    <form method="POST" action="/api/admin/inventory/adjust" class="flex items-end gap-2">
+                      <input type="hidden" name="book_id" value={book._id} />
+                      <input type="hidden" name="book_slug" value={book.slug.current} />
+                      <input type="hidden" name="book_title" value={book.title} />
+                      <input type="hidden" name="action" value="set" />
+                      <div>
+                        <label class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+                          Set stock to
+                        </label>
+                        <input
+                          name="qty"
+                          type="number"
+                          min="0"
+                          max="9999"
+                          required
+                          placeholder={String(inv.stock)}
+                          class="w-24 h-9 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir placeholder:text-noir/30"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        class="h-9 px-4 border border-noir/20 text-noir font-inter text-xs font-semibold hover:border-noir hover:bg-noir/5 transition-colors"
+                      >
+                        Set
+                      </button>
+                    </form>
+                  )}
+                </div>
+
+                {inv && (
+                  <p class="mt-3 font-inter text-xs text-noir/30">
+                    Last updated: {new Date(inv.updated_at).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" })}
+                  </p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </main>
+  </div>
+</Layout>
