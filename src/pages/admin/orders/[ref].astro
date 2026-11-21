@@ -57,7 +57,7 @@ const statusColors: Record<string, string> = {
 ---
 
 <AdminLayout title={`Order ${order.reference}`} activePage="orders">
-    <main class="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-6">
 
       {dispatched && (
         <div class="p-4 border border-lime/30 bg-lime/10 font-inter text-sm text-noir">
@@ -197,5 +197,5 @@ const statusColors: Record<string, string> = {
         <p>Updated: {new Date(order.updated_at).toLocaleString("en-NG", { dateStyle: "long", timeStyle: "short" })}</p>
       </div>
 
-    </main>
+    </div>
 </AdminLayout>

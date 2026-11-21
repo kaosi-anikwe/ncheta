@@ -46,7 +46,7 @@ const error = Astro.url.searchParams.get("error");
 ---
 
 <AdminLayout title="Inventory" activePage="inventory">
-    <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 py-8">
       <div class="flex items-center justify-between gap-4 mb-6">
         <h1 class="font-cinzel font-bold text-2xl text-noir">Physical Inventory</h1>
         <p class="font-inter text-xs text-noir/40">{books.length} book{books.length !== 1 ? "s" : ""} with physical format</p>
@@ -235,5 +235,5 @@ const error = Astro.url.searchParams.get("error");
           </div>
         </div>
       )}
-    </main>
+    </div>
 </AdminLayout>
