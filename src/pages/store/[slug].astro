@@ -177,7 +177,7 @@ const formatLabels: Record<string, string> = {
             <div class="border-t border-noir/10 pt-6">
               <h2 class="font-cinzel font-bold text-lg text-noir mb-4">About this book</h2>
               <div class="prose-content">
-                <PortableText value={book.description} />
+                <PortableText blocks={book.description} />
               </div>
             </div>
           )}
