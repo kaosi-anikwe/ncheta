@@ -1,0 +1,122 @@
+export const storeSettingsSchema = {
+  name: 'storeSettings',
+  type: 'document',
+  title: 'Store Settings',
+  fields: [
+    {
+      name: 'storeOpen',
+      type: 'boolean',
+      title: 'Store Open',
+      description: 'Set to false to show a "coming soon" banner instead of the store',
+      initialValue: false,
+    },
+    {
+      name: 'defaultCurrency',
+      type: 'string',
+      title: 'Default Currency',
+      initialValue: 'NGN',
+      options: { list: ['NGN', 'USD'] },
+    },
+    {
+      name: 'taxRatePercent',
+      type: 'number',
+      title: 'Tax Rate (%)',
+      description: 'e.g. 7.5 for Nigerian VAT. Applied to NGN orders.',
+      initialValue: 7.5,
+    },
+    {
+      name: 'lowStockThreshold',
+      type: 'number',
+      title: 'Low Stock Warning Threshold',
+      description: 'Show "Only X left" badge when stock is at or below this number',
+      initialValue: 3,
+    },
+    // DHL settings
+    {
+      name: 'dhlBufferDays',
+      type: 'number',
+      title: 'DHL Buffer Days',
+      description: 'Extra days added to DHL estimate to account for PO → DHL handoff',
+      initialValue: 3,
+      validation: (Rule: any) => Rule.min(0).max(30),
+    },
+    {
+      name: 'dhlOriginName',
+      type: 'string',
+      title: 'DHL Origin — Contact Name',
+      initialValue: 'Ncheta Magazine',
+    },
+    {
+      name: 'dhlOriginCompany',
+      type: 'string',
+      title: 'DHL Origin — Company',
+      initialValue: 'Essence Technologies & Agric',
+    },
+    {
+      name: 'dhlOriginAddressLine1',
+      type: 'string',
+      title: 'DHL Origin — Address Line 1',
+      initialValue: 'Suite 19D, Block B, Anon Plaza',
+    },
+    {
+      name: 'dhlOriginAddressLine2',
+      type: 'string',
+      title: 'DHL Origin — Address Line 2',
+      initialValue: 'Plot 1085 Joseph Gomwalk Way',
+    },
+    {
+      name: 'dhlOriginCity',
+      type: 'string',
+      title: 'DHL Origin — City',
+      initialValue: 'Abuja',
+    },
+    {
+      name: 'dhlOriginPostalCode',
+      type: 'string',
+      title: 'DHL Origin — Postal Code',
+      initialValue: '900001',
+    },
+    {
+      name: 'dhlOriginCountryCode',
+      type: 'string',
+      title: 'DHL Origin — Country Code (ISO 2-letter)',
+      initialValue: 'NG',
+    },
+    // Digital delivery settings
+    {
+      name: 'downloadTokenExpiryHours',
+      type: 'number',
+      title: 'Download Link Expiry (hours)',
+      initialValue: 72,
+      validation: (Rule: any) => Rule.min(1).max(720),
+    },
+    {
+      name: 'maxDownloadsPerToken',
+      type: 'number',
+      title: 'Max Downloads Per Link',
+      initialValue: 3,
+      validation: (Rule: any) => Rule.min(1).max(20),
+    },
+    // Email settings
+    {
+      name: 'storeEmailFrom',
+      type: 'string',
+      title: 'Store From Email Address',
+      description: 'e.g. store@nchetamagazine.com',
+      initialValue: 'store@nchetamagazine.com',
+    },
+    {
+      name: 'poNotificationEmail',
+      type: 'string',
+      title: 'PO Notification Email',
+      description: 'Receives alerts for new physical orders',
+      initialValue: 'hello@nchetamagazine.com',
+    },
+    {
+      name: 'storeIntroText',
+      type: 'text',
+      title: 'Store Introduction Text (optional)',
+      rows: 2,
+    },
+  ],
+};

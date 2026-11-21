@@ -1,0 +1,84 @@
+---
+import { urlFor } from "../../sanity/image";
+import type { Book, BookFormat } from "../../sanity/types";
+
+export interface Props {
+  book: Book;
+  currency?: "NGN" | "USD";
+}
+
+const { book, currency = "NGN" } = Astro.props;
+
+function lowestPrice(formats: BookFormat[], cur: "NGN" | "USD"): number | null {
+  const amounts: number[] = [];
+  for (const fmt of formats) {
+    const p = fmt.prices?.find((p) => p.currency === cur);
+    if (p) amounts.push(p.amount);
+  }
+  return amounts.length ? Math.min(...amounts) : null;
+}
+
+function formatPrice(amount: number | null, cur: "NGN" | "USD"): string {
+  if (amount == null) return "";
+  if (cur === "NGN") {
+    return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+  }
+  return "$" + (amount / 100).toFixed(2);
+}
+
+const price = lowestPrice(book.formats ?? [], currency);
+const priceStr = formatPrice(price, currency);
+const coverUrl = book.coverImage ? urlFor(book.coverImage).width(400).height(560).fit("crop").url() : null;
+const hasPhysical = (book.formats ?? []).some((f) => f.format === "physical");
+const hasDigital = (book.formats ?? []).some((f) => f.format === "pdf" || f.format === "epub");
+---
+
+<a
+  href={`/store/${book.slug.current}`}
+  class="group flex flex-col bg-cotton hover:bg-noir/4 transition-colors duration-200"
+  aria-label={book.title}
+  data-book-id={book._id}
+>
+  <div class="overflow-hidden aspect-[2/3]">
+    {coverUrl ? (
+      <img
+        src={coverUrl}
+        alt={book.coverImage?.alt ?? book.title}
+        class="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-500 ease-out"
+        loading="lazy"
+      />
+    ) : (
+      <div
+        class="w-full h-full flex items-center justify-center"
+        style="background: linear-gradient(160deg, var(--color-maroon) 0%, var(--color-noir) 100%);"
+      >
+        <span class="font-cinzel text-cotton/40 text-xs text-center px-4">{book.title}</span>
+      </div>
+    )}
+  </div>
+
+  <div class="pt-3 pb-5 flex flex-col flex-1">
+    <div class="flex gap-1 mb-2 flex-wrap">
+      {hasDigital && (
+        <span class="tag-pill text-maroon">Digital</span>
+      )}
+      {hasPhysical && (
+        <span class="tag-pill">Physical</span>
+      )}
+    </div>
+
+    <h3 class="font-cinzel font-bold text-base text-noir group-hover:text-maroon transition-colors duration-200 leading-snug">
+      {book.title}
+    </h3>
+
+    {book.author?.name && (
+      <p class="mt-1 font-inter text-xs text-noir/50">{book.author.name}</p>
+    )}
+
+    {priceStr && (
+      <p class="mt-auto pt-3 font-inter text-sm font-semibold text-noir" data-book-price data-book-formats={JSON.stringify(book.formats?.map(f => ({ format: f.format, prices: f.prices })))}>
+        From {priceStr}
+      </p>
+    )}
+  </div>
+</a>

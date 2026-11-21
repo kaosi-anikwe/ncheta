@@ -1,0 +1,356 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/navigation/Header.astro";
+import Footer from "../../components/navigation/Footer.astro";
+import PortableText from "../../components/ui/PortableText.astro";
+import { getBookBySlug } from "../../sanity/queries";
+import { urlFor } from "../../sanity/image";
+import type { BookFormat } from "../../sanity/types";
+
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/store", 301);
+
+const book = await getBookBySlug(slug);
+if (!book) return new Response(null, { status: 404 });
+
+const coverUrl = book.coverImage
+  ? urlFor(book.coverImage).width(560).height(784).fit("crop").url()
+  : null;
+
+function formatPrice(amount: number, cur: "NGN" | "USD"): string {
+  if (cur === "NGN") return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+  return "$" + (amount / 100).toFixed(2);
+}
+
+function getPrice(fmt: BookFormat, cur: "NGN" | "USD"): string {
+  const p = fmt.prices?.find((p) => p.currency === cur);
+  return p ? formatPrice(p.amount, cur) : "—";
+}
+
+const formatLabels: Record<string, string> = {
+  pdf: "Digital — PDF",
+  epub: "Digital — EPUB",
+  physical: "Physical Book",
+};
+---
+
+<Layout
+  title={book.title}
+  description={book.excerpt ?? `Purchase ${book.title} from Ncheta Magazine.`}
+>
+  <Header />
+
+  <main class="flex-1">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <!-- Breadcrumb -->
+      <nav class="mb-8" aria-label="Breadcrumb">
+        <ol class="flex items-center gap-2 font-inter text-xs text-noir/40">
+          <li><a href="/store" class="hover:text-noir transition-colors">Books</a></li>
+          <li aria-hidden="true">›</li>
+          <li class="text-noir/70 truncate max-w-[200px]">{book.title}</li>
+        </ol>
+      </nav>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-16">
+        <!-- Cover image -->
+        <div class="lg:col-span-2">
+          <div class="aspect-[2/3] overflow-hidden bg-noir/5 sticky top-28">
+            {coverUrl ? (
+              <img
+                src={coverUrl}
+                alt={book.coverImage?.alt ?? book.title}
+                class="w-full h-full object-cover"
+                loading="eager"
+              />
+            ) : (
+              <div
+                class="w-full h-full flex items-center justify-center"
+                style="background: linear-gradient(160deg, var(--color-maroon) 0%, var(--color-noir) 100%);"
+              >
+                <span class="font-cinzel text-cotton/40 text-sm text-center px-6">{book.title}</span>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <!-- Book info + purchase -->
+        <div class="lg:col-span-3 flex flex-col gap-6">
+          <!-- Title & meta -->
+          <div>
+            <h1 class="font-cinzel text-3xl md:text-4xl font-bold text-noir leading-snug">{book.title}</h1>
+            {book.author?.name && (
+              <p class="mt-2 font-inter text-sm text-noir/55">by {book.author.name}</p>
+            )}
+            <div class="mt-3 flex flex-wrap gap-3 font-inter text-xs text-noir/40">
+              {book.publishedYear && <span>{book.publishedYear}</span>}
+              {book.pageCount && <span>· {book.pageCount} pages</span>}
+              {book.isbn && <span>· ISBN {book.isbn}</span>}
+              {book.publisher && <span>· {book.publisher}</span>}
+            </div>
+          </div>
+
+          <!-- Excerpt -->
+          {book.excerpt && (
+            <p class="font-inter text-base text-noir/70 leading-relaxed border-l-2 border-maroon pl-4">
+              {book.excerpt}
+            </p>
+          )}
+
+          <!-- Currency & format selector -->
+          <div id="purchase-block" data-formats={JSON.stringify(book.formats)}>
+            <!-- Currency toggle -->
+            <div class="flex items-center gap-1 mb-4" id="currency-toggle" aria-label="Select currency">
+              <span class="font-inter text-xs text-noir/40 mr-2">Currency:</span>
+              <button data-cur="NGN" class="px-3 py-1 text-xs font-inter font-medium border transition-colors duration-150 cursor-pointer bg-noir text-cotton border-noir" aria-pressed="true">₦ NGN</button>
+              <button data-cur="USD" class="px-3 py-1 text-xs font-inter font-medium border transition-colors duration-150 cursor-pointer bg-cotton text-noir/60 border-noir/20 hover:border-noir/50" aria-pressed="false">$ USD</button>
+            </div>
+
+            <!-- Format options -->
+            <fieldset class="border border-noir/15">
+              <legend class="sr-only">Choose format</legend>
+              {(book.formats ?? []).map((fmt, i) => (
+                <label
+                  class:list={[
+                    "flex items-center justify-between gap-4 px-4 py-3 cursor-pointer hover:bg-noir/4 transition-colors duration-150",
+                    i > 0 ? "border-t border-noir/10" : "",
+                  ]}
+                >
+                  <div class="flex items-center gap-3">
+                    <input
+                      type="radio"
+                      name="book-format"
+                      value={fmt._key}
+                      data-format={fmt.format}
+                      data-prices={JSON.stringify(fmt.prices)}
+                      data-r2-key={fmt.r2Key ?? ""}
+                      class="accent-maroon w-4 h-4 cursor-pointer"
+                      checked={i === 0}
+                    />
+                    <span class="font-inter text-sm font-medium text-noir">
+                      {formatLabels[fmt.format] ?? fmt.format}
+                    </span>
+                  </div>
+                  <span
+                    class="font-inter text-sm font-semibold text-noir tabular-nums"
+                    data-format-price={fmt._key}
+                  >
+                    {getPrice(fmt, "NGN")}
+                  </span>
+                </label>
+              ))}
+            </fieldset>
+
+            <!-- Stock indicator (shown for physical, populated by client) -->
+            <p
+              id="stock-indicator"
+              class="mt-2 font-inter text-xs text-noir/50 h-4"
+              aria-live="polite"
+            ></p>
+
+            <!-- Add to cart -->
+            <button
+              id="add-to-cart-btn"
+              type="button"
+              class="mt-4 w-full h-12 bg-noir text-cotton font-inter font-medium text-sm tracking-wide
+                     border border-noir
+                     hover:bg-maroon hover:border-maroon
+                     focus:outline-none focus:ring-2 focus:ring-maroon/40 focus:ring-offset-2 focus:ring-offset-cotton
+                     disabled:opacity-50 disabled:cursor-not-allowed
+                     transition-colors duration-200 cursor-pointer"
+              data-book-id={book._id}
+              data-book-title={book.title}
+              data-book-slug={book.slug.current}
+            >
+              Add to Cart
+            </button>
+
+            <p class="mt-3 font-inter text-xs text-noir/40 text-center">
+              Physical orders shipped via DHL Express worldwide.
+              Digital orders available for immediate download after payment.
+            </p>
+          </div>
+
+          <!-- Full description -->
+          {book.description && book.description.length > 0 && (
+            <div class="border-t border-noir/10 pt-6">
+              <h2 class="font-cinzel font-bold text-lg text-noir mb-4">About this book</h2>
+              <div class="prose-content">
+                <PortableText value={book.description} />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  import type { BookFormat, BookPrice } from "../../sanity/types";
+
+  const CURRENCY_KEY = "ncheta_currency";
+  const CART_KEY = "ncheta_cart_v1";
+
+  function getPreferredCurrency(): "NGN" | "USD" {
+    try {
+      const s = localStorage.getItem(CURRENCY_KEY);
+      return s === "USD" ? "USD" : "NGN";
+    } catch { return "NGN"; }
+  }
+
+  function formatPrice(amount: number, cur: "NGN" | "USD"): string {
+    if (cur === "NGN") return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+    return "$" + (amount / 100).toFixed(2);
+  }
+
+  function setCurrencyUI(currency: "NGN" | "USD") {
+    document.querySelectorAll<HTMLButtonElement>("[data-cur]").forEach((btn) => {
+      const isActive = btn.dataset.cur === currency;
+      btn.setAttribute("aria-pressed", String(isActive));
+      btn.className = btn.className
+        .replace(/bg-noir text-cotton border-noir|bg-cotton text-noir\/60 border-noir\/20 hover:border-noir\/50/g, "")
+        .trimEnd();
+      btn.className += isActive
+        ? " bg-noir text-cotton border-noir"
+        : " bg-cotton text-noir/60 border-noir/20 hover:border-noir/50";
+    });
+  }
+
+  function updatePrices(currency: "NGN" | "USD") {
+    document.querySelectorAll<HTMLElement>("[data-format-price]").forEach((el) => {
+      const formatKey = el.dataset.formatPrice;
+      const radio = document.querySelector<HTMLInputElement>(`input[value="${formatKey}"]`);
+      if (!radio) return;
+      try {
+        const prices: BookPrice[] = JSON.parse(radio.dataset.prices ?? "[]");
+        const p = prices.find((p) => p.currency === currency);
+        el.textContent = p ? formatPrice(p.amount, currency) : "—";
+      } catch {}
+    });
+  }
+
+  async function checkPhysicalStock(bookId: string) {
+    const selectedRadio = document.querySelector<HTMLInputElement>("input[name='book-format']:checked");
+    if (!selectedRadio || selectedRadio.dataset.format !== "physical") {
+      document.getElementById("stock-indicator")!.textContent = "";
+      return;
+    }
+    try {
+      const res = await fetch(`/api/store/stock-check?bookId=${bookId}&format=physical&qty=1`);
+      if (!res.ok) return;
+      const data = await res.json() as { available: number; sufficient: boolean };
+      const indicator = document.getElementById("stock-indicator")!;
+      const btn = document.getElementById("add-to-cart-btn") as HTMLButtonElement;
+      if (data.available <= 0) {
+        indicator.textContent = "Out of stock";
+        indicator.className = indicator.className.replace("text-noir/50", "text-cherry font-medium");
+        btn.disabled = true;
+        btn.textContent = "Out of Stock";
+      } else if (data.available <= 3) {
+        indicator.textContent = `Only ${data.available} left`;
+        indicator.className = indicator.className.replace("text-noir/50", "text-maroon font-medium");
+        btn.disabled = false;
+        btn.textContent = "Add to Cart";
+      } else {
+        indicator.textContent = "";
+        btn.disabled = false;
+        btn.textContent = "Add to Cart";
+      }
+    } catch {}
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const currency = getPreferredCurrency();
+    setCurrencyUI(currency);
+    updatePrices(currency);
+
+    const bookId = document.getElementById("add-to-cart-btn")?.dataset.bookId ?? "";
+
+    // Check stock on page load for default selected format
+    checkPhysicalStock(bookId);
+
+    // Re-check when format selection changes
+    document.querySelectorAll<HTMLInputElement>("input[name='book-format']").forEach((radio) => {
+      radio.addEventListener("change", () => checkPhysicalStock(bookId));
+    });
+
+    // Currency toggle
+    document.getElementById("currency-toggle")?.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement).closest("[data-cur]") as HTMLElement | null;
+      if (!target) return;
+      const cur = target.dataset.cur as "NGN" | "USD";
+      try { localStorage.setItem(CURRENCY_KEY, cur); } catch {}
+      setCurrencyUI(cur);
+      updatePrices(cur);
+    });
+
+    // Add to cart
+    document.getElementById("add-to-cart-btn")?.addEventListener("click", () => {
+      const selectedRadio = document.querySelector<HTMLInputElement>("input[name='book-format']:checked");
+      if (!selectedRadio) return;
+
+      const currency = getPreferredCurrency();
+      const prices: BookPrice[] = JSON.parse(selectedRadio.dataset.prices ?? "[]");
+      const price = prices.find((p) => p.currency === currency);
+      if (!price) {
+        alert("This book is not available in the selected currency.");
+        return;
+      }
+
+      const btn = document.getElementById("add-to-cart-btn") as HTMLButtonElement;
+      const bookId = btn.dataset.bookId!;
+      const bookTitle = btn.dataset.bookTitle!;
+      const bookSlug = btn.dataset.bookSlug!;
+      const format = selectedRadio.dataset.format as "pdf" | "epub" | "physical";
+      const formatKey = selectedRadio.value;
+
+      const coverImg = document.querySelector<HTMLImageElement>(".aspect-\\[2\\/3\\] img");
+
+      // Build cart item
+      const item = {
+        bookId,
+        bookTitle,
+        bookSlug,
+        format,
+        formatKey,
+        currency,
+        unitPrice: price.amount,
+        quantity: 1,
+        coverUrl: coverImg?.src ?? "",
+      };
+
+      // Load existing cart
+      let cart: typeof item[] = [];
+      try {
+        cart = JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
+      } catch {}
+
+      // Check if same format already in cart
+      const existingIdx = cart.findIndex(
+        (i) => i.bookId === bookId && i.format === format && i.currency === currency
+      );
+      if (existingIdx >= 0) {
+        cart[existingIdx].quantity += 1;
+      } else {
+        cart.push(item);
+      }
+
+      try { localStorage.setItem(CART_KEY, JSON.stringify(cart)); } catch {}
+
+      // Update badge across page
+      window.dispatchEvent(new CustomEvent("cart:updated", { detail: cart }));
+
+      // Brief feedback
+      btn.textContent = "Added!";
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.textContent = "Add to Cart";
+        btn.disabled = false;
+      }, 1200);
+    });
+  });
+</script>

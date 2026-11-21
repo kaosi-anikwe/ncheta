@@ -1,5 +1,5 @@
 import { sanityClient } from "./client";
-import type { Category, Article, NavigationSettings } from "./types";
+import type { Category, Article, NavigationSettings, Book, StoreSettings } from "./types";
 
 // Fetch all categories with parent category and featured articles
 export const getAllCategories = async (): Promise<Category[]> => {
@@ -81,6 +81,55 @@ export const getEditorialBySlug = async (slug: string): Promise<Article | null> 
     { slug }
   );
 };
+
+// ── Store queries ─────────────────────────────────────────────────────────────
+
+const BOOK_FIELDS = `
+  _id,
+  title,
+  slug,
+  author->{ name, title, avatar },
+  coverImage,
+  excerpt,
+  description,
+  isbn,
+  publishedYear,
+  pageCount,
+  publisher,
+  formats[]{
+    _key,
+    format,
+    prices[]{currency, amount},
+    r2Key,
+    weightKg,
+    dimensionsCm
+  },
+  featured
+`;
+
+export const getStoreBooks = async (): Promise<Book[]> => {
+  return sanityClient.fetch<Book[]>(
+    `*[_type == "book"] | order(featured desc, title asc) { ${BOOK_FIELDS} }`
+  );
+};
+
+export const getBookBySlug = async (slug: string): Promise<Book | null> => {
+  return sanityClient.fetch<Book | null>(
+    `*[_type == "book" && slug.current == $slug][0]{
+      ${BOOK_FIELDS},
+      relatedArticles[]->{ _id, title, slug, excerpt, publishedAt, featuredImage, primaryCategory->{ name, slug } }
+    }`,
+    { slug }
+  );
+};
+
+export const getStoreSettings = async (): Promise<StoreSettings | null> => {
+  return sanityClient.fetch<StoreSettings | null>(
+    `*[_type == "storeSettings"][0]`
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 // Fetch editorials by category slug (including subcategories whose parent is categorySlug)
 export const getEditorialsByCategory = async (categorySlug: string): Promise<Article[]> => {

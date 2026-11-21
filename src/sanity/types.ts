@@ -55,6 +55,61 @@ export interface Article {
   author?: Author;
 }
 
+// ── Store types ──────────────────────────────────────────────────────────────
+
+export interface BookPrice {
+  currency: 'NGN' | 'USD';
+  amount: number;
+}
+
+export interface BookFormat {
+  _key: string;
+  format: 'pdf' | 'epub' | 'physical';
+  prices: BookPrice[];
+  r2Key?: string;
+  weightKg?: number;
+  dimensionsCm?: { length: number; width: number; height: number };
+}
+
+export interface Book {
+  _id: string;
+  title: string;
+  slug: { current: string };
+  author?: Author;
+  coverImage?: any;
+  excerpt?: string;
+  description?: any[];
+  isbn?: string;
+  publishedYear?: number;
+  pageCount?: number;
+  publisher?: string;
+  formats: BookFormat[];
+  featured?: boolean;
+  relatedArticles?: Article[];
+}
+
+export interface StoreSettings {
+  storeOpen: boolean;
+  defaultCurrency: 'NGN' | 'USD';
+  taxRatePercent: number;
+  lowStockThreshold: number;
+  dhlBufferDays: number;
+  dhlOriginName: string;
+  dhlOriginCompany: string;
+  dhlOriginAddressLine1: string;
+  dhlOriginAddressLine2?: string;
+  dhlOriginCity: string;
+  dhlOriginPostalCode: string;
+  dhlOriginCountryCode: string;
+  downloadTokenExpiryHours: number;
+  maxDownloadsPerToken: number;
+  storeEmailFrom: string;
+  poNotificationEmail: string;
+  storeIntroText?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export interface NavigationItem {
   _type: string;
   _key: string;

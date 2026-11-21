@@ -1,0 +1,166 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import BookCard from "../../components/cards/BookCard.astro";
+import { getStoreBooks, getStoreSettings } from "../../sanity/queries";
+import { getNavigationSettings } from "../../sanity/queries";
+import Header from "../../components/navigation/Header.astro";
+import Footer from "../../components/navigation/Footer.astro";
+
+const [books, settings] = await Promise.all([
+  getStoreBooks(),
+  getStoreSettings(),
+]);
+
+const featured = books.filter((b) => b.featured);
+const rest = books.filter((b) => !b.featured);
+const orderedBooks = [...featured, ...rest];
+---
+
+<Layout title="Books" description="Browse and purchase books published by Ncheta Magazine.">
+  <Header />
+
+  <main class="flex-1">
+    {!settings?.storeOpen ? (
+      <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 text-center">
+        <h1 class="font-cinzel text-4xl md:text-5xl font-bold text-noir mb-6">The Store</h1>
+        <p class="font-inter text-noir/60 text-lg max-w-md mx-auto">
+          Our bookshop is coming soon. Subscribe to be notified when we launch.
+        </p>
+      </section>
+    ) : (
+      <>
+        <!-- Page header -->
+        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-10 pb-6">
+          <div class="flex items-end justify-between border-b border-noir/10 pb-6">
+            <div>
+              <h1 class="font-cinzel text-3xl md:text-4xl font-bold text-noir">Books</h1>
+              {settings.storeIntroText && (
+                <p class="mt-2 font-inter text-sm text-noir/55 max-w-2xl">{settings.storeIntroText}</p>
+              )}
+            </div>
+
+            <!-- Currency toggle -->
+            <div class="flex items-center gap-1 shrink-0" id="currency-toggle" aria-label="Select currency">
+              <button
+                id="cur-ngn"
+                data-cur="NGN"
+                class="px-3 py-1 text-xs font-inter font-medium border transition-colors duration-150 cursor-pointer
+                       bg-noir text-cotton border-noir"
+                aria-pressed="true"
+              >
+                ₦ NGN
+              </button>
+              <button
+                id="cur-usd"
+                data-cur="USD"
+                class="px-3 py-1 text-xs font-inter font-medium border transition-colors duration-150 cursor-pointer
+                       bg-cotton text-noir/60 border-noir/20 hover:border-noir/50"
+                aria-pressed="false"
+              >
+                $ USD
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <!-- Book grid -->
+        {orderedBooks.length > 0 ? (
+          <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 md:gap-8">
+              {orderedBooks.map((book) => (
+                <BookCard book={book} />
+              ))}
+            </div>
+          </section>
+        ) : (
+          <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+            <p class="font-inter text-noir/50">No books available yet. Check back soon.</p>
+          </section>
+        )}
+      </>
+    )}
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  // Currency preference — syncs across store pages via localStorage
+  const CURRENCY_KEY = "ncheta_currency";
+
+  function getPreferredCurrency(): "NGN" | "USD" {
+    try {
+      const stored = localStorage.getItem(CURRENCY_KEY);
+      return stored === "USD" ? "USD" : "NGN";
+    } catch {
+      return "NGN";
+    }
+  }
+
+  function formatPrice(amount: number, currency: "NGN" | "USD"): string {
+    if (currency === "NGN") {
+      return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+    }
+    return "$" + (amount / 100).toFixed(2);
+  }
+
+  function updatePrices(currency: "NGN" | "USD") {
+    document.querySelectorAll<HTMLElement>("[data-book-price]").forEach((el) => {
+      try {
+        const formats = JSON.parse(el.dataset.bookFormats ?? "[]") as Array<{
+          format: string;
+          prices: Array<{ currency: string; amount: number }>;
+        }>;
+        const amounts: number[] = [];
+        for (const fmt of formats) {
+          const p = fmt.prices?.find((p) => p.currency === currency);
+          if (p) amounts.push(p.amount);
+        }
+        if (amounts.length) {
+          const min = Math.min(...amounts);
+          el.textContent = "From " + formatPrice(min, currency);
+        }
+      } catch {
+        // malformed data, leave as-is
+      }
+    });
+  }
+
+  function setCurrencyUI(currency: "NGN" | "USD") {
+    const ngnBtn = document.getElementById("cur-ngn");
+    const usdBtn = document.getElementById("cur-usd");
+    if (!ngnBtn || !usdBtn) return;
+
+    const active = "bg-noir text-cotton border-noir";
+    const inactive = "bg-cotton text-noir/60 border-noir/20 hover:border-noir/50";
+
+    if (currency === "NGN") {
+      ngnBtn.className = ngnBtn.className.replace(/bg-cotton.*?hover:border-noir\/50/, active);
+      ngnBtn.setAttribute("aria-pressed", "true");
+      usdBtn.className = usdBtn.className.replace(/bg-noir text-cotton border-noir/, inactive);
+      usdBtn.setAttribute("aria-pressed", "false");
+    } else {
+      usdBtn.className = usdBtn.className.replace(/bg-cotton.*?hover:border-noir\/50/, active);
+      usdBtn.setAttribute("aria-pressed", "true");
+      ngnBtn.className = ngnBtn.className.replace(/bg-noir text-cotton border-noir/, inactive);
+      ngnBtn.setAttribute("aria-pressed", "false");
+    }
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const currency = getPreferredCurrency();
+    setCurrencyUI(currency);
+    updatePrices(currency);
+
+    document.getElementById("currency-toggle")?.addEventListener("click", (e) => {
+      const target = (e.target as HTMLElement).closest("[data-cur]") as HTMLElement | null;
+      if (!target) return;
+      const cur = target.dataset.cur as "NGN" | "USD";
+      try { localStorage.setItem(CURRENCY_KEY, cur); } catch {}
+      setCurrencyUI(cur);
+      updatePrices(cur);
+    });
+  });
+</script>
