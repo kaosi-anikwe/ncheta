@@ -148,7 +148,7 @@ export async function sendOrderConfirmationEmail(
     ${shippingSection}
 
     <p style="margin-top:24px;">
-      <a href="${orderUrl}" class="btn">View Order</a>
+      <a href="${orderUrl}" class="btn" style="display:inline-block;background:#181717;color:#e7d7b6;font-size:13px;font-weight:600;padding:12px 24px;text-decoration:none;letter-spacing:0.5px;">View Order</a>
     </p>
     <p>Save your order reference: <strong style="font-family:monospace;">${order.reference}</strong></p>
   `);
@@ -219,7 +219,7 @@ async function sendPoNotification(env: Env, order: OrderRow, items: OrderItemRow
     <ul>${physicalItems.map((i) => `<li>${i.book_title} ×${i.quantity}</li>`).join("")}</ul>
     <p><strong>DHL Service:</strong> ${dhlSummary}</p>
     <p><strong>Total paid:</strong> ${formatPrice(order.total_amount, order.currency)}</p>
-    <p style="margin-top:24px;"><a href="${adminUrl}" class="btn">View in Admin</a></p>
+    <p style="margin-top:24px;"><a href="${adminUrl}" class="btn" style="display:inline-block;background:#181717;color:#e7d7b6;font-size:13px;font-weight:600;padding:12px 24px;text-decoration:none;letter-spacing:0.5px;">View in Admin</a></p>
   `);
 
   const text = [
@@ -260,7 +260,7 @@ export async function sendDispatchEmail(
     <p>Hi ${firstName},</p>
     <p>Great news — your Ncheta order <strong>${order.reference}</strong> has been dispatched via DHL Express.</p>
     ${trackingNumber ? `<p><strong>Tracking number:</strong> <span style="font-family:monospace;font-size:16px;">${trackingNumber}</span></p>` : ""}
-    <p style="margin-top:24px;"><a href="${orderUrl}" class="btn">View Order</a></p>
+    <p style="margin-top:24px;"><a href="${orderUrl}" class="btn" style="display:inline-block;background:#181717;color:#e7d7b6;font-size:13px;font-weight:600;padding:12px 24px;text-decoration:none;letter-spacing:0.5px;">View Order</a></p>
   `);
 
   const text = [
