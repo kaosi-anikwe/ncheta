@@ -36,7 +36,12 @@ const books = sanityBooks.map((book) => ({
   inventory: inventoryByBookId.get(book._id) ?? null,
 }));
 
+// Orphaned rows: in D1 but not in Sanity
+const sanityIds = new Set(sanityBooks.map((b) => b._id));
+const orphans = inventoryResult.results.filter((r) => !sanityIds.has(r.book_id));
+
 const updated = Astro.url.searchParams.get("updated");
+const deleted = Astro.url.searchParams.get("deleted");
 const error = Astro.url.searchParams.get("error");
 ---
 
@@ -62,9 +67,19 @@ const error = Astro.url.searchParams.get("error");
           Inventory updated for <strong>{updated}</strong>.
         </div>
       )}
+      {deleted && (
+        <div class="mb-5 p-4 border border-lime/30 bg-lime/10 font-inter text-sm text-noir">
+          Orphaned record for <strong class="font-mono">{deleted}</strong> removed.
+        </div>
+      )}
       {error === "not_found" && (
         <div class="mb-5 p-4 border border-cherry/20 bg-cherry/5 font-inter text-sm text-cherry">
           Book not found. Refresh and try again.
+        </div>
+      )}
+      {error === "reserved" && (
+        <div class="mb-5 p-4 border border-cherry/20 bg-cherry/5 font-inter text-sm text-cherry">
+          Cannot remove — this book has pending orders holding reserved stock. Wait for those orders to complete or fail first.
         </div>
       )}
       {error === "failed" && (
@@ -198,6 +213,36 @@ const error = Astro.url.searchParams.get("error");
               </div>
             );
           })}
+        </div>
+      )}
+      {orphans.length > 0 && (
+        <div class="mt-10">
+          <h2 class="font-cinzel font-bold text-base text-noir mb-1">Orphaned Records</h2>
+          <p class="font-inter text-xs text-noir/40 mb-4">
+            These D1 rows have no matching book in Sanity — the book was likely deleted from the CMS.
+            Remove them to keep inventory clean.
+          </p>
+          <div class="space-y-3">
+            {orphans.map((row) => (
+              <div class="border border-cherry/20 bg-cherry/5 p-4 flex items-center justify-between gap-4">
+                <div class="font-inter text-sm">
+                  <p class="font-medium text-noir font-mono">{row.book_id}</p>
+                  <p class="text-xs text-noir/40 mt-0.5">
+                    slug: {row.book_slug} · stock: {row.stock} · sold: {row.sold}
+                  </p>
+                </div>
+                <form method="POST" action="/api/admin/inventory/delete">
+                  <input type="hidden" name="book_id" value={row.book_id} />
+                  <button
+                    type="submit"
+                    class="h-8 px-4 border border-cherry/30 text-cherry font-inter text-xs font-semibold hover:bg-cherry/10 transition-colors"
+                  >
+                    Remove
+                  </button>
+                </form>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </main>

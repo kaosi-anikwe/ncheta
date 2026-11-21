@@ -10,7 +10,10 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://nchetamagazine.com",
   output: "static",
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    imageService: "passthrough",
+    sessionKVBindingName: undefined,
+  }),
 
   vite: {
     plugins: [tailwindcss()],
