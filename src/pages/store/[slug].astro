@@ -39,6 +39,7 @@ const formatLabels: Record<string, string> = {
 <Layout
   title={book.title}
   description={book.excerpt ?? `Purchase ${book.title} from Ncheta Magazine.`}
+  ogImage={book.coverImage ? urlFor(book.coverImage).width(1200).height(630).fit("fill").url() : undefined}
 >
   <Header />
 
