@@ -101,7 +101,18 @@ import Footer from "../../components/navigation/Footer.astro";
     physical: "Physical Book",
   };
 
-  function renderCart() {
+  async function getPhysicalStock(bookId: string): Promise<number> {
+    try {
+      const res = await fetch(`/api/store/stock-check?bookId=${bookId}&format=physical&qty=1`);
+      if (!res.ok) return 99;
+      const data = await res.json() as { available: number };
+      return data.available;
+    } catch {
+      return 99;
+    }
+  }
+
+  async function renderCart() {
     const cart = getCart();
     const loading = document.getElementById("cart-loading")!;
     const empty = document.getElementById("cart-empty")!;
@@ -120,6 +131,30 @@ import Footer from "../../components/navigation/Footer.astro";
     empty.classList.add("hidden");
     content.classList.remove("hidden");
 
+    // Fetch stock for all physical items in parallel
+    const stockMap = new Map<string, number>();
+    await Promise.all(
+      cart
+        .filter((i) => i.format === "physical")
+        .map(async (i) => {
+          const available = await getPhysicalStock(i.bookId);
+          stockMap.set(i.bookId, available);
+        })
+    );
+
+    // Clamp any cart quantities that exceed available stock
+    let clamped = false;
+    for (const item of cart) {
+      if (item.format === "physical") {
+        const available = stockMap.get(item.bookId) ?? 0;
+        if (item.quantity > available) {
+          item.quantity = Math.max(1, available);
+          clamped = true;
+        }
+      }
+    }
+    if (clamped) saveCart(cart);
+
     itemsEl.innerHTML = "";
     let subtotal = 0;
     let subtotalCur: "NGN" | "USD" = "NGN";
@@ -127,6 +162,10 @@ import Footer from "../../components/navigation/Footer.astro";
     for (const item of cart) {
       subtotalCur = item.currency;
       subtotal += item.unitPrice * item.quantity;
+
+      const maxQty = item.format === "physical"
+        ? Math.max(1, stockMap.get(item.bookId) ?? 1)
+        : 5;
 
       const row = document.createElement("div");
       row.className = "flex gap-4 py-5";
@@ -149,7 +188,9 @@ import Footer from "../../components/navigation/Footer.astro";
               data-format-key="${item.formatKey}"
               class="h-7 px-2 text-xs font-inter bg-cotton border border-noir/20 focus:outline-none focus:border-maroon"
             >
-              ${[1,2,3,4,5].map(n => `<option ${n === item.quantity ? "selected" : ""}>${n}</option>`).join("")}
+              ${Array.from({ length: maxQty }, (_, i) => i + 1)
+                .map(n => `<option ${n === item.quantity ? "selected" : ""}>${n}</option>`)
+                .join("")}
             </select>
             <button
               data-remove="${item.formatKey}"
