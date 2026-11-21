@@ -7,4 +7,20 @@
   "observability": {
     "enabled": true,
   },
+  // Run `wrangler d1 create ncheta-store` and paste the returned database_id below
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "ncheta-store",
+      "database_id": "REPLACE_WITH_ID_FROM_wrangler_d1_create",
+      "preview_database_id": "REPLACE_WITH_ID_FROM_wrangler_d1_create",
+    },
+  ],
+  "r2_buckets": [
+    {
+      "binding": "BOOKS_BUCKET",
+      "bucket_name": "ncheta-digital-books",
+      "preview_bucket_name": "ncheta-digital-books-dev",
+    },
+  ],
 }

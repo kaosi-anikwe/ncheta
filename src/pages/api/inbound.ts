@@ -1,13 +1,12 @@
-// Cloudflare Pages Function — forwards service inquiries to HubSpot CRM
-interface Env {
-  HUBSPOT_PORTAL_ID?: string;
-  HUBSPOT_FORM_GUID?: string;
-}
+import type { APIRoute } from "astro";
 
-export const onRequestPost = async (context: { request: Request; env: Env }) => {
-  const { request, env } = context;
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  const env = locals.runtime.env;
+
   try {
-    const data = await request.json() as Record<string, string>;
+    const data = (await request.json()) as Record<string, string>;
     const { firstName, lastName, email, serviceType, message } = data;
 
     const hubspotPortalId = env.HUBSPOT_PORTAL_ID;
@@ -35,16 +34,16 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
                   {
                     value: true,
                     subscriptionTypeId: 3093178206,
-                    text: "I agree to receive marketing communications and newsletters."
+                    text: "I agree to receive marketing communications and newsletters.",
                   },
                   {
                     value: true,
                     subscriptionTypeId: 3093178198,
-                    text: "I agree to receive sales and one-to-one communications."
-                  }
-                ]
-              }
-            }
+                    text: "I agree to receive sales and one-to-one communications.",
+                  },
+                ],
+              },
+            },
           }),
         }
       );

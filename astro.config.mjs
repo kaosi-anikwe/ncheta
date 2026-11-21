@@ -2,6 +2,7 @@
 import { defineConfig } from "astro/config";
 import pagefind from "astro-pagefind";
 import sitemap from "@astrojs/sitemap";
+import cloudflare from "@astrojs/cloudflare";
 
 import tailwindcss from "@tailwindcss/vite";
 
@@ -9,6 +10,7 @@ import tailwindcss from "@tailwindcss/vite";
 export default defineConfig({
   site: "https://nchetamagazine.com",
   output: "static",
+  adapter: cloudflare(),
 
   vite: {
     plugins: [tailwindcss()],

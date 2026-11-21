@@ -1,12 +1,12 @@
-// Cloudflare Pages Function — forwards newsletter signups to Kit (formerly ConvertKit)
-interface Env {
-  KIT_API_KEY?: string;
-}
+import type { APIRoute } from "astro";
 
-export const onRequestPost = async (context: { request: Request; env: Env }) => {
-  const { request, env } = context;
+export const prerender = false;
+
+export const POST: APIRoute = async ({ request, locals }) => {
+  const env = locals.runtime.env;
+
   try {
-    const { email } = await request.json() as { email: string };
+    const { email } = (await request.json()) as { email: string };
 
     if (!email || typeof email !== "string") {
       return new Response(JSON.stringify({ success: false, error: "Email required" }), {
@@ -57,4 +57,3 @@ export const onRequestPost = async (context: { request: Request; env: Env }) => 
     });
   }
 };
-
