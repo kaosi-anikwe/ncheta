@@ -289,7 +289,7 @@ const formatLabels: Record<string, string> = {
     });
 
     // Add to cart
-    document.getElementById("add-to-cart-btn")?.addEventListener("click", () => {
+    document.getElementById("add-to-cart-btn")?.addEventListener("click", async () => {
       const selectedRadio = document.querySelector<HTMLInputElement>("input[name='book-format']:checked");
       if (!selectedRadio) return;
 
@@ -328,6 +328,29 @@ const formatLabels: Record<string, string> = {
       try {
         cart = JSON.parse(localStorage.getItem(CART_KEY) ?? "[]");
       } catch {}
+
+      // For physical format, check available stock against cart quantity + 1
+      if (format === "physical") {
+        const existingQty = cart.find(
+          (i) => i.bookId === bookId && i.format === "physical"
+        )?.quantity ?? 0;
+        try {
+          const res = await fetch(
+            `/api/store/stock-check?bookId=${bookId}&format=physical&qty=${existingQty + 1}`
+          );
+          if (res.ok) {
+            const data = await res.json() as { available: number; sufficient: boolean };
+            if (!data.sufficient) {
+              const indicator = document.getElementById("stock-indicator")!;
+              indicator.textContent = data.available <= 0
+                ? "Out of stock"
+                : `Only ${data.available} available (you have ${existingQty} in cart)`;
+              indicator.className = indicator.className.replace("text-noir/50", "text-cherry font-medium");
+              return;
+            }
+          }
+        } catch {}
+      }
 
       // Check if same format already in cart
       const existingIdx = cart.findIndex(
