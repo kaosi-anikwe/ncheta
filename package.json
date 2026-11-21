@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "astro": "astro",
     "generate-types": "wrangler types",
-    "deploy": "npm run build && wrangler pages deploy dist"
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "postinstall": "node scripts/patch-cloudflare-adapter.mjs"
   },
   "dependencies": {
     "@astrojs/cloudflare": "^14.4.9",

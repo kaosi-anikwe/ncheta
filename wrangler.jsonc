@@ -4,13 +4,6 @@
   "compatibility_date": "2026-07-03",
   "compatibility_flags": ["nodejs_compat"],
   "pages_build_output_dir": "./dist",
-  // Any non-"ASSETS" name prevents the adapter from inserting the reserved ASSETS binding
-  // into the generated prerender config, which would otherwise fail the build.
-  // Pages always provides env.ASSETS automatically at runtime regardless.
-  "assets": {
-    "binding": "CF_ASSETS",
-    "directory": "./dist/client",
-  },
   "observability": {
     "enabled": true,
   },
