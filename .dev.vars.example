@@ -1,0 +1,33 @@
+# Wrangler / Cloudflare Workers variables — read via locals.runtime.env.*
+# Copy this file to .dev.vars and fill in values for local development.
+# These are set as Secrets in Cloudflare Pages (never as plain env vars).
+
+# ── Newsletter & CRM ──────────────────────────────────────────────────────────
+KIT_API_KEY=your_kit_api_key
+HUBSPOT_PORTAL_ID=
+HUBSPOT_FORM_GUID=
+
+# ── Payments ──────────────────────────────────────────────────────────────────
+PAYSTACK_SECRET_KEY=sk_test_...
+PAYSTACK_WEBHOOK_SECRET=...
+
+# ── Shipping ──────────────────────────────────────────────────────────────────
+DHL_API_KEY=...
+DHL_API_SECRET=...
+DHL_ACCOUNT_NUMBER=...
+
+# ── Email (Resend) ────────────────────────────────────────────────────────────
+RESEND_API_KEY=re_...
+EMAIL_FROM_ADDRESS=store@nchetamagazine.com
+EMAIL_FROM_NAME=Ncheta Magazine
+STORE_PO_EMAIL=hello@nchetamagazine.com
+
+# ── Admin panel ───────────────────────────────────────────────────────────────
+ADMIN_USERNAME=admin
+ADMIN_PASSWORD=...
+# Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+ADMIN_SESSION_SECRET=...
+
+# ── Sanity ────────────────────────────────────────────────────────────────────
+# Write token — Editor role, from Sanity Dashboard → API → Tokens
+SANITY_WRITE_TOKEN=...
