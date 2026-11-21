@@ -1,0 +1,228 @@
+---
+export const prerender = false;
+
+import Layout from "../../../layouts/Layout.astro";
+import Header from "../../../components/navigation/Header.astro";
+import Footer from "../../../components/navigation/Footer.astro";
+
+const { ref } = Astro.params;
+if (!ref) return Astro.redirect("/store", 301);
+
+// Fetch order from D1 directly (we're in SSR context)
+const env = Astro.locals.runtime.env;
+
+interface OrderRow {
+  id: string; reference: string; status: string; order_type: string;
+  customer_name: string; customer_email: string;
+  total_amount: number; currency: string;
+  ship_city: string | null; ship_country: string | null;
+  tracking_number: string | null; dispatched_at: string | null;
+}
+
+interface OrderItemRow {
+  book_title: string; book_slug: string; format: string;
+  unit_price: number; quantity: number;
+}
+
+interface DownloadTokenRow {
+  id: string; book_title: string; format: string;
+  expires_at: string; download_count: number; max_downloads: number;
+}
+
+// Auto-verify if Paystack just redirected here (reference param from Paystack)
+const isCallback = Astro.url.searchParams.has("trxref") || Astro.url.searchParams.has("reference");
+if (isCallback) {
+  // Trigger verify endpoint (fire-and-forget via redirect to same page without params)
+  try {
+    const verifyUrl = new URL(`/api/store/verify?reference=${ref}`, Astro.url.origin);
+    await fetch(verifyUrl.toString());
+  } catch {}
+  return Astro.redirect(`/store/order/${ref}`, 302);
+}
+
+const order = await env.DB.prepare(
+  "SELECT id, reference, status, order_type, customer_name, customer_email, total_amount, currency, ship_city, ship_country, tracking_number, dispatched_at FROM orders WHERE reference = ?"
+).bind(ref).first<OrderRow>();
+
+if (!order) return new Response(null, { status: 404 });
+
+const items = await env.DB.prepare(
+  "SELECT book_title, book_slug, format, unit_price, quantity FROM order_items WHERE order_id = ?"
+).bind(order.id).all<OrderItemRow>();
+
+const tokens = order.status === "paid"
+  ? await env.DB.prepare(
+      "SELECT id, book_title, format, expires_at, download_count, max_downloads FROM download_tokens WHERE order_id = ? AND expires_at > datetime('now')"
+    ).bind(order.id).all<DownloadTokenRow>()
+  : { results: [] };
+
+function formatPrice(amount: number, cur: string): string {
+  if (cur === "NGN") return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+  return "$" + (amount / 100).toFixed(2);
+}
+
+const formatLabels: Record<string, string> = {
+  pdf: "Digital — PDF", epub: "Digital — EPUB", physical: "Physical Book",
+};
+
+const statusLabels: Record<string, string> = {
+  pending: "Awaiting Payment",
+  paid: "Confirmed",
+  failed: "Payment Failed",
+  refunded: "Refunded",
+  dispatched: "Dispatched",
+};
+
+const statusColors: Record<string, string> = {
+  pending: "text-noir/50",
+  paid: "text-lime font-semibold",
+  failed: "text-cherry font-semibold",
+  dispatched: "text-lime font-semibold",
+  refunded: "text-noir/50",
+};
+---
+
+<Layout
+  title={`Order ${order.reference}`}
+  description="Your Ncheta order confirmation."
+>
+  <Header />
+
+  <main class="flex-1">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+      {order.status === "paid" || order.status === "dispatched" ? (
+        <div class="mb-6 p-4 border border-lime/30 bg-lime/10">
+          <p class="font-cinzel font-bold text-noir text-lg mb-1">Thank you, {order.customer_name.split(" ")[0]}!</p>
+          <p class="font-inter text-sm text-noir/60">
+            Your order has been confirmed. A confirmation email has been sent to <strong>{order.customer_email}</strong>.
+          </p>
+        </div>
+      ) : order.status === "failed" ? (
+        <div class="mb-6 p-4 border border-cherry/20 bg-cherry/5">
+          <p class="font-cinzel font-bold text-cherry text-lg mb-1">Payment Failed</p>
+          <p class="font-inter text-sm text-noir/60">
+            Your payment could not be completed. No charge was made.
+            <a href="/store/cart" class="underline text-maroon">Return to cart</a> to try again.
+          </p>
+        </div>
+      ) : (
+        <div class="mb-6 p-4 border border-noir/15 bg-cotton">
+          <p class="font-inter text-sm text-noir/60">
+            Payment is being processed. If you completed payment, this page will update automatically.
+          </p>
+          <meta http-equiv="refresh" content="5" />
+        </div>
+      )}
+
+      <div class="border border-noir/10 p-6 space-y-6">
+        <!-- Order header -->
+        <div class="flex items-start justify-between gap-4 border-b border-noir/10 pb-4">
+          <div>
+            <p class="font-cinzel font-bold text-xl text-noir">{order.reference}</p>
+            <p class:list={["mt-1 font-inter text-sm", statusColors[order.status] ?? "text-noir/50"]}>
+              {statusLabels[order.status] ?? order.status}
+            </p>
+          </div>
+          <p class="font-inter font-bold text-xl text-noir tabular-nums">
+            {formatPrice(order.total_amount, order.currency)}
+          </p>
+        </div>
+
+        <!-- Order items -->
+        <div>
+          <h2 class="font-cinzel font-bold text-base text-noir mb-3">Items</h2>
+          <div class="divide-y divide-noir/8">
+            {items.results.map((item) => (
+              <div class="py-3 flex items-center justify-between gap-4 font-inter text-sm">
+                <div>
+                  <a href={`/store/${item.book_slug}`} class="font-medium text-noir hover:text-maroon transition-colors">
+                    {item.book_title}
+                  </a>
+                  <span class="ml-2 text-noir/40">{formatLabels[item.format] ?? item.format}</span>
+                  {item.quantity > 1 && <span class="ml-2 text-noir/40">×{item.quantity}</span>}
+                </div>
+                <span class="shrink-0 font-semibold text-noir tabular-nums">
+                  {formatPrice(item.unit_price * item.quantity, order.currency)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <!-- Download links -->
+        {tokens.results.length > 0 && (
+          <div class="border-t border-noir/10 pt-4">
+            <h2 class="font-cinzel font-bold text-base text-noir mb-3">Your Downloads</h2>
+            <div class="space-y-3">
+              {tokens.results.map((token) => {
+                const remaining = token.max_downloads - token.download_count;
+                const expires = new Date(token.expires_at).toLocaleString("en-US", { dateStyle: "medium", timeStyle: "short" });
+                return (
+                  <div class="flex items-center justify-between gap-4 p-3 border border-noir/10 hover:border-maroon transition-colors">
+                    <div class="font-inter text-sm">
+                      <p class="font-medium text-noir">{token.book_title}</p>
+                      <p class="text-noir/40 text-xs mt-0.5">{formatLabels[token.format] ?? token.format} · {remaining} download{remaining !== 1 ? "s" : ""} remaining · expires {expires}</p>
+                    </div>
+                    <a
+                      href={`/api/downloads/${token.id}`}
+                      class="shrink-0 h-9 px-4 bg-noir text-cotton font-inter text-xs font-medium hover:bg-maroon transition-colors leading-9 inline-block"
+                      download
+                    >
+                      Download
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+            <p class="mt-3 font-inter text-xs text-noir/40">
+              Save your downloads before the links expire. Need help?
+              Email <a href="mailto:hello@nchetamagazine.com" class="underline">hello@nchetamagazine.com</a>
+            </p>
+          </div>
+        )}
+
+        <!-- Physical shipping info -->
+        {(order.order_type === "physical" || order.order_type === "mixed") && (
+          <div class="border-t border-noir/10 pt-4">
+            <h2 class="font-cinzel font-bold text-base text-noir mb-3">Shipping</h2>
+            {order.dispatched_at ? (
+              <div class="font-inter text-sm text-noir/70 space-y-1">
+                <p>Your order has been dispatched.</p>
+                {order.tracking_number && (
+                  <p>Tracking number: <strong class="text-noir">{order.tracking_number}</strong></p>
+                )}
+              </div>
+            ) : (
+              <p class="font-inter text-sm text-noir/60">
+                We'll dispatch your order via DHL Express and send you a tracking number by email.
+              </p>
+            )}
+            {order.ship_city && (
+              <p class="mt-2 font-inter text-xs text-noir/40">
+                Shipping to: {order.ship_city}{order.ship_country ? `, ${order.ship_country}` : ""}
+              </p>
+            )}
+          </div>
+        )}
+
+        <!-- Order reference reminder -->
+        <div class="border-t border-noir/10 pt-4">
+          <p class="font-inter text-xs text-noir/40">
+            Save your order reference: <strong class="text-noir/70 font-mono">{order.reference}</strong>
+            &nbsp;·&nbsp;
+            <a href={`/store/order/${order.reference}`} class="underline hover:text-noir">View order</a>
+            &nbsp;·&nbsp;
+            For refunds or support, email <a href="mailto:hello@nchetamagazine.com" class="underline">hello@nchetamagazine.com</a>
+          </p>
+        </div>
+      </div>
+
+      <div class="mt-8 text-center">
+        <a href="/store" class="font-inter text-sm text-noir/50 hover:text-noir transition-colors">← Continue shopping</a>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>

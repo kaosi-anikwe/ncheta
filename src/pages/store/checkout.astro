@@ -1,0 +1,412 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import Header from "../../components/navigation/Header.astro";
+import Footer from "../../components/navigation/Footer.astro";
+---
+
+<Layout title="Checkout" description="Complete your Ncheta book purchase.">
+  <Header />
+
+  <main class="flex-1">
+    <div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <!-- Cart empty redirect handled by JS -->
+      <div id="checkout-loading" class="font-inter text-sm text-noir/40">Loading…</div>
+
+      <div id="checkout-main" class="hidden">
+        <h1 class="font-cinzel text-3xl font-bold text-noir mb-8">Checkout</h1>
+
+        <!-- Order summary (read-only) -->
+        <section class="mb-8 border border-noir/10 p-4">
+          <h2 class="font-cinzel font-bold text-base text-noir mb-3">Order Summary</h2>
+          <div id="summary-items" class="space-y-2 text-sm font-inter divide-y divide-noir/8"></div>
+          <div class="mt-4 pt-3 border-t border-noir/10 space-y-1 font-inter text-sm">
+            <div class="flex justify-between text-noir/60"><span>Subtotal</span><span id="sum-subtotal"></span></div>
+            <div id="sum-tax-row" class="hidden flex justify-between text-noir/60"><span>VAT (7.5%)</span><span id="sum-tax"></span></div>
+            <div id="sum-shipping-row" class="hidden flex justify-between text-noir/60"><span>Shipping</span><span id="sum-shipping"></span></div>
+            <div class="flex justify-between font-semibold text-noir pt-1 border-t border-noir/10"><span>Total</span><span id="sum-total"></span></div>
+          </div>
+        </section>
+
+        <!-- Step 1: Customer info + email verification -->
+        <section id="step-customer" class="mb-6">
+          <h2 class="font-cinzel font-bold text-lg text-noir mb-4">1. Your Details</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="cust-name">Full Name *</label>
+              <input id="cust-name" type="text" required autocomplete="name"
+                class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+            </div>
+            <div>
+              <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="cust-email">Email Address *</label>
+              <div class="flex gap-2">
+                <input id="cust-email" type="email" required autocomplete="email"
+                  class="flex-1 h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+                <button id="send-otp-btn" type="button"
+                  class="shrink-0 h-10 px-4 bg-noir text-cotton font-inter text-xs font-medium border border-noir hover:bg-maroon hover:border-maroon transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                  Send Code
+                </button>
+              </div>
+            </div>
+            <div id="otp-block" class="hidden">
+              <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="otp-code">Verification Code *</label>
+              <div class="flex gap-2">
+                <input id="otp-code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="6-digit code"
+                  class="w-40 h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30 tracking-widest" />
+                <button id="verify-otp-btn" type="button"
+                  class="h-10 px-4 bg-noir text-cotton font-inter text-xs font-medium border border-noir hover:bg-maroon hover:border-maroon transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+                  Verify
+                </button>
+              </div>
+              <p id="otp-status" class="mt-1 font-inter text-xs text-noir/50"></p>
+            </div>
+            <div>
+              <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="cust-phone">Phone (optional)</label>
+              <input id="cust-phone" type="tel" autocomplete="tel"
+                class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+            </div>
+          </div>
+        </section>
+
+        <!-- Step 2: Shipping address (shown only for physical items) -->
+        <section id="step-shipping" class="hidden mb-6">
+          <h2 class="font-cinzel font-bold text-lg text-noir mb-4">2. Shipping Address</h2>
+          <div class="space-y-4">
+            <div>
+              <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="ship-line1">Address Line 1 *</label>
+              <input id="ship-line1" type="text" autocomplete="address-line1"
+                class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+            </div>
+            <div>
+              <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="ship-line2">Address Line 2</label>
+              <input id="ship-line2" type="text" autocomplete="address-line2"
+                class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="ship-city">City *</label>
+                <input id="ship-city" type="text" autocomplete="address-level2"
+                  class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+              </div>
+              <div>
+                <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="ship-state">State / Province *</label>
+                <input id="ship-state" type="text" autocomplete="address-level1"
+                  class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="ship-country">Country *</label>
+                <input id="ship-country" type="text" autocomplete="country-name" placeholder="e.g. Nigeria"
+                  class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+              </div>
+              <div>
+                <label class="block font-inter text-xs font-medium text-noir/60 mb-1" for="ship-postal">Postal Code</label>
+                <input id="ship-postal" type="text" autocomplete="postal-code"
+                  class="w-full h-10 px-3 font-inter text-sm bg-cotton border border-noir/20 focus:border-maroon focus:outline-none focus:ring-1 focus:ring-maroon/30" />
+              </div>
+            </div>
+
+            <!-- DHL quote section -->
+            <div id="dhl-quote-section" class="pt-2">
+              <button id="get-shipping-quote-btn" type="button"
+                class="h-9 px-4 bg-cotton text-noir font-inter text-xs font-medium border border-noir/30 hover:border-noir transition-colors disabled:opacity-50 cursor-pointer">
+                Get Shipping Quote
+              </button>
+              <div id="dhl-rates" class="hidden mt-3 space-y-2"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Error display -->
+        <p id="checkout-error" class="hidden mb-4 font-inter text-sm text-cherry border border-cherry/20 bg-cherry/5 px-4 py-3"></p>
+
+        <!-- Pay button -->
+        <button id="pay-btn" type="button" disabled
+          class="w-full h-12 bg-noir text-cotton font-inter font-medium text-sm tracking-wide
+                 border border-noir
+                 hover:bg-maroon hover:border-maroon
+                 focus:outline-none focus:ring-2 focus:ring-maroon/40 focus:ring-offset-2 focus:ring-offset-cotton
+                 disabled:opacity-50 disabled:cursor-not-allowed
+                 transition-colors duration-200 cursor-pointer">
+          Pay Now
+        </button>
+        <p class="mt-3 font-inter text-xs text-noir/40 text-center">
+          You'll be redirected to Paystack to complete payment securely.
+        </p>
+      </div>
+    </div>
+  </main>
+
+  <Footer />
+</Layout>
+
+<script>
+  const CART_KEY = "ncheta_cart_v1";
+  const CURRENCY_KEY = "ncheta_currency";
+
+  interface CartItem {
+    bookId: string; bookTitle: string; bookSlug: string;
+    format: "pdf" | "epub" | "physical"; formatKey: string;
+    currency: "NGN" | "USD"; unitPrice: number; quantity: number; coverUrl?: string;
+  }
+
+  function getCart(): CartItem[] {
+    try { return JSON.parse(localStorage.getItem(CART_KEY) ?? "[]"); } catch { return []; }
+  }
+
+  function formatPrice(amount: number, cur: "NGN" | "USD"): string {
+    if (cur === "NGN") return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+    return "$" + (amount / 100).toFixed(2);
+  }
+
+  const formatLabels: Record<string, string> = {
+    pdf: "Digital — PDF", epub: "Digital — EPUB", physical: "Physical Book",
+  };
+
+  let emailToken = "";
+  let emailVerified = false;
+  let selectedDhlQuoteJson: string | null = null;
+  let shippingCost = 0;
+  let currency: "NGN" | "USD" = "NGN";
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const cart = getCart();
+    currency = (localStorage.getItem(CURRENCY_KEY) as "NGN" | "USD") ?? "NGN";
+    const loading = document.getElementById("checkout-loading")!;
+    const main = document.getElementById("checkout-main")!;
+
+    loading.classList.add("hidden");
+
+    if (cart.length === 0) {
+      window.location.href = "/store/cart";
+      return;
+    }
+
+    main.classList.remove("hidden");
+    renderSummary(cart);
+
+    const hasPhysical = cart.some((i) => i.format === "physical");
+    if (hasPhysical) {
+      document.getElementById("step-shipping")!.classList.remove("hidden");
+    }
+
+    // Send OTP
+    document.getElementById("send-otp-btn")!.addEventListener("click", async () => {
+      const email = (document.getElementById("cust-email") as HTMLInputElement).value.trim();
+      if (!email) { alert("Please enter your email address first."); return; }
+      const btn = document.getElementById("send-otp-btn") as HTMLButtonElement;
+      btn.disabled = true; btn.textContent = "Sending…";
+      try {
+        const res = await fetch("/api/store/verify-email", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        });
+        const data = await res.json() as { success: boolean; error?: string };
+        if (data.success) {
+          document.getElementById("otp-block")!.classList.remove("hidden");
+          document.getElementById("otp-status")!.textContent = "Code sent — check your inbox.";
+          btn.textContent = "Resend Code"; btn.disabled = false;
+        } else {
+          btn.textContent = "Send Code"; btn.disabled = false;
+          alert(data.error ?? "Failed to send code.");
+        }
+      } catch {
+        btn.textContent = "Send Code"; btn.disabled = false;
+        alert("Network error. Please try again.");
+      }
+    });
+
+    // Verify OTP
+    document.getElementById("verify-otp-btn")!.addEventListener("click", async () => {
+      const email = (document.getElementById("cust-email") as HTMLInputElement).value.trim();
+      const code = (document.getElementById("otp-code") as HTMLInputElement).value.trim();
+      if (!code) { alert("Please enter the verification code."); return; }
+      const btn = document.getElementById("verify-otp-btn") as HTMLButtonElement;
+      btn.disabled = true; btn.textContent = "Verifying…";
+      try {
+        const res = await fetch("/api/store/confirm-email-otp", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, code }),
+        });
+        const data = await res.json() as { success: boolean; emailToken?: string; error?: string };
+        if (data.success && data.emailToken) {
+          emailToken = data.emailToken;
+          emailVerified = true;
+          document.getElementById("otp-status")!.textContent = "✓ Email verified";
+          document.getElementById("otp-status")!.className = "mt-1 font-inter text-xs text-lime font-medium";
+          btn.textContent = "Verified ✓"; btn.disabled = true;
+          document.getElementById("cust-email")!.setAttribute("readonly", "true");
+          updatePayBtn();
+        } else {
+          btn.textContent = "Verify"; btn.disabled = false;
+          document.getElementById("otp-status")!.textContent = data.error ?? "Invalid code.";
+          document.getElementById("otp-status")!.className = "mt-1 font-inter text-xs text-cherry";
+        }
+      } catch {
+        btn.textContent = "Verify"; btn.disabled = false;
+        alert("Network error.");
+      }
+    });
+
+    // DHL shipping quote
+    document.getElementById("get-shipping-quote-btn")?.addEventListener("click", async () => {
+      const cart = getCart();
+      const physicalItem = cart.find((i) => i.format === "physical");
+      if (!physicalItem) return;
+      const country = (document.getElementById("ship-country") as HTMLInputElement).value.trim();
+      const city = (document.getElementById("ship-city") as HTMLInputElement).value.trim();
+      const postal = (document.getElementById("ship-postal") as HTMLInputElement).value.trim();
+      if (!country) { alert("Please enter destination country."); return; }
+
+      const btn = document.getElementById("get-shipping-quote-btn") as HTMLButtonElement;
+      btn.disabled = true; btn.textContent = "Getting quote…";
+      const dhlRatesEl = document.getElementById("dhl-rates")!;
+
+      try {
+        const params = new URLSearchParams({ bookId: physicalItem.bookId, country, city, postal });
+        const res = await fetch(`/api/shipping/quote?${params}`);
+        const data = await res.json() as {
+          success: boolean;
+          rates?: Array<{ serviceCode: string; serviceName: string; totalCharge: number; currency: string; estimatedDaysWithBuffer: number; estimatedDeliveryDate: string }>;
+          error?: string;
+        };
+        btn.textContent = "Refresh Quote"; btn.disabled = false;
+        dhlRatesEl.classList.remove("hidden");
+
+        if (!data.success || !data.rates?.length) {
+          dhlRatesEl.innerHTML = `<p class="font-inter text-xs text-noir/50">${data.error ?? "No rates available for this address."}</p>`;
+          return;
+        }
+
+        dhlRatesEl.innerHTML = `<p class="font-inter text-xs font-medium text-noir/60 mb-2">Select shipping service:</p>` +
+          data.rates.map((r) => `
+            <label class="flex items-center gap-3 p-3 border border-noir/15 cursor-pointer hover:bg-noir/4 has-[:checked]:border-maroon has-[:checked]:bg-maroon/5 transition-colors">
+              <input type="radio" name="dhl-rate" value="${r.serviceCode}"
+                data-charge="${r.totalCharge}" data-currency="${r.currency}" data-quote='${JSON.stringify(r)}'
+                class="accent-maroon" />
+              <span class="flex-1 font-inter text-sm text-noir">${r.serviceName}</span>
+              <span class="font-inter text-sm font-semibold text-noir">${r.currency} ${(r.totalCharge / 100).toFixed(2)} · ~${r.estimatedDaysWithBuffer} days</span>
+            </label>
+          `).join("");
+
+        dhlRatesEl.querySelectorAll<HTMLInputElement>("input[name='dhl-rate']").forEach((radio) => {
+          radio.addEventListener("change", () => {
+            selectedDhlQuoteJson = JSON.stringify(JSON.parse(radio.dataset.quote!));
+            shippingCost = parseInt(radio.dataset.charge!, 10);
+            renderSummary(getCart());
+            updatePayBtn();
+          });
+        });
+      } catch {
+        btn.textContent = "Get Shipping Quote"; btn.disabled = false;
+        dhlRatesEl.innerHTML = `<p class="font-inter text-xs text-cherry">Failed to fetch shipping rates. Please try again.</p>`;
+        dhlRatesEl.classList.remove("hidden");
+      }
+    });
+
+    // Pay button
+    document.getElementById("pay-btn")!.addEventListener("click", async () => {
+      const btn = document.getElementById("pay-btn") as HTMLButtonElement;
+      btn.disabled = true; btn.textContent = "Processing…";
+      showError("");
+
+      const cart = getCart();
+      const hasPhysical = cart.some((i) => i.format === "physical");
+
+      const body = {
+        items: cart,
+        customer: {
+          name: (document.getElementById("cust-name") as HTMLInputElement).value.trim(),
+          email: (document.getElementById("cust-email") as HTMLInputElement).value.trim(),
+          phone: (document.getElementById("cust-phone") as HTMLInputElement).value.trim() || undefined,
+        },
+        emailToken,
+        shippingAddress: hasPhysical ? {
+          line1: (document.getElementById("ship-line1") as HTMLInputElement).value.trim(),
+          line2: (document.getElementById("ship-line2") as HTMLInputElement).value.trim() || undefined,
+          city: (document.getElementById("ship-city") as HTMLInputElement).value.trim(),
+          state: (document.getElementById("ship-state") as HTMLInputElement).value.trim(),
+          country: (document.getElementById("ship-country") as HTMLInputElement).value.trim(),
+          postalCode: (document.getElementById("ship-postal") as HTMLInputElement).value.trim() || undefined,
+        } : undefined,
+        dhlQuoteJson: selectedDhlQuoteJson ?? undefined,
+        shippingCost,
+      };
+
+      try {
+        const res = await fetch("/api/store/checkout", {
+          method: "POST", headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+        const data = await res.json() as { success: boolean; authorizationUrl?: string; error?: string };
+        if (data.success && data.authorizationUrl) {
+          localStorage.removeItem(CART_KEY);
+          window.location.href = data.authorizationUrl;
+        } else {
+          showError(data.error ?? "Checkout failed. Please try again.");
+          btn.disabled = false; btn.textContent = "Pay Now";
+        }
+      } catch {
+        showError("Network error. Please try again.");
+        btn.disabled = false; btn.textContent = "Pay Now";
+      }
+    });
+  });
+
+  function renderSummary(cart: CartItem[]) {
+    const itemsEl = document.getElementById("summary-items")!;
+    const taxRate = currency === "NGN" ? 0.075 : 0;
+    const subtotal = cart.reduce((s, i) => s + i.unitPrice * i.quantity, 0);
+    const tax = Math.round(subtotal * taxRate);
+    const total = subtotal + tax + shippingCost;
+
+    itemsEl.innerHTML = cart.map((item) => `
+      <div class="flex justify-between py-2 text-noir/70">
+        <span class="truncate mr-4">${item.bookTitle} <span class="text-noir/40">(${formatLabels[item.format] ?? item.format}${item.quantity > 1 ? " ×" + item.quantity : ""})</span></span>
+        <span class="shrink-0 font-semibold text-noir">${formatPrice(item.unitPrice * item.quantity, item.currency)}</span>
+      </div>
+    `).join("");
+
+    document.getElementById("sum-subtotal")!.textContent = formatPrice(subtotal, currency);
+
+    const taxRow = document.getElementById("sum-tax-row")!;
+    if (tax > 0) {
+      taxRow.classList.remove("hidden");
+      document.getElementById("sum-tax")!.textContent = formatPrice(tax, currency);
+    } else {
+      taxRow.classList.add("hidden");
+    }
+
+    const shipRow = document.getElementById("sum-shipping-row")!;
+    if (shippingCost > 0) {
+      shipRow.classList.remove("hidden");
+      document.getElementById("sum-shipping")!.textContent = formatPrice(shippingCost, currency);
+    } else {
+      shipRow.classList.add("hidden");
+    }
+
+    document.getElementById("sum-total")!.textContent = formatPrice(total, currency);
+  }
+
+  function updatePayBtn() {
+    const btn = document.getElementById("pay-btn") as HTMLButtonElement;
+    const cart = getCart();
+    const hasPhysical = cart.some((i) => i.format === "physical");
+    const name = (document.getElementById("cust-name") as HTMLInputElement)?.value.trim();
+    const shippingReady = !hasPhysical || (selectedDhlQuoteJson !== null);
+    btn.disabled = !emailVerified || !name || !shippingReady;
+  }
+
+  function showError(msg: string) {
+    const el = document.getElementById("checkout-error")!;
+    if (msg) { el.textContent = msg; el.classList.remove("hidden"); }
+    else { el.textContent = ""; el.classList.add("hidden"); }
+  }
+
+  // Update pay button state on name input
+  document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("cust-name")?.addEventListener("input", updatePayBtn);
+  });
+</script>
