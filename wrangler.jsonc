@@ -12,8 +12,8 @@
     {
       "binding": "DB",
       "database_name": "ncheta-store",
-      "database_id": "REPLACE_WITH_ID_FROM_wrangler_d1_create",
-      "preview_database_id": "REPLACE_WITH_ID_FROM_wrangler_d1_create",
+      "database_id": "9676da7a-2c28-445b-a500-dd33e43ba0e5",
+      "remote": true,
     },
   ],
   "r2_buckets": [
