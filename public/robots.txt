@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
+Disallow: /store/cart
+Disallow: /store/checkout
+Disallow: /store/order/
+Disallow: /admin/
 
 Sitemap: https://nchetamagazine.com/sitemap-index.xml

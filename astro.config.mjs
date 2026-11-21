@@ -19,5 +19,14 @@ export default defineConfig({
     },
   },
 
-  integrations: [pagefind(), sitemap()],
+  integrations: [
+    pagefind(),
+    sitemap({
+      filter: (page) =>
+        !page.includes("/store/cart") &&
+        !page.includes("/store/checkout") &&
+        !page.includes("/store/order/") &&
+        !page.includes("/admin/"),
+    }),
+  ],
 });

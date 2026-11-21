@@ -13,6 +13,7 @@ An independent African art and culture media company dedicated to documenting, p
 - **Search**: [Pagefind](https://pagefind.app/)
 - **OG Image Generation**: [Sharp](https://sharp.pixelplumbing.com/) & SVG Vector Templates
 - **Newsletter**: Kit (formerly ConvertKit) API integration via Cloudflare Pages Function
+- **CRM**: [HubSpot](https://www.hubspot.com/) for contact form submissions via Cloudflare Pages Function
 
 ---
 
@@ -92,3 +93,70 @@ npm run deploy
 ## 🌩️ Deployment & Hybrid SSR Mode
 
 - For instructions on switching from purely static output to **Hybrid SSR Mode** with `@astrojs/cloudflare` on Cloudflare Pages, see [HYBRID_SSR_GUIDE.md](docs/HYBRID_SSR_GUIDE.md).
+
+---
+
+## 🛒 Book Store — Deployment Checklist
+
+The store requires Cloudflare D1, R2, and several secrets. Complete these steps before going live:
+
+### 1. Create Cloudflare resources
+
+```bash
+# Create D1 database — copy the database_id from the output
+wrangler d1 create ncheta-store
+
+# Apply schema migrations
+wrangler d1 execute ncheta-store --file=migrations/0001_create_store_tables.sql
+
+# Create R2 bucket for digital files (private — no public access)
+wrangler r2 bucket create ncheta-digital-books
+
+# Regenerate TypeScript bindings
+wrangler types
+```
+
+Update `wrangler.jsonc` with the real `database_id` from step 1.
+
+### 2. Set Cloudflare secret environment variables
+
+In the Cloudflare Pages dashboard → Settings → Environment Variables (mark each as a **Secret**):
+
+| Variable | Description |
+|---|---|
+| `PAYSTACK_SECRET_KEY` | Paystack secret key (`sk_live_…`) |
+| `PAYSTACK_WEBHOOK_SECRET` | Paystack webhook secret |
+| `DHL_API_KEY` | DHL Express API key |
+| `DHL_API_SECRET` | DHL Express API secret |
+| `DHL_ACCOUNT_NUMBER` | DHL account number |
+| `RESEND_API_KEY` | Resend API key (`re_…`) |
+| `EMAIL_FROM_ADDRESS` | From address (e.g. `store@nchetamagazine.com`) |
+| `EMAIL_FROM_NAME` | From name (e.g. `Ncheta Magazine`) |
+| `STORE_PO_EMAIL` | Physical order notification email (`hello@nchetamagazine.com`) |
+| `ADMIN_USERNAME` | Admin panel username |
+| `ADMIN_PASSWORD` | Admin panel password |
+| `ADMIN_SESSION_SECRET` | 32+ character random string for HMAC signing |
+| `SANITY_WRITE_TOKEN` | Sanity token with write permissions (for R2 key patching) |
+
+### 3. Register Paystack webhook
+
+In the Paystack dashboard, register:
+`https://nchetamagazine.com/api/webhooks/paystack`
+
+Events to subscribe: `charge.success`, `refund.processed`
+
+### 4. Add books in Sanity Studio
+
+- Create book entries with the `book` schema: title, slug, cover image, formats (PDF/EPUB/physical)
+- For physical books: set weight (kg) and dimensions (cm) per format
+- Configure `storeSettings` singleton: DHL origin address, tax rate, buffer days, etc.
+
+### 5. Rate limiting (Cloudflare dashboard)
+
+Add a rate limiting rule in Cloudflare WAF for:
+- `/api/store/checkout` — max 5 requests per minute per IP
+- `/api/store/verify-email` — max 3 requests per 10 minutes per IP
+
+### 6. Admin panel
+
+Access at `/admin/orders`. Credentials are set via `ADMIN_USERNAME` / `ADMIN_PASSWORD` env vars.

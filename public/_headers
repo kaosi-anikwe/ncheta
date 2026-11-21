@@ -1,0 +1,16 @@
+# Cloudflare Pages _headers — applied before the Worker runs
+
+/store/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+/admin/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/api/*
+  X-Content-Type-Options: nosniff
+  Cache-Control: no-store
