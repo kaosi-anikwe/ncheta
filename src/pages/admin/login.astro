@@ -1,0 +1,65 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+
+const error = Astro.url.searchParams.has("error");
+const next = Astro.url.searchParams.get("next") ?? "/admin/orders";
+---
+
+<Layout title="Admin Login" description="Ncheta admin login">
+  <main class="min-h-screen bg-cotton flex items-center justify-center px-4">
+    <div class="w-full max-w-sm">
+      <p class="font-cinzel text-2xl font-bold text-noir text-center mb-8 tracking-widest uppercase">
+        Ncheta
+      </p>
+
+      {error && (
+        <div class="mb-4 p-3 border border-cherry/20 bg-cherry/5 text-cherry font-inter text-sm text-center">
+          Incorrect username or password.
+        </div>
+      )}
+
+      <form
+        method="POST"
+        action={`/api/admin/login?next=${encodeURIComponent(next)}`}
+        class="space-y-4"
+      >
+        <div>
+          <label for="username" class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+            Username
+          </label>
+          <input
+            id="username"
+            name="username"
+            type="text"
+            required
+            autocomplete="username"
+            class="w-full h-11 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir placeholder:text-noir/30"
+          />
+        </div>
+
+        <div>
+          <label for="password" class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+            Password
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autocomplete="current-password"
+            class="w-full h-11 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir"
+          />
+        </div>
+
+        <button
+          type="submit"
+          class="w-full h-11 bg-noir text-cotton font-inter text-sm font-medium hover:bg-maroon transition-colors"
+        >
+          Sign In
+        </button>
+      </form>
+    </div>
+  </main>
+</Layout>

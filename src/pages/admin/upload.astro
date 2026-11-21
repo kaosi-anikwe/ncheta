@@ -1,0 +1,160 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+import { getStoreBooks } from "../../sanity/queries";
+
+const books = await getStoreBooks().catch(() => []);
+
+const uploaded = Astro.url.searchParams.has("uploaded");
+const uploadedKey = Astro.url.searchParams.get("key") ?? "";
+const uploadError = Astro.url.searchParams.get("error") ?? "";
+---
+
+<Layout title="Upload — Admin" description="Upload digital book files">
+  <div class="min-h-screen bg-cotton">
+    <header class="border-b border-noir/10 bg-cotton px-6 py-4 flex items-center gap-6">
+      <span class="font-cinzel text-sm font-bold text-noir tracking-widest uppercase">Ncheta Admin</span>
+      <nav class="flex items-center gap-4 font-inter text-sm">
+        <a href="/admin/orders" class="text-noir/50 hover:text-noir transition-colors">Orders</a>
+        <a href="/admin/upload" class="text-noir font-semibold">Upload</a>
+      </nav>
+    </header>
+
+    <main class="max-w-xl mx-auto px-4 sm:px-6 py-8">
+      <h1 class="font-cinzel font-bold text-2xl text-noir mb-6">Upload Digital Book</h1>
+
+      {uploaded && (
+        <div class="mb-5 p-4 border border-lime/30 bg-lime/10 font-inter text-sm text-noir">
+          File uploaded successfully.
+          {uploadedKey && <span class="block text-xs text-noir/50 mt-1 font-mono">{uploadedKey}</span>}
+        </div>
+      )}
+
+      {uploadError && (
+        <div class="mb-5 p-4 border border-cherry/20 bg-cherry/5 font-inter text-sm text-cherry">
+          {uploadError === "size" ? "File too large. Maximum size is 100 MB." :
+           uploadError === "type" ? "Only PDF and EPUB files are allowed." :
+           uploadError === "book" ? "Book not found." :
+           "Upload failed. Please try again."}
+        </div>
+      )}
+
+      {books.length === 0 ? (
+        <p class="font-inter text-sm text-noir/50">No books found in Sanity. Add books to the CMS first.</p>
+      ) : (
+        <form
+          id="upload-form"
+          method="POST"
+          action="/api/admin/books/upload"
+          enctype="multipart/form-data"
+          class="space-y-5"
+        >
+          <div>
+            <label for="book_id" class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+              Book
+            </label>
+            <select
+              id="book_id"
+              name="book_id"
+              required
+              class="w-full h-11 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir"
+            >
+              <option value="">— Select book —</option>
+              {books.map((book) => (
+                <option value={book._id} data-slug={book.slug.current}>{book.title}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label for="format" class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+              Format
+            </label>
+            <select
+              id="format"
+              name="format"
+              required
+              class="w-full h-11 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir"
+            >
+              <option value="">— Select format —</option>
+              <option value="pdf">PDF</option>
+              <option value="epub">EPUB</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="file" class="block font-inter text-xs font-medium text-noir/50 uppercase tracking-wider mb-1.5">
+              File <span class="normal-case">(PDF or EPUB, max 100 MB)</span>
+            </label>
+            <input
+              id="file"
+              name="file"
+              type="file"
+              required
+              accept=".pdf,.epub,application/pdf,application/epub+zip"
+              class="w-full font-inter text-sm text-noir file:mr-3 file:h-9 file:px-4 file:border-0 file:bg-noir file:text-cotton file:font-inter file:text-xs file:font-medium file:cursor-pointer hover:file:bg-maroon"
+            />
+          </div>
+
+          <div id="progress-wrap" class="hidden">
+            <div class="h-1 bg-noir/10 w-full">
+              <div id="progress-bar" class="h-1 bg-noir transition-all duration-200" style="width:0%"></div>
+            </div>
+            <p id="progress-label" class="font-inter text-xs text-noir/40 mt-1">Uploading…</p>
+          </div>
+
+          <button
+            type="submit"
+            id="submit-btn"
+            class="h-11 px-8 bg-noir text-cotton font-inter text-sm font-medium hover:bg-maroon transition-colors"
+          >
+            Upload
+          </button>
+        </form>
+      )}
+    </main>
+  </div>
+</Layout>
+
+<script>
+  const form = document.getElementById("upload-form") as HTMLFormElement | null;
+  const progressWrap = document.getElementById("progress-wrap");
+  const progressBar = document.getElementById("progress-bar") as HTMLElement | null;
+  const progressLabel = document.getElementById("progress-label");
+  const submitBtn = document.getElementById("submit-btn") as HTMLButtonElement | null;
+
+  form?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const xhr = new XMLHttpRequest();
+
+    xhr.upload.onprogress = (ev) => {
+      if (ev.lengthComputable && progressBar && progressLabel && progressWrap) {
+        progressWrap.classList.remove("hidden");
+        const pct = Math.round((ev.loaded / ev.total) * 100);
+        progressBar.style.width = pct + "%";
+        progressLabel.textContent = `Uploading… ${pct}%`;
+      }
+    };
+
+    xhr.onload = () => {
+      if (xhr.status >= 200 && xhr.status < 400) {
+        try {
+          const res = JSON.parse(xhr.responseText);
+          if (res.success) {
+            window.location.href = `/admin/upload?uploaded=1&key=${encodeURIComponent(res.r2Key ?? "")}`;
+            return;
+          }
+        } catch {}
+      }
+      window.location.href = "/admin/upload?error=upload";
+    };
+
+    xhr.onerror = () => { window.location.href = "/admin/upload?error=upload"; };
+
+    if (submitBtn) submitBtn.disabled = true;
+    xhr.open("POST", "/api/admin/books/upload");
+    xhr.send(data);
+  });
+</script>

@@ -1,0 +1,201 @@
+---
+export const prerender = false;
+
+import Layout from "../../layouts/Layout.astro";
+
+const env = Astro.locals.runtime.env;
+
+const page = Number(Astro.url.searchParams.get("page") ?? "1");
+const limit = 25;
+const offset = (page - 1) * limit;
+const statusFilter = Astro.url.searchParams.get("status") ?? "";
+const search = Astro.url.searchParams.get("q") ?? "";
+
+type OrderRow = {
+  id: string; reference: string; status: string; order_type: string;
+  customer_name: string; customer_email: string;
+  total_amount: number; currency: string; created_at: string;
+};
+
+let query = "SELECT id, reference, status, order_type, customer_name, customer_email, total_amount, currency, created_at FROM orders";
+const conditions: string[] = [];
+const binds: (string | number)[] = [];
+
+if (statusFilter) { conditions.push("status = ?"); binds.push(statusFilter); }
+if (search) {
+  conditions.push("(reference LIKE ? OR customer_email LIKE ? OR customer_name LIKE ?)");
+  const like = `%${search}%`;
+  binds.push(like, like, like);
+}
+if (conditions.length) query += " WHERE " + conditions.join(" AND ");
+query += " ORDER BY created_at DESC LIMIT ? OFFSET ?";
+binds.push(limit, offset);
+
+const countQuery = "SELECT COUNT(*) as n FROM orders" + (conditions.length ? " WHERE " + conditions.join(" AND ") : "");
+
+const [ordersResult, countResult] = await Promise.all([
+  env.DB.prepare(query).bind(...binds).all<OrderRow>(),
+  env.DB.prepare(countQuery).bind(...binds.slice(0, -2)).first<{ n: number }>(),
+]);
+
+const orders = ordersResult.results;
+const total = countResult?.n ?? 0;
+const totalPages = Math.ceil(total / limit);
+
+function formatPrice(amount: number, cur: string): string {
+  if (cur === "NGN") return "₦" + (amount / 100).toLocaleString("en-NG", { minimumFractionDigits: 0 });
+  return "$" + (amount / 100).toFixed(2);
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleString("en-NG", { dateStyle: "medium", timeStyle: "short" });
+}
+
+const statusColors: Record<string, string> = {
+  pending: "text-noir/40",
+  paid: "text-lime font-semibold",
+  failed: "text-cherry",
+  refunded: "text-noir/40 line-through",
+  dispatched: "text-lime font-semibold",
+};
+
+const statuses = ["", "pending", "paid", "dispatched", "failed", "refunded"];
+const statusLabels: Record<string, string> = {
+  "": "All", pending: "Pending", paid: "Paid", dispatched: "Dispatched", failed: "Failed", refunded: "Refunded",
+};
+
+function buildUrl(params: Record<string, string>): string {
+  const u = new URL(Astro.url);
+  for (const [k, v] of Object.entries(params)) {
+    if (v) u.searchParams.set(k, v); else u.searchParams.delete(k);
+  }
+  u.searchParams.delete("page");
+  return u.pathname + u.search;
+}
+---
+
+<Layout title="Orders — Admin" description="Ncheta admin orders">
+  <div class="min-h-screen bg-cotton">
+
+    <!-- Nav -->
+    <header class="border-b border-noir/10 bg-cotton px-6 py-4 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-6">
+        <span class="font-cinzel text-sm font-bold text-noir tracking-widest uppercase">Ncheta Admin</span>
+        <nav class="hidden sm:flex items-center gap-4 font-inter text-sm">
+          <a href="/admin/orders" class="text-noir font-semibold">Orders</a>
+          <a href="/admin/upload" class="text-noir/50 hover:text-noir transition-colors">Upload</a>
+        </nav>
+      </div>
+      <form method="POST" action="/api/admin/logout">
+        <button class="font-inter text-xs text-noir/40 hover:text-noir transition-colors">Sign out</button>
+      </form>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8">
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <h1 class="font-cinzel font-bold text-2xl text-noir">Orders</h1>
+        <p class="font-inter text-sm text-noir/40">{total} total</p>
+      </div>
+
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center gap-3 mb-6">
+        <!-- Status tabs -->
+        <div class="flex items-center gap-1 border border-noir/15 p-0.5">
+          {statuses.map((s) => (
+            <a
+              href={buildUrl({ status: s, q: search })}
+              class:list={[
+                "px-3 py-1.5 font-inter text-xs font-medium transition-colors",
+                statusFilter === s
+                  ? "bg-noir text-cotton"
+                  : "text-noir/50 hover:text-noir",
+              ]}
+            >
+              {statusLabels[s]}
+            </a>
+          ))}
+        </div>
+
+        <!-- Search -->
+        <form method="GET" action="/admin/orders" class="flex items-center gap-2">
+          <input type="hidden" name="status" value={statusFilter} />
+          <input
+            name="q"
+            value={search}
+            placeholder="Search reference, email, name…"
+            class="h-9 px-3 border border-noir/20 bg-cotton font-inter text-sm text-noir focus:outline-none focus:border-noir placeholder:text-noir/30 w-64"
+          />
+          <button class="h-9 px-4 bg-noir text-cotton font-inter text-sm hover:bg-maroon transition-colors">
+            Search
+          </button>
+          {search && (
+            <a href={buildUrl({ status: statusFilter, q: "" })} class="font-inter text-xs text-noir/40 hover:text-noir">
+              Clear
+            </a>
+          )}
+        </form>
+      </div>
+
+      <!-- Table -->
+      {orders.length === 0 ? (
+        <div class="text-center py-16 font-inter text-noir/30">No orders found.</div>
+      ) : (
+        <div class="border border-noir/10 overflow-x-auto">
+          <table class="w-full font-inter text-sm">
+            <thead>
+              <tr class="border-b border-noir/10 text-left">
+                <th class="px-4 py-3 font-semibold text-noir/60 text-xs uppercase tracking-wider">Reference</th>
+                <th class="px-4 py-3 font-semibold text-noir/60 text-xs uppercase tracking-wider">Customer</th>
+                <th class="px-4 py-3 font-semibold text-noir/60 text-xs uppercase tracking-wider">Type</th>
+                <th class="px-4 py-3 font-semibold text-noir/60 text-xs uppercase tracking-wider">Total</th>
+                <th class="px-4 py-3 font-semibold text-noir/60 text-xs uppercase tracking-wider">Status</th>
+                <th class="px-4 py-3 font-semibold text-noir/60 text-xs uppercase tracking-wider">Date</th>
+                <th class="px-4 py-3"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-noir/5">
+              {orders.map((order) => (
+                <tr class="hover:bg-noir/2 transition-colors">
+                  <td class="px-4 py-3 font-mono text-xs text-noir/70">{order.reference}</td>
+                  <td class="px-4 py-3">
+                    <div class="font-medium text-noir">{order.customer_name}</div>
+                    <div class="text-xs text-noir/40">{order.customer_email}</div>
+                  </td>
+                  <td class="px-4 py-3 capitalize text-noir/60">{order.order_type}</td>
+                  <td class="px-4 py-3 font-semibold text-noir tabular-nums">{formatPrice(order.total_amount, order.currency)}</td>
+                  <td class:list={["px-4 py-3 capitalize", statusColors[order.status] ?? "text-noir/50"]}>
+                    {order.status}
+                  </td>
+                  <td class="px-4 py-3 text-noir/40 text-xs">{formatDate(order.created_at)}</td>
+                  <td class="px-4 py-3">
+                    <a href={`/admin/orders/${order.reference}`} class="text-xs text-maroon hover:underline">View</a>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <!-- Pagination -->
+      {totalPages > 1 && (
+        <div class="flex items-center justify-between mt-6 font-inter text-sm">
+          <p class="text-noir/40">Page {page} of {totalPages}</p>
+          <div class="flex gap-2">
+            {page > 1 && (
+              <a href={`?page=${page - 1}&status=${statusFilter}&q=${search}`} class="h-9 px-4 border border-noir/20 text-noir hover:border-noir flex items-center transition-colors">
+                Previous
+              </a>
+            )}
+            {page < totalPages && (
+              <a href={`?page=${page + 1}&status=${statusFilter}&q=${search}`} class="h-9 px-4 border border-noir/20 text-noir hover:border-noir flex items-center transition-colors">
+                Next
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+    </main>
+  </div>
+</Layout>
